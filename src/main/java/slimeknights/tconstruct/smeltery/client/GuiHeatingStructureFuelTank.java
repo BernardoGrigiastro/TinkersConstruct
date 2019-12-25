@@ -1,8 +1,7 @@
 package slimeknights.tconstruct.smeltery.client;
 
 import com.google.common.collect.Lists;
-
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
 import net.minecraftforge.fluids.FluidStack;
 
 import java.util.List;
@@ -47,7 +46,7 @@ public class GuiHeatingStructureFuelTank extends GuiMultiModule {
   protected void drawFuelTooltip(int mouseX, int mouseY) {
     List<String> text = Lists.newArrayList();
     FluidStack fuel = fuelInfo.fluid;
-    text.add(TextFormatting.WHITE + Util.translate("gui.smeltery.fuel"));
+    text.add(TextFormat.field_1068 + Util.translate("gui.smeltery.fuel"));
     if(fuel != null) {
       if(TinkerRegistry.isSmelteryFuel(fuel)) {
         text.add(fuel.getLocalizedName());

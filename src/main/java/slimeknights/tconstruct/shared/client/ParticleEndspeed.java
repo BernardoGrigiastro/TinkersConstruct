@@ -11,11 +11,11 @@ public class ParticleEndspeed extends Particle {
     //this.setAlphaF(0.9f);
     this.setParticleTextureIndex(176);
     this.particleScale = 1f;
-    this.particleMaxAge = 20;
+    this.maxAge = 20;
 
-    this.motionX = xSpeedIn;
-    this.motionY = ySpeedIn;
-    this.motionZ = zSpeedIn;
+    this.velocityX = xSpeedIn;
+    this.velocityY = ySpeedIn;
+    this.velocityZ = zSpeedIn;
   }
 
   @Override
@@ -23,6 +23,6 @@ public class ParticleEndspeed extends Particle {
     super.onUpdate();
 
     //this.particleScale -= 0.0001f;
-    this.particleAlpha -= 0.05f;
+    this.colorAlpha -= 0.05f;
   }
 }

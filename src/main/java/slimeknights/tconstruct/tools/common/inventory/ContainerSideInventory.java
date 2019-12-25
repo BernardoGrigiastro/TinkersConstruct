@@ -1,14 +1,14 @@
 package slimeknights.tconstruct.tools.common.inventory;
 
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Slot;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
 import slimeknights.mantle.inventory.BaseContainer;
 
-public class ContainerSideInventory<T extends TileEntity> extends BaseContainer<T> {
+public class ContainerSideInventory<T extends BlockEntity> extends BaseContainer<T> {
 
   public final int columns;
   public final int slotCount;

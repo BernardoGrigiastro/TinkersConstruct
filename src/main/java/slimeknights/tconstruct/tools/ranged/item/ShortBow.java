@@ -5,7 +5,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -48,7 +48,7 @@ public class ShortBow extends BowCore implements ICustomCrosshairUser {
   }
 
   @Override
-  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
     if(this.isInCreativeTab(tab)) {
       addDefaultSubItems(subItems, null, null, TinkerMaterials.string);
     }

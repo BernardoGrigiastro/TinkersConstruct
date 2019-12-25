@@ -2,8 +2,7 @@ package slimeknights.tconstruct.tools.traits;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
-
+import net.minecraft.text.TextFormat;
 import slimeknights.tconstruct.library.traits.AbstractTrait;
 
 // This basically is Reinforced 3 with a twist.
@@ -13,7 +12,7 @@ import slimeknights.tconstruct.library.traits.AbstractTrait;
 public class TraitDuritos extends AbstractTrait {
 
   public TraitDuritos() {
-    super("duritos", TextFormatting.LIGHT_PURPLE);
+    super("duritos", TextFormat.field_1076);
   }
 
   @Override

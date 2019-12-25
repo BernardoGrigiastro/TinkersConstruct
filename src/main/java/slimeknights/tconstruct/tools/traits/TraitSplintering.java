@@ -3,8 +3,7 @@ package slimeknights.tconstruct.tools.traits;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.text.TextFormatting;
-
+import net.minecraft.text.TextFormat;
 import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.potion.TinkerPotion;
 import slimeknights.tconstruct.library.traits.AbstractTrait;
@@ -14,7 +13,7 @@ public class TraitSplintering extends AbstractTrait {
   public static TinkerPotion Splinter = new TinkerPotion(Util.getResource("splinter"), true, false);
 
   public TraitSplintering() {
-    super("splintering", TextFormatting.WHITE);
+    super("splintering", TextFormat.field_1068);
   }
 
   @Override

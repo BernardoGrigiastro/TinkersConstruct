@@ -3,6 +3,7 @@ package slimeknights.tconstruct.world.block;
 import com.google.common.collect.Lists;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.BlockRenderLayer;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -10,9 +11,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -33,7 +33,7 @@ public class BlockSlimeLeaves extends BlockLeaves {
     this.setCreativeTab(TinkerRegistry.tabWorld);
     this.setHardness(0.3f);
 
-    this.setDefaultState(this.blockState.getBaseState().withProperty(CHECK_DECAY, false).withProperty(DECAYABLE, true));
+    this.setDefaultState(this.stateFactory.getBaseState().withProperty(CHECK_DECAY, false).withProperty(DECAYABLE, true));
   }
 
   @Override
@@ -42,7 +42,7 @@ public class BlockSlimeLeaves extends BlockLeaves {
   }
 
   @Override
-  public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
     for(FoliageType type : FoliageType.values()) {
       list.add(new ItemStack(this, 1, getMetaFromState(this.getDefaultState().withProperty(BlockSlimeGrass.FOLIAGE, type))));
     }
@@ -81,13 +81,13 @@ public class BlockSlimeLeaves extends BlockLeaves {
 
   @Override
   protected void dropApple(World worldIn, BlockPos pos, IBlockState state, int chance) {
-    if(worldIn.rand.nextInt(chance) == 0) {
+    if(worldIn.random.nextInt(chance) == 0) {
       ItemStack stack = null;
       if(state.getValue(BlockSlimeGrass.FOLIAGE) == FoliageType.PURPLE) {
         stack = TinkerCommons.matSlimeBallPurple.copy();
       }
       else if(state.getValue(BlockSlimeGrass.FOLIAGE) == FoliageType.BLUE) {
-        if(worldIn.rand.nextInt(3) == 0) {
+        if(worldIn.random.nextInt(3) == 0) {
           stack = TinkerCommons.matSlimeBallBlue.copy();
         }
         else {

@@ -1,13 +1,12 @@
 package slimeknights.tconstruct.library.client;
 
-import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.util.Identifier;
 import slimeknights.mantle.client.gui.GuiElement;
 import slimeknights.tconstruct.library.Util;
 
 public interface Icons {
 
-  ResourceLocation ICON = Util.getResource("textures/gui/icons.png");
+  Identifier ICON = Util.getResource("textures/gui/icons.png");
 
   GuiElement ICON_Anvil = new GuiElement(18 * 3, 0, 18, 18, 256, 256);
   GuiElement ICON_Pattern = new GuiElement(18 * 0, 18 * 12, 18, 18);

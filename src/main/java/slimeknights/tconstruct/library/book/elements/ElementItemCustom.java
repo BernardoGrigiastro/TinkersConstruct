@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.library.book.elements;
 
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
@@ -18,14 +18,14 @@ public class ElementItemCustom extends ElementItem {
   }
 
   @Override
-  public void draw(int mouseX, int mouseY, float partialTicks, FontRenderer fontRenderer) {
+  public void draw(int mouseX, int mouseY, float partialTicks, TextRenderer fontRenderer) {
     GlStateManager.translate(0, 0, -depth);
     super.draw(mouseX, mouseY, partialTicks, fontRenderer);
     GlStateManager.translate(0, 0, depth);
   }
 
   @Override
-  public void drawOverlay(int mouseX, int mouseY, float partialTicks, FontRenderer fontRenderer) {
+  public void drawOverlay(int mouseX, int mouseY, float partialTicks, TextRenderer fontRenderer) {
     // no tooltip
   }
 }

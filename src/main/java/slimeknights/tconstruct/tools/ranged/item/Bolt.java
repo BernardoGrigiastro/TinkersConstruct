@@ -4,12 +4,12 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.DamageSource;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EntityDamageSourceIndirect;
-import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.common.config.Config;
 import slimeknights.tconstruct.library.TinkerRegistry;
@@ -56,7 +56,7 @@ public class Bolt extends ProjectileCore {
   }
 
   @Override
-  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
     if(this.isInCreativeTab(tab)) {
       for(Material head : TinkerRegistry.getAllMaterials()) {
         List<Material> mats = new ArrayList<>(3);
@@ -105,7 +105,7 @@ public class Bolt extends ProjectileCore {
 
   @Nonnull
   @Override
-  public ItemStack buildItemFromStacks(NonNullList<ItemStack> inputStacks) {
+  public ItemStack buildItemFromStacks(DefaultedList<ItemStack> inputStacks) {
     List<ItemStack> stacks = inputStacks.stream().filter(itemStack -> !itemStack.isEmpty()).collect(Collectors.toList());
     if(stacks.size() != 2) {
       return ItemStack.EMPTY;

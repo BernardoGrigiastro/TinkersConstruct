@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.gadgets;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.item.ItemColorMap;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -42,14 +42,14 @@ public class GadgetClientProxy extends ClientProxy {
 
   @Override
   public void init() {
-    Minecraft minecraft = Minecraft.getMinecraft();
+    MinecraftClient minecraft = MinecraftClient.getMinecraft();
 
     // slime channels
     minecraft.getBlockColors().registerBlockColorHandler(
         (@Nonnull IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) -> state.getValue(BlockSlimeChannel.TYPE).getColor(),
         TinkerGadgets.slimeChannel);
 
-    ItemColors colors = minecraft.getItemColors();
+    ItemColorMap colors = minecraft.getItemColors();
     colors.registerItemColorHandler(
         (@Nonnull ItemStack stack, int tintIndex) -> BlockSlime.SlimeType.fromMeta(stack.getItemDamage()).getColor(),
         TinkerGadgets.slimeChannel);

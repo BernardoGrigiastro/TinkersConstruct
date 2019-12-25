@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.BlockRenderLayer;
+import net.minecraft.block.Material;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
@@ -14,12 +14,12 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -37,13 +37,13 @@ public class BlockGlow extends Block {
   public static PropertyDirection FACING = PropertyDirection.create("facing");
 
   public BlockGlow() {
-    super(Material.CIRCUITS);
+    super(Material.PART);
     this.setTickRandomly(true);
     this.setHardness(0.0F);
     this.setLightLevel(0.9375F);
-    this.setSoundType(SoundType.CLOTH);
+    this.setSoundType(BlockSoundGroup.WOOL);
 
-    this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.DOWN));
+    this.setDefaultState(this.stateFactory.getBaseState().withProperty(FACING, EnumFacing.DOWN));
   }
 
   @Nonnull
@@ -65,7 +65,7 @@ public class BlockGlow extends Block {
 
   @Nonnull
   @Override
-  public ItemStack getPickBlock(@Nonnull IBlockState state, RayTraceResult target, @Nonnull World world, @Nonnull BlockPos pos, EntityPlayer player) {
+  public ItemStack getPickBlock(@Nonnull IBlockState state, HitResult target, @Nonnull World world, @Nonnull BlockPos pos, EntityPlayer player) {
     // only use the glowball for pickblock if it was loaded (which happens when gadgets is loaded)
     if(TinkerGadgets.throwball != null) {
       return new ItemStack(TinkerGadgets.throwball, 1, ItemThrowball.ThrowballType.GLOW.ordinal());
@@ -116,7 +116,7 @@ public class BlockGlow extends Block {
 
       // if the location is valid, place the block directly
       if(this.canBlockStay(world, pos, facing)) {
-        if(!world.isRemote) {
+        if(!world.isClient) {
           world.setBlockState(pos, getDefaultState().withProperty(FACING, facing));
         }
         return true;
@@ -125,7 +125,7 @@ public class BlockGlow extends Block {
       else {
         for(EnumFacing enumfacing : EnumFacing.VALUES) {
           if(this.canBlockStay(world, pos, enumfacing)) {
-            if(!world.isRemote) {
+            if(!world.isClient) {
               world.setBlockState(pos, getDefaultState().withProperty(FACING, enumfacing));
             }
             return true;
@@ -142,28 +142,28 @@ public class BlockGlow extends Block {
   }
 
   /* Bounds */
-  private static final ImmutableMap<EnumFacing, AxisAlignedBB> BOUNDS;
+  private static final ImmutableMap<EnumFacing, BoundingBox> BOUNDS;
 
   static {
-    ImmutableMap.Builder<EnumFacing, AxisAlignedBB> builder = ImmutableMap.builder();
-    builder.put(EnumFacing.UP, new AxisAlignedBB(0.0D, 0.9375D, 0.0D, 1.0D, 1.0D, 1.0D));
-    builder.put(EnumFacing.DOWN, new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.0625D, 1.0D));
-    builder.put(EnumFacing.NORTH, new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 0.0625D));
-    builder.put(EnumFacing.SOUTH, new AxisAlignedBB(0.0D, 0.0D, 0.9375D, 1.0D, 1.0D, 1.0D));
-    builder.put(EnumFacing.EAST, new AxisAlignedBB(0.9375D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D));
-    builder.put(EnumFacing.WEST, new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.0625D, 1.0D, 1.0D));
+    ImmutableMap.Builder<EnumFacing, BoundingBox> builder = ImmutableMap.builder();
+    builder.put(EnumFacing.UP, new BoundingBox(0.0D, 0.9375D, 0.0D, 1.0D, 1.0D, 1.0D));
+    builder.put(EnumFacing.DOWN, new BoundingBox(0.0D, 0.0D, 0.0D, 1.0D, 0.0625D, 1.0D));
+    builder.put(EnumFacing.NORTH, new BoundingBox(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 0.0625D));
+    builder.put(EnumFacing.SOUTH, new BoundingBox(0.0D, 0.0D, 0.9375D, 1.0D, 1.0D, 1.0D));
+    builder.put(EnumFacing.EAST, new BoundingBox(0.9375D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D));
+    builder.put(EnumFacing.WEST, new BoundingBox(0.0D, 0.0D, 0.0D, 0.0625D, 1.0D, 1.0D));
 
     BOUNDS = builder.build();
   }
 
   @Nonnull
   @Override
-  public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+  public BoundingBox getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
     return BOUNDS.get(state.getValue(FACING));
   }
 
   @Override
-  public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+  public BoundingBox getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
     return NULL_AABB;
   }
 
@@ -196,6 +196,6 @@ public class BlockGlow extends Block {
   }
 
   @Override
-  public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
   }
 }

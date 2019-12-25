@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.DefaultedList;
 import net.minecraftforge.oredict.OreDictionary;
 import slimeknights.mantle.client.CreativeTab;
 
@@ -68,7 +68,7 @@ public final class RecipeUtil {
 
     // ensure we do not return a wildcard value
     if(preference.getMetadata() == OreDictionary.WILDCARD_VALUE) {
-      NonNullList<ItemStack> subItems = NonNullList.create();
+      DefaultedList<ItemStack> subItems = DefaultedList.create();
       preference.getItem().getSubItems(CreativeTab.SEARCH, subItems);
       // just in case
       if(subItems.isEmpty()) {

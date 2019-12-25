@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.smeltery.network;
 
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.tileentity.TileEntity;
 import io.netty.buffer.ByteBuf;
 import slimeknights.mantle.inventory.BaseContainer;
 import slimeknights.mantle.network.AbstractPacketThreadsafe;
@@ -29,7 +29,7 @@ public class SmelteryFluidClicked extends AbstractPacketThreadsafe {
   @Override
   public void handleServerSafe(NetHandlerPlayServer netHandler) {
     if(netHandler.player.openContainer instanceof BaseContainer) {
-      TileEntity te = ((BaseContainer<?>) netHandler.player.openContainer).getTile();
+      BlockEntity te = ((BaseContainer<?>) netHandler.player.openContainer).getTile();
       if(te instanceof ISmelteryTankHandler) {
         ISmelteryTankHandler smeltery = (ISmelteryTankHandler)te;
 

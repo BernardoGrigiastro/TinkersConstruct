@@ -5,11 +5,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import gnu.trove.map.hash.THashMap;
-
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.texture.Sprite;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ItemLayerModel;
 import net.minecraftforge.common.model.IModelState;
@@ -46,28 +45,28 @@ public class ModifierModel implements IModel {
   }
 
   @Override
-  public Collection<ResourceLocation> getDependencies() {
+  public Collection<Identifier> getDependencies() {
     return ImmutableList.of(); // none
   }
 
   @Override
-  public Collection<ResourceLocation> getTextures() {
-    ImmutableSet.Builder<ResourceLocation> builder = ImmutableSet.builder();
+  public Collection<Identifier> getTextures() {
+    ImmutableSet.Builder<Identifier> builder = ImmutableSet.builder();
 
     for(String texture : models.values()) {
-      builder.add(new ResourceLocation(texture));
+      builder.add(new Identifier(texture));
     }
 
     return builder.build();
   }
 
   @Override
-  public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+  public IBakedModel bake(IModelState state, VertexFormat format, Function<Identifier, Sprite> bakedTextureGetter) {
     throw new UnsupportedOperationException("The modifier-Model is not built to be used as an item model");
   }
 
   public Map<String, IBakedModel> bakeModels(IModelState state, VertexFormat format,
-                                             Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+                                             Function<Identifier, Sprite> bakedTextureGetter) {
     Map<String, IBakedModel> bakedModels = new THashMap<>();
 
     // we scale the modifier up slightly so it's always above the tool
@@ -80,7 +79,7 @@ public class ModifierModel implements IModel {
       // if this check ever causes an NPE then a modifier has been removed between model loading and model baking
       IModifier modifier = TinkerRegistry.getModifier(entry.getKey());
       if(modifier != null && modifier.hasTexturePerMaterial()) {
-        MaterialModel materialModel = new MaterialModel(ImmutableList.of(new ResourceLocation(entry.getValue())));
+        MaterialModel materialModel = new MaterialModel(ImmutableList.of(new Identifier(entry.getValue())));
         BakedMaterialModel bakedModel = materialModel.bakeIt(state, format, bakedTextureGetter);
         for(Material material : TinkerRegistry.getAllMaterials()) {
           IBakedModel materialBakedModel = bakedModel.getModelByIdentifier(material.getIdentifier());

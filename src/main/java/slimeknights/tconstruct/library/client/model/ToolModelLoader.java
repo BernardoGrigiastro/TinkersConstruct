@@ -9,7 +9,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.client.model.ICustomModelLoader;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
@@ -34,19 +34,19 @@ public class ToolModelLoader implements ICustomModelLoader {
   public static String EXTENSION = ".tcon";
 
   // used to create only actually needed textures in the texturegenerator instead of ALL materials for all parts
-  private static final Map<ResourceLocation, ToolCore> modelItemMap = Maps.newHashMap();
+  private static final Map<Identifier, ToolCore> modelItemMap = Maps.newHashMap();
 
-  public static void addPartMapping(ResourceLocation resourceLocation, ToolCore tool) {
+  public static void addPartMapping(Identifier resourceLocation, ToolCore tool) {
     modelItemMap.put(resourceLocation, tool);
   }
 
   @Override
-  public boolean accepts(ResourceLocation modelLocation) {
+  public boolean accepts(Identifier modelLocation) {
     return modelLocation.getResourcePath().endsWith(EXTENSION); // tinkertoolmodel extension. Foo.tcon.json
   }
 
   @Override
-  public IModel loadModel(ResourceLocation modelLocation) {
+  public IModel loadModel(Identifier modelLocation) {
     try {
       // Modelblock is used since our format is compatible to the vanilla format
       // and we don't have to write our own json deserializer
@@ -62,7 +62,7 @@ public class ToolModelLoader implements ICustomModelLoader {
         rotations = new Float[0];
       }
 
-      ImmutableList.Builder<ResourceLocation> defaultTextureListBuilder = ImmutableList.builder();
+      ImmutableList.Builder<Identifier> defaultTextureListBuilder = ImmutableList.builder();
       List<MaterialModel> parts = Lists.newArrayList();
       List<MaterialModel> brokenParts = Lists.newArrayList();
 
@@ -88,7 +88,7 @@ public class ToolModelLoader implements ICustomModelLoader {
             continue;
           }
 
-          ResourceLocation location = new ResourceLocation(entry.getValue());
+          Identifier location = new Identifier(entry.getValue());
           MaterialModel partModel = new MaterialModel(ImmutableList.of(location));
           while(listToAdd.size() <= i) {
             listToAdd.add(null);
@@ -124,7 +124,7 @@ public class ToolModelLoader implements ICustomModelLoader {
               continue;
             }
 
-            ResourceLocation location = new ResourceLocation(entry.getValue());
+            Identifier location = new Identifier(entry.getValue());
             MaterialModel partModel = new MaterialModel(ImmutableList.of(location));
             mapToAdd.put(i, partModel);
 
@@ -181,7 +181,7 @@ public class ToolModelLoader implements ICustomModelLoader {
     return ModelLoaderRegistry.getMissingModel();
   }
 
-  private void registerCustomTextures(int i, ResourceLocation resourceLocation, ToolCore toolCore) {
+  private void registerCustomTextures(int i, Identifier resourceLocation, ToolCore toolCore) {
     if(toolCore == null) {
       CustomTextureCreator.registerTexture(resourceLocation);
     }

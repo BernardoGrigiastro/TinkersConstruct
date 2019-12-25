@@ -3,11 +3,11 @@ package slimeknights.tconstruct.world;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.block.BlockColorMap;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.IStateMapper;
 import net.minecraft.client.renderer.block.statemap.StateMap;
-import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -30,7 +30,7 @@ import slimeknights.tconstruct.world.entity.EntityBlueSlime;
 public class WorldClientProxy extends ClientProxy {
 
   public static SlimeColorizer slimeColorizer = new SlimeColorizer();
-  public static Minecraft minecraft = Minecraft.getMinecraft();
+  public static MinecraftClient minecraft = MinecraftClient.getMinecraft();
 
   @Override
   public void preInit() {
@@ -44,7 +44,7 @@ public class WorldClientProxy extends ClientProxy {
 
   @Override
   public void init() {
-    final BlockColors blockColors = minecraft.getBlockColors();
+    final BlockColorMap blockColors = minecraft.getBlockColors();
 
     // slime grass, slime tall grass, and slime leaves
     blockColors.registerBlockColorHandler(

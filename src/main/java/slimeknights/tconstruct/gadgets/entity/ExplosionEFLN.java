@@ -3,15 +3,15 @@ package slimeknights.tconstruct.gadgets.entity;
 import com.google.common.collect.ImmutableSet;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -40,7 +40,7 @@ public class ExplosionEFLN extends Explosion {
     ImmutableSet.Builder<BlockPos> builder = ImmutableSet.builder();
 
     // we do a sphere of a certain radius, and check if the blockpos is inside the radius
-    float r = size * size;
+    float r = power * power;
     int i = (int) r + 1;
 
     for(int j = -i; j < i; ++j) {
@@ -56,13 +56,13 @@ public class ExplosionEFLN extends Explosion {
             }
 
             // explosion "strength" at the current position
-            float f = this.size * (1f - d / (r));
+            float f = this.power * (1f - d / (r));
             IBlockState iblockstate = this.world.getBlockState(blockpos);
 
-            float f2 = this.exploder != null ? this.exploder.getExplosionResistance(this, this.world, blockpos, iblockstate) : iblockstate.getBlock().getExplosionResistance(world, blockpos, null, this);
+            float f2 = this.entity != null ? this.entity.getExplosionResistance(this, this.world, blockpos, iblockstate) : iblockstate.getBlock().getExplosionResistance(world, blockpos, null, this);
             f -= (f2 + 0.3F) * 0.3F;
 
-            if(f > 0.0F && (this.exploder == null || this.exploder.canExplosionDestroyBlock(this, this.world, blockpos, iblockstate, f))) {
+            if(f > 0.0F && (this.entity == null || this.entity.canExplosionDestroyBlock(this, this.world, blockpos, iblockstate, f))) {
               builder.add(blockpos);
             }
           }
@@ -75,7 +75,7 @@ public class ExplosionEFLN extends Explosion {
 
   @Override
   public void doExplosionB(boolean spawnParticles) {
-    this.world.playSound(null, this.x, this.y, this.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F) * 0.7F);
+    this.world.playSound(null, this.x, this.y, this.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.field_15245, 4.0F, (1.0F + (this.world.random.nextFloat() - this.world.random.nextFloat()) * 0.2F) * 0.7F);
 
     this.world.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, this.x, this.y, this.z, 1.0D, 0.0D, 0.0D);
 
@@ -116,7 +116,7 @@ public class ExplosionEFLN extends Explosion {
   }
 
   public void addAffectedBlock(BlockPos blockPos) {
-    this.affectedBlockPositions.add(blockPos);
+    this.affectedBlocks.add(blockPos);
   }
 
 }

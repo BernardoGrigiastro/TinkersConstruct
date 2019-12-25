@@ -5,10 +5,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonUtils;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.IRecipeFactory;
@@ -21,7 +21,7 @@ public class ShapedFallbackRecipe extends ShapedOreRecipe {
 
   private Ingredient[] ignore;
   private int need;
-  public ShapedFallbackRecipe(ResourceLocation group, ItemStack result, CraftingHelper.ShapedPrimer primer, Ingredient[] ignore, int need) {
+  public ShapedFallbackRecipe(Identifier group, ItemStack result, CraftingHelper.ShapedPrimer primer, Ingredient[] ignore, int need) {
     super(group, result, primer);
     this.ignore = ignore;
     this.need = need;
@@ -54,7 +54,7 @@ public class ShapedFallbackRecipe extends ShapedOreRecipe {
 
   public static class Factory implements IRecipeFactory {
     @Override
-    public IRecipe parse(JsonContext context, JsonObject json) {
+    public Recipe parse(JsonContext context, JsonObject json) {
       // use shaped parser to start
       ShapedOreRecipe recipe = ShapedOreRecipe.factory(context, json);
       CraftingHelper.ShapedPrimer primer = new CraftingHelper.ShapedPrimer();
@@ -62,7 +62,7 @@ public class ShapedFallbackRecipe extends ShapedOreRecipe {
       primer.height = recipe.getRecipeHeight();
       primer.mirrored = JsonUtils.getBoolean(json, "mirrored", true);
       primer.input = recipe.getIngredients();
-      ResourceLocation group = recipe.getGroup().isEmpty() ? null : new ResourceLocation(recipe.getGroup());
+      Identifier group = recipe.getGroup().isEmpty() ? null : new Identifier(recipe.getGroup());
 
       // custom properties
       JsonArray elements = JsonUtils.getJsonArray(json, "ignore");

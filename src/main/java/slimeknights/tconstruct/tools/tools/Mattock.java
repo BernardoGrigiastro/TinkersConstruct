@@ -7,12 +7,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.ChatUtil;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.StringUtils;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -39,17 +39,17 @@ import slimeknights.tconstruct.tools.TinkerTools;
 
 public class Mattock extends AoeToolCore {
 
-  public static final ImmutableSet<net.minecraft.block.material.Material> effective_materials_axe =
-      ImmutableSet.of(net.minecraft.block.material.Material.WOOD,
-                      net.minecraft.block.material.Material.CACTUS,
-                      net.minecraft.block.material.Material.PLANTS,
-                      net.minecraft.block.material.Material.VINE,
-                      net.minecraft.block.material.Material.GOURD);
+  public static final ImmutableSet<net.minecraft.block.Material> effective_materials_axe =
+      ImmutableSet.of(net.minecraft.block.Material.WOOD,
+                      net.minecraft.block.Material.CACTUS,
+                      net.minecraft.block.Material.PLANT,
+                      net.minecraft.block.Material.REPLACEABLE_PLANT,
+                      net.minecraft.block.Material.PUMPKIN);
 
-  public static final ImmutableSet<net.minecraft.block.material.Material> effective_materials_shovel =
-      ImmutableSet.of(net.minecraft.block.material.Material.GRASS,
-                      net.minecraft.block.material.Material.GROUND,
-                      net.minecraft.block.material.Material.CLAY);
+  public static final ImmutableSet<net.minecraft.block.Material> effective_materials_shovel =
+      ImmutableSet.of(net.minecraft.block.Material.ORGANIC,
+                      net.minecraft.block.Material.EARTH,
+                      net.minecraft.block.Material.CLAY);
 
   public Mattock() {
     super(PartMaterialType.handle(TinkerTools.toolRod),
@@ -64,7 +64,7 @@ public class Mattock extends AoeToolCore {
 
   @Override
   public int getHarvestLevel(ItemStack stack, String toolClass, @Nullable EntityPlayer player, @Nullable IBlockState blockState) {
-    if(StringUtils.isNullOrEmpty(toolClass)) {
+    if(ChatUtil.isNullOrEmpty(toolClass)) {
       return -1;
     }
 
@@ -145,7 +145,7 @@ public class Mattock extends AoeToolCore {
     stack.setItemDamage(damage);
 
     // do tinkers damaging
-    if(!worldIn.isRemote && ret == EnumActionResult.SUCCESS) {
+    if(!worldIn.isClient && ret == EnumActionResult.SUCCESS) {
       ToolHelper.damageTool(stack, 1, playerIn);
     }
     return ret;
@@ -165,11 +165,11 @@ public class Mattock extends AoeToolCore {
 
     // special axe harvest level
     String text = Util.translate("stat.mattock.axelevel.name");
-    info.add(String.format("%s: %s", text, HarvestLevels.getHarvestLevelName(getAxeLevel(stack))) + TextFormatting.RESET);
+    info.add(String.format("%s: %s", text, HarvestLevels.getHarvestLevelName(getAxeLevel(stack))) + TextFormat.RESET);
 
     // special shovel harvest level
     text = Util.translate("stat.mattock.shovellevel.name");
-    info.add(String.format("%s: %s", text, HarvestLevels.getHarvestLevelName(getShovelLevel(stack))) + TextFormatting.RESET);
+    info.add(String.format("%s: %s", text, HarvestLevels.getHarvestLevelName(getShovelLevel(stack))) + TextFormat.RESET);
 
     info.addMiningSpeed();
     info.addAttack();

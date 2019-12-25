@@ -15,7 +15,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemTransformVec3f;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -31,7 +31,7 @@ import slimeknights.tconstruct.library.client.model.ModifierModel;
 @SideOnly(Side.CLIENT)
 public class ToolModelOverride {
 
-  public final ImmutableMap<ResourceLocation, Float> predicates;
+  public final ImmutableMap<Identifier, Float> predicates;
   public final ImmutableMap<String, String> textures;
   public final ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> transforms;
   public final AmmoPosition ammoPosition;
@@ -43,7 +43,7 @@ public class ToolModelOverride {
   public final TIntObjectHashMap<MaterialModel> brokenPartModelReplacement = new TIntObjectHashMap<>();
   public ModifierModel overrideModifierModel;
 
-  public ToolModelOverride(ImmutableMap<ResourceLocation, Float> predicates, ImmutableMap<String, String> textures, ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> transforms, AmmoPosition ammoPosition, String modifierSuffix) {
+  public ToolModelOverride(ImmutableMap<Identifier, Float> predicates, ImmutableMap<String, String> textures, ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> transforms, AmmoPosition ammoPosition, String modifierSuffix) {
     this.predicates = predicates;
     this.textures = textures;
     this.transforms = transforms;
@@ -103,7 +103,7 @@ public class ToolModelOverride {
         throws JsonParseException {
       JsonObject json = jsonElement.getAsJsonObject();
 
-      ImmutableMap<ResourceLocation, Float> predicates = GSON.fromJson(json, PredicateDeserializer.TYPE);
+      ImmutableMap<Identifier, Float> predicates = GSON.fromJson(json, PredicateDeserializer.TYPE);
 
       ImmutableMap<String, String> textures;
       if(json.get("textures") != null) {

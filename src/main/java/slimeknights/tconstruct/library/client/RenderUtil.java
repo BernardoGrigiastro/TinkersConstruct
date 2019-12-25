@@ -1,16 +1,16 @@
 package slimeknights.tconstruct.library.client;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.GuiLighting;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
 
@@ -23,7 +23,7 @@ public final class RenderUtil {
 
   public static float FLUID_OFFSET = 0.005f;
 
-  protected static Minecraft mc = Minecraft.getMinecraft();
+  protected static MinecraftClient mc = MinecraftClient.getMinecraft();
 
   /**
    * Renders a fluid block, call from TESR. x/y/z is the rendering offset.
@@ -54,16 +54,16 @@ public final class RenderUtil {
   public static void renderFluidCuboid(FluidStack fluid, BlockPos pos, double x, double y, double z, double x1, double y1, double z1, double x2, double y2, double z2, int color) {
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder renderer = tessellator.getBuffer();
-    renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-    mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+    renderer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR_UV_LMAP);
+    mc.textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
     //RenderUtil.setColorRGBA(color);
     int brightness = mc.world.getCombinedLight(pos, fluid.getFluid().getLuminosity());
     boolean upsideDown = fluid.getFluid().isGaseous(fluid);
 
     pre(x, y, z);
 
-    TextureAtlasSprite still = mc.getTextureMapBlocks().getTextureExtry(fluid.getFluid().getStill(fluid).toString());
-    TextureAtlasSprite flowing = mc.getTextureMapBlocks().getTextureExtry(fluid.getFluid().getFlowing(fluid).toString());
+    Sprite still = mc.getTextureMapBlocks().getTextureExtry(fluid.getFluid().getStill(fluid).toString());
+    Sprite flowing = mc.getTextureMapBlocks().getTextureExtry(fluid.getFluid().getFlowing(fluid).toString());
 
     // x/y/z2 - x/y/z1 is because we need the width/height/depth
     putTexturedQuad(renderer, still, x1, y1, z1, x2 - x1, y2 - y1, z2 - z1, EnumFacing.DOWN, color, brightness, false, upsideDown);
@@ -90,16 +90,16 @@ public final class RenderUtil {
     }
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder renderer = tessellator.getBuffer();
-    renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-    mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+    renderer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR_UV_LMAP);
+    mc.textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
     int color = fluid.getFluid().getColor(fluid);
     int brightness = mc.world.getCombinedLight(pos, fluid.getFluid().getLuminosity());
 
     pre(px, py, pz);
     GlStateManager.translate(from.getX(), from.getY(), from.getZ());
 
-    TextureAtlasSprite still = mc.getTextureMapBlocks().getTextureExtry(fluid.getFluid().getStill(fluid).toString());
-    TextureAtlasSprite flowing = mc.getTextureMapBlocks().getTextureExtry(fluid.getFluid().getFlowing(fluid).toString());
+    Sprite still = mc.getTextureMapBlocks().getTextureExtry(fluid.getFluid().getStill(fluid).toString());
+    Sprite flowing = mc.getTextureMapBlocks().getTextureExtry(fluid.getFluid().getFlowing(fluid).toString());
 
     if(still == null) {
       still = mc.getTextureMapBlocks().getMissingSprite();
@@ -181,10 +181,10 @@ public final class RenderUtil {
     post();
   }
 
-  public static void putTexturedCuboid(BufferBuilder renderer, ResourceLocation location, double x1, double y1, double z1, double x2, double y2, double z2,
+  public static void putTexturedCuboid(BufferBuilder renderer, Identifier location, double x1, double y1, double z1, double x2, double y2, double z2,
                                        int color, int brightness) {
     boolean flowing = false;
-    TextureAtlasSprite sprite = mc.getTextureMapBlocks().getTextureExtry(location.toString());
+    Sprite sprite = mc.getTextureMapBlocks().getTextureExtry(location.toString());
     putTexturedQuad(renderer, sprite, x1, y1, z1, x2 - x1, y2 - y1, z2 - z1, EnumFacing.DOWN, color, brightness, flowing);
     putTexturedQuad(renderer, sprite, x1, y1, z1, x2 - x1, y2 - y1, z2 - z1, EnumFacing.NORTH, color, brightness, flowing);
     putTexturedQuad(renderer, sprite, x1, y1, z1, x2 - x1, y2 - y1, z2 - z1, EnumFacing.EAST, color, brightness, flowing);
@@ -193,12 +193,12 @@ public final class RenderUtil {
     putTexturedQuad(renderer, sprite, x1, y1, z1, x2 - x1, y2 - y1, z2 - z1, EnumFacing.UP, color, brightness, flowing);
   }
 
-  public static void putTexturedQuad(BufferBuilder renderer, TextureAtlasSprite sprite, double x, double y, double z, double w, double h, double d, EnumFacing face,
+  public static void putTexturedQuad(BufferBuilder renderer, Sprite sprite, double x, double y, double z, double w, double h, double d, EnumFacing face,
                                      int color, int brightness, boolean flowing) {
     putTexturedQuad(renderer, sprite, x, y, z, w, h, d, face, color, brightness, flowing, false);
   }
 
-  public static void putTexturedQuad(BufferBuilder renderer, TextureAtlasSprite sprite, double x, double y, double z, double w, double h, double d, EnumFacing face,
+  public static void putTexturedQuad(BufferBuilder renderer, Sprite sprite, double x, double y, double z, double w, double h, double d, EnumFacing face,
                                      int color, int brightness, boolean flowing, boolean flipHorizontally) {
     int l1 = brightness >> 0x10 & 0xFFFF;
     int l2 = brightness & 0xFFFF;
@@ -211,13 +211,13 @@ public final class RenderUtil {
     putTexturedQuad(renderer, sprite, x, y, z, w, h, d, face, r, g, b, a, l1, l2, flowing, flipHorizontally);
   }
 
-  public static void putTexturedQuad(BufferBuilder renderer, TextureAtlasSprite sprite, double x, double y, double z, double w, double h, double d, EnumFacing face,
+  public static void putTexturedQuad(BufferBuilder renderer, Sprite sprite, double x, double y, double z, double w, double h, double d, EnumFacing face,
                                      int r, int g, int b, int a, int light1, int light2, boolean flowing) {
     putTexturedQuad(renderer, sprite, x, y, z, w, h, d, face, r, g, b, a, light1, light2, flowing, false);
   }
 
   // x and x+w has to be within [0,1], same for y/h and z/d
-  public static void putTexturedQuad(BufferBuilder renderer, TextureAtlasSprite sprite, double x, double y, double z, double w, double h, double d, EnumFacing face,
+  public static void putTexturedQuad(BufferBuilder renderer, Sprite sprite, double x, double y, double z, double w, double h, double d, EnumFacing face,
                                      int r, int g, int b, int a, int light1, int light2, boolean flowing, boolean flipHorizontally) {
     // safety
     if(sprite == null) {
@@ -335,7 +335,7 @@ public final class RenderUtil {
   /**
    * Similar to putTexturedQuad, except its only for upwards quads and a rotation is specified
    */
-  public static void putRotatedQuad(BufferBuilder renderer, TextureAtlasSprite sprite, double x, double y, double z, double w, double d, EnumFacing rotation,
+  public static void putRotatedQuad(BufferBuilder renderer, Sprite sprite, double x, double y, double z, double w, double d, EnumFacing rotation,
       int color, int brightness, boolean flowing) {
     int l1 = brightness >> 0x10 & 0xFFFF;
     int l2 = brightness & 0xFFFF;
@@ -351,7 +351,7 @@ public final class RenderUtil {
   /**
    * Similar to putTexturedQuad, except its only for upwards quads and a rotation is specified
    */
-  public static void putRotatedQuad(BufferBuilder renderer, TextureAtlasSprite sprite, double x, double y, double z, double w, double d, EnumFacing rotation,
+  public static void putRotatedQuad(BufferBuilder renderer, Sprite sprite, double x, double y, double z, double w, double d, EnumFacing rotation,
       int r, int g, int b, int a, int light1, int light2, boolean flowing) {
     // safety
     if(sprite == null) {
@@ -429,11 +429,11 @@ public final class RenderUtil {
   public static void pre(double x, double y, double z) {
     GlStateManager.pushMatrix();
 
-    RenderHelper.disableStandardItemLighting();
+    GuiLighting.disableStandardItemLighting();
     GlStateManager.enableBlend();
     GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-    if(Minecraft.isAmbientOcclusionEnabled()) {
+    if(MinecraftClient.isAmbientOcclusionEnabled()) {
       GL11.glShadeModel(GL11.GL_SMOOTH);
     }
     else {
@@ -446,7 +446,7 @@ public final class RenderUtil {
   public static void post() {
     GlStateManager.disableBlend();
     GlStateManager.popMatrix();
-    RenderHelper.enableStandardItemLighting();
+    GuiLighting.enableStandardItemLighting();
   }
 
   public static void setColorRGB(int color) {

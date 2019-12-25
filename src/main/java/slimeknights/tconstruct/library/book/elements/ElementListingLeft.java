@@ -1,8 +1,7 @@
 package slimeknights.tconstruct.library.book.elements;
 
 import com.google.common.collect.Lists;
-
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -20,7 +19,7 @@ public class ElementListingLeft extends ElementText {
   }
 
   @Override
-  public void draw(int mouseX, int mouseY, float partialTicks, FontRenderer fontRenderer) {
+  public void draw(int mouseX, int mouseY, float partialTicks, TextRenderer fontRenderer) {
     if(isHovered(mouseX, mouseY)) {
       text[0].text = " > ";
       for(int i = 1; i < text.length; i++) {

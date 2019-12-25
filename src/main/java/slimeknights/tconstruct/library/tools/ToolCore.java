@@ -4,23 +4,23 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.DamageSource;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -250,8 +250,8 @@ public abstract class ToolCore extends TinkersItem implements IToolStationDispla
   public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
     float speed = ToolHelper.getActualAttackSpeed(stack);
     int time = Math.round(20f / speed);
-    if(time < target.hurtResistantTime / 2) {
-      target.hurtResistantTime = (target.hurtResistantTime + time) / 2;
+    if(time < target.field_6008 / 2) {
+      target.field_6008 = (target.field_6008 + time) / 2;
       target.hurtTime = (target.hurtTime + time) / 2;
     }
     return super.hitEntity(stack, target, attacker);
@@ -259,12 +259,12 @@ public abstract class ToolCore extends TinkersItem implements IToolStationDispla
 
   @Nonnull
   @Override
-  public Multimap<String, AttributeModifier> getAttributeModifiers(@Nonnull EntityEquipmentSlot slot, ItemStack stack) {
-    Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
+  public Multimap<String, EntityAttributeModifier> getAttributeModifiers(@Nonnull EntityEquipmentSlot slot, ItemStack stack) {
+    Multimap<String, EntityAttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
 
     if(slot == EntityEquipmentSlot.MAINHAND && !ToolHelper.isBroken(stack)) {
-      multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", ToolHelper.getActualAttack(stack), 0));
-      multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", ToolHelper.getActualAttackSpeed(stack) - 4d, 0));
+      multimap.put(EntityAttributes.ATTACK_DAMAGE.getName(), new EntityAttributeModifier(MODIFIER_DAMAGE, "Weapon modifier", ToolHelper.getActualAttack(stack), 0));
+      multimap.put(EntityAttributes.ATTACK_SPEED.getName(), new EntityAttributeModifier(MODIFIER_SWING_SPEED, "Weapon modifier", ToolHelper.getActualAttackSpeed(stack) - 4d, 0));
     }
 
     TinkerUtil.getTraitsOrdered(stack).forEach(trait -> trait.getAttributeModifiers(slot, stack, multimap));
@@ -280,7 +280,7 @@ public abstract class ToolCore extends TinkersItem implements IToolStationDispla
   @Override
   public void getTooltip(ItemStack stack, List<String> tooltips) {
     if(ToolHelper.isBroken(stack)) {
-      tooltips.add("" + TextFormatting.DARK_RED + TextFormatting.BOLD + getBrokenTooltip(stack));
+      tooltips.add("" + TextFormat.field_1079 + TextFormat.field_1067 + getBrokenTooltip(stack));
     }
     super.getTooltip(stack, tooltips);
   }
@@ -343,7 +343,7 @@ public abstract class ToolCore extends TinkersItem implements IToolStationDispla
       ItemStack partStack = part.getItemstackWithMaterial(material);
       if(partStack != null) {
         // we have the part, add it
-        tooltips.add(material.getTextColor() + TextFormatting.UNDERLINE + partStack.getDisplayName());
+        tooltips.add(material.getTextColor() + TextFormat.field_1073 + partStack.getDisplayName());
 
         Set<ITrait> usedTraits = Sets.newHashSet();
         // find out which stats and traits it contributes and add it to the tooltip
@@ -366,7 +366,7 @@ public abstract class ToolCore extends TinkersItem implements IToolStationDispla
   @Nonnull
   @SideOnly(Side.CLIENT)
   @Override
-  public FontRenderer getFontRenderer(ItemStack stack) {
+  public TextRenderer getFontRenderer(ItemStack stack) {
     return ClientProxy.fontRenderer;
   }
 
@@ -395,7 +395,7 @@ public abstract class ToolCore extends TinkersItem implements IToolStationDispla
 
   // Creative tab items
   @Override
-  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
     if(this.isInCreativeTab(tab)) {
       addDefaultSubItems(subItems);
     }
@@ -489,7 +489,7 @@ public abstract class ToolCore extends TinkersItem implements IToolStationDispla
   }
 
   @Override
-  protected int repairCustom(Material material, NonNullList<ItemStack> repairItems) {
+  protected int repairCustom(Material material, DefaultedList<ItemStack> repairItems) {
     Optional<RecipeMatch.Match> matchOptional = RecipeMatch.of(TinkerTools.sharpeningKit).matches(repairItems);
     if(!matchOptional.isPresent()) {
       return 0;
@@ -565,7 +565,7 @@ public abstract class ToolCore extends TinkersItem implements IToolStationDispla
 
   // elevate to public
   @Override
-  public RayTraceResult rayTrace(@Nonnull World worldIn, @Nonnull EntityPlayer playerIn, boolean useLiquids) {
+  public HitResult rayTrace(@Nonnull World worldIn, @Nonnull EntityPlayer playerIn, boolean useLiquids) {
     return super.rayTrace(worldIn, playerIn, useLiquids);
   }
 
@@ -596,8 +596,8 @@ public abstract class ToolCore extends TinkersItem implements IToolStationDispla
       return true;
     }
 
-    Multimap<String, AttributeModifier> attributesNew = newStack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND);
-    Multimap<String, AttributeModifier> attributesOld = oldStack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND);
+    Multimap<String, EntityAttributeModifier> attributesNew = newStack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND);
+    Multimap<String, EntityAttributeModifier> attributesOld = oldStack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND);
 
     if(attributesNew.size() != attributesOld.size()) {
       return true;
@@ -606,8 +606,8 @@ public abstract class ToolCore extends TinkersItem implements IToolStationDispla
       if(!attributesNew.containsKey(key)) {
         return true;
       }
-      Iterator<AttributeModifier> iter1 = attributesNew.get(key).iterator();
-      Iterator<AttributeModifier> iter2 = attributesOld.get(key).iterator();
+      Iterator<EntityAttributeModifier> iter1 = attributesNew.get(key).iterator();
+      Iterator<EntityAttributeModifier> iter2 = attributesOld.get(key).iterator();
       while(iter1.hasNext() && iter2.hasNext()) {
         if(!iter1.next().equals(iter2.next())) {
           return true;

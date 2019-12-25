@@ -1,13 +1,13 @@
 package slimeknights.tconstruct.shared;
 
-import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.AdvancementProgress;
+import net.minecraft.advancement.Advancement;
+import net.minecraft.advancement.AdvancementProgress;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -61,7 +61,7 @@ public class AchievementEvents {
   }
 
   private void grantAdvancement(EntityPlayerMP playerMP, String advancementResource) {
-    Advancement advancement = playerMP.getServer().getAdvancementManager().getAdvancement(new ResourceLocation(advancementResource));
+    Advancement advancement = playerMP.getServer().getAdvancementManager().getAdvancement(new Identifier(advancementResource));
     if(advancement != null) {
       AdvancementProgress advancementProgress = playerMP.getAdvancements().getProgress(advancement);
       if(!advancementProgress.isDone()) {

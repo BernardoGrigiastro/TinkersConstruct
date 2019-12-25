@@ -1,9 +1,8 @@
 package slimeknights.tconstruct.tools.common.block;
 
 import com.google.common.collect.Sets;
-
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -11,8 +10,8 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.NonNullList;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -37,10 +36,10 @@ public class BlockToolForge extends BlockTable implements ITinkerStationBlock {
   public final Set<String> baseBlocks = Sets.newLinkedHashSet(); // oredict list of toolforge blocks
 
   public BlockToolForge() {
-    super(Material.IRON);
+    super(Material.METAL);
     this.setCreativeTab(TinkerRegistry.tabGeneral);
 
-    this.setSoundType(SoundType.METAL);
+    this.setSoundType(BlockSoundGroup.METAL);
     this.setResistance(10f);
     this.setHardness(2f);
 
@@ -58,12 +57,12 @@ public class BlockToolForge extends BlockTable implements ITinkerStationBlock {
 
   @Nonnull
   @Override
-  public TileEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
+  public BlockEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
     return new TileToolForge();
   }
 
   @Override
-  public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
     // toolforge has custom blocks
     for(String oredict : baseBlocks) {
       // only add the first entry per oredict

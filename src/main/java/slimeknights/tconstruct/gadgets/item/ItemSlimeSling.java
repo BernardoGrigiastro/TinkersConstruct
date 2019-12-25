@@ -6,11 +6,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import slimeknights.mantle.item.ItemTooltip;
@@ -34,10 +34,10 @@ public class ItemSlimeSling extends ItemTooltip {
 
   @Nonnull
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+  public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
     ItemStack itemStackIn = playerIn.getHeldItem(hand);
     playerIn.setActiveHand(hand);
-    return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+    return new TypedActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
   }
 
   @Nonnull
@@ -75,9 +75,9 @@ public class ItemSlimeSling extends ItemTooltip {
     }
 
     // check if player was targeting a block
-    RayTraceResult mop = rayTrace(world, player, false);
+    HitResult mop = rayTrace(world, player, false);
 
-    if(mop != null && mop.typeOfHit == RayTraceResult.Type.BLOCK) {
+    if(mop != null && mop.typeOfHit == HitResult.Type.BLOCK) {
       // we fling the inverted player look vector
       Vec3d vec = player.getLookVec().normalize();
 
@@ -110,7 +110,7 @@ public class ItemSlimeSling extends ItemTooltip {
   }
 
   @Override
-  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
     if(this.isInCreativeTab(tab)) {
       for(SlimeType type : SlimeType.VISIBLE_COLORS) {
         subItems.add(new ItemStack(this, 1, type.getMeta()));

@@ -1,12 +1,11 @@
 package slimeknights.tconstruct.library.utils;
 
 import com.google.common.collect.Lists;
-
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
 import net.minecraft.util.text.translation.I18n;
 
 import java.util.List;
@@ -60,15 +59,15 @@ public class TooltipBuilder {
                          Util.translate(LOC_Ammo),
                          CustomFontColor.valueToColorCode((float) durability / (float) ref),
                          df.format(durability),
-                         TextFormatting.GRAY.toString(),
+                         TextFormat.field_1080.toString(),
                          COLOR_Durability,
                          df.format(ref))
-           + TextFormatting.RESET;
+           + TextFormat.RESET;
   }
 
   public TooltipBuilder addDurability(boolean textIfBroken) {
     if(ToolHelper.isBroken(stack) && textIfBroken) {
-      tips.add(String.format("%s: %s%s%s", Util.translate(HeadMaterialStats.LOC_Durability), TextFormatting.DARK_RED, TextFormatting.BOLD, Util.translate("tooltip.tool.broken")));
+      tips.add(String.format("%s: %s%s%s", Util.translate(HeadMaterialStats.LOC_Durability), TextFormat.field_1079, TextFormat.field_1067, Util.translate("tooltip.tool.broken")));
     }
     else {
       tips.add(HeadMaterialStats.formatDurability(ToolHelper.getCurrentDurability(stack), ToolHelper.getMaxDurability(stack)));
@@ -80,7 +79,7 @@ public class TooltipBuilder {
   public TooltipBuilder addAmmo(boolean textIfEmpty) {
     if(stack.getItem() instanceof IAmmo) {
       if(ToolHelper.isBroken(stack) && textIfEmpty) {
-        tips.add(String.format("%s: %s%s%s", Util.translate(LOC_Ammo), TextFormatting.DARK_RED, TextFormatting.BOLD, Util.translate(LOC_Empty)));
+        tips.add(String.format("%s: %s%s%s", Util.translate(LOC_Ammo), TextFormat.field_1079, TextFormat.field_1067, Util.translate(LOC_Empty)));
       }
       else {
         IAmmo ammoItem = (IAmmo) stack.getItem();
@@ -104,7 +103,7 @@ public class TooltipBuilder {
   }
 
   public TooltipBuilder addAttack() {
-    float attack = ToolHelper.getActualDamage(stack, Minecraft.getMinecraft().player);
+    float attack = ToolHelper.getActualDamage(stack, MinecraftClient.getMinecraft().player);
     tips.add(HeadMaterialStats.formatAttack(attack));
 
     return this;

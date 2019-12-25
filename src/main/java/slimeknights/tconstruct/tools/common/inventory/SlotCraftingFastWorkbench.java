@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.tools.common.inventory;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.DefaultedList;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import slimeknights.tconstruct.shared.inventory.InventoryCraftingPersistent;
@@ -20,7 +20,7 @@ public class SlotCraftingFastWorkbench extends SlotCrafting {
   private final ContainerCraftingStation containerCraftingStation;
   private final InventoryCraftingPersistent craftMatrixPersistent;
 
-  public SlotCraftingFastWorkbench(ContainerCraftingStation containerCraftingStation, EntityPlayer player, InventoryCraftingPersistent craftingInventory, IInventory inventoryIn, int slotIndex, int xPosition, int yPosition) {
+  public SlotCraftingFastWorkbench(ContainerCraftingStation containerCraftingStation, EntityPlayer player, InventoryCraftingPersistent craftingInventory, Inventory inventoryIn, int slotIndex, int xPosition, int yPosition) {
     super(player, craftingInventory, inventoryIn, slotIndex, xPosition, yPosition);
     this.containerCraftingStation = containerCraftingStation;
     this.craftMatrixPersistent = craftingInventory;
@@ -51,7 +51,7 @@ public class SlotCraftingFastWorkbench extends SlotCrafting {
     this.onCrafting(stack);
     net.minecraftforge.common.ForgeHooks.setCraftingPlayer(thePlayer);
     /* CHANGE BEGINS HERE */
-    NonNullList<ItemStack> nonnulllist = containerCraftingStation.getRemainingItems();
+    DefaultedList<ItemStack> nonnulllist = containerCraftingStation.getRemainingItems();
     /* END OF CHANGE */
     net.minecraftforge.common.ForgeHooks.setCraftingPlayer(null);
 

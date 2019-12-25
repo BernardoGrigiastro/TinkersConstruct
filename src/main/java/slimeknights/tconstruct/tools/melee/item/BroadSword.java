@@ -49,7 +49,7 @@ public class BroadSword extends SwordCore {
     if(hit && !ToolHelper.isBroken(stack)) {
       // sweep code from EntityPlayer#attackTargetEntityWithCurrentItem()
       // basically: no crit, no sprinting and has to stand on the ground for sweep. Also has to move regularly slowly
-      double d0 = (double) (player.distanceWalkedModified - player.prevDistanceWalkedModified);
+      double d0 = (double) (player.field_5973 - player.field_6039);
       boolean flag = true;
       if(player instanceof EntityPlayer) {
         flag = ((EntityPlayer) player).getCooledAttackStrength(0.5F) > 0.9f;
@@ -58,12 +58,12 @@ public class BroadSword extends SwordCore {
       if(flag && !player.isSprinting() && !flag2 && player.onGround && d0 < (double) player.getAIMoveSpeed()) {
         for(EntityLivingBase entitylivingbase : player.getEntityWorld().getEntitiesWithinAABB(EntityLivingBase.class, entity.getEntityBoundingBox().expand(1.0D, 0.25D, 1.0D))) {
           if(entitylivingbase != player && entitylivingbase != entity && !player.isOnSameTeam(entitylivingbase) && player.getDistanceSqToEntity(entitylivingbase) < 9.0D) {
-            entitylivingbase.knockBack(player, 0.4F, (double) MathHelper.sin(player.rotationYaw * 0.017453292F), (double) (-MathHelper.cos(player.rotationYaw * 0.017453292F)));
+            entitylivingbase.knockBack(player, 0.4F, (double) MathHelper.sin(player.yaw * 0.017453292F), (double) (-MathHelper.cos(player.yaw * 0.017453292F)));
             super.dealDamage(stack, player, entitylivingbase, 1f);
           }
         }
 
-        player.getEntityWorld().playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, player.getSoundCategory(), 1.0F, 1.0F);
+        player.getEntityWorld().playSound(null, player.x, player.y, player.z, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, player.getSoundCategory(), 1.0F, 1.0F);
         if(player instanceof EntityPlayer) {
           ((EntityPlayer) player).spawnSweepParticles();
         }

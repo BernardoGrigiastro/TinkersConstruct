@@ -3,12 +3,11 @@ package slimeknights.tconstruct.tools.common.inventory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -26,7 +25,7 @@ import slimeknights.tconstruct.tools.common.block.BlockToolTable;
 import slimeknights.tconstruct.tools.common.block.ITinkerStationBlock;
 import slimeknights.tconstruct.tools.common.client.GuiTinkerStation;
 
-public class ContainerTinkerStation<T extends TileEntity & IInventory> extends ContainerMultiModule<T> {
+public class ContainerTinkerStation<T extends BlockEntity & Inventory> extends ContainerMultiModule<T> {
 
   public final boolean hasCraftingStation;
   public final List<Pair<BlockPos, IBlockState>> tinkerStationBlocks;
@@ -39,9 +38,9 @@ public class ContainerTinkerStation<T extends TileEntity & IInventory> extends C
   }
 
   @SuppressWarnings("unchecked")
-  public <TE extends TileEntity> TE getTinkerTE(Class<TE> clazz) {
+  public <TE extends BlockEntity> TE getTinkerTE(Class<TE> clazz) {
     for(Pair<BlockPos, IBlockState> pair : tinkerStationBlocks) {
-      TileEntity te = this.world.getTileEntity(pair.getLeft());
+      BlockEntity te = this.world.getTileEntity(pair.getLeft());
 
       if(te != null && clazz.isAssignableFrom(te.getClass())) {
         return (TE) te;
@@ -129,7 +128,7 @@ public class ContainerTinkerStation<T extends TileEntity & IInventory> extends C
   /** Tells the client to take the current state and update its info displays */
   public void updateGUI() {
     if(tile.getWorld().isRemote) {
-      Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+      MinecraftClient.getMinecraft().addScheduledTask(new Runnable() {
         @Override
         public void run() {
           ContainerTinkerStation.clientGuiUpdate();
@@ -141,7 +140,7 @@ public class ContainerTinkerStation<T extends TileEntity & IInventory> extends C
   /** Tells the client to display the LOCALIZED error message */
   public void error(final String message) {
     if(tile.getWorld().isRemote) {
-      Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+      MinecraftClient.getMinecraft().addScheduledTask(new Runnable() {
         @Override
         public void run() {
           ContainerTinkerStation.clientError(message);
@@ -153,7 +152,7 @@ public class ContainerTinkerStation<T extends TileEntity & IInventory> extends C
   /** Tells the client to display the LOCALIZED warning message */
   public void warning(final String message) {
     if(tile.getWorld().isRemote) {
-      Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+      MinecraftClient.getMinecraft().addScheduledTask(new Runnable() {
         @Override
         public void run() {
           ContainerTinkerStation.clientWarning(message);
@@ -164,7 +163,7 @@ public class ContainerTinkerStation<T extends TileEntity & IInventory> extends C
 
   @SideOnly(Side.CLIENT)
   private static void clientGuiUpdate() {
-    GuiScreen screen = Minecraft.getMinecraft().currentScreen;
+    GuiScreen screen = MinecraftClient.getMinecraft().currentScreen;
     if(screen instanceof GuiTinkerStation) {
       ((GuiTinkerStation) screen).updateDisplay();
     }
@@ -172,7 +171,7 @@ public class ContainerTinkerStation<T extends TileEntity & IInventory> extends C
 
   @SideOnly(Side.CLIENT)
   private static void clientError(String message) {
-    GuiScreen screen = Minecraft.getMinecraft().currentScreen;
+    GuiScreen screen = MinecraftClient.getMinecraft().currentScreen;
     if(screen instanceof GuiTinkerStation) {
       ((GuiTinkerStation) screen).error(message);
     }
@@ -180,7 +179,7 @@ public class ContainerTinkerStation<T extends TileEntity & IInventory> extends C
 
   @SideOnly(Side.CLIENT)
   private static void clientWarning(String message) {
-    GuiScreen screen = Minecraft.getMinecraft().currentScreen;
+    GuiScreen screen = MinecraftClient.getMinecraft().currentScreen;
     if(screen instanceof GuiTinkerStation) {
       ((GuiTinkerStation) screen).warning(message);
     }

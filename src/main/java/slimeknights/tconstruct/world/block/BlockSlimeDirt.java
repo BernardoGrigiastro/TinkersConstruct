@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.world.block;
 
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.EnumPlantType;
@@ -24,10 +24,10 @@ public class BlockSlimeDirt extends EnumBlock<BlockSlimeDirt.DirtType> {
   public static PropertyEnum<DirtType> TYPE = PropertyEnum.create("type", DirtType.class);
 
   public BlockSlimeDirt() {
-    super(Material.GROUND, TYPE, DirtType.class);
+    super(Material.EARTH, TYPE, DirtType.class);
     this.setCreativeTab(TinkerRegistry.tabWorld);
     this.setHardness(0.55f);
-    this.setSoundType(SoundType.SLIME);
+    this.setSoundType(BlockSoundGroup.SLIME);
   }
 
   @Override
@@ -36,7 +36,7 @@ public class BlockSlimeDirt extends EnumBlock<BlockSlimeDirt.DirtType> {
     return plantable.getPlantType(world, pos) == TinkerWorld.slimePlantType || plantable.getPlantType(world, pos) == EnumPlantType.Plains;
   }
 
-  public enum DirtType implements IStringSerializable, EnumBlock.IEnumMeta {
+  public enum DirtType implements StringRepresentable, EnumBlock.IEnumMeta {
     GREEN,
     BLUE,
     PURPLE,

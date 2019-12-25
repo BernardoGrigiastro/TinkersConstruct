@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
 import java.util.List;
@@ -16,7 +16,7 @@ import slimeknights.tconstruct.library.utils.ToolHelper;
 public class TraitStonebound extends AbstractTrait {
 
   public TraitStonebound() {
-    super("stonebound", TextFormatting.DARK_GRAY);
+    super("stonebound", TextFormat.field_1063);
   }
 
   private double calcBonus(ItemStack tool) {

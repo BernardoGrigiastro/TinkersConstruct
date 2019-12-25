@@ -2,8 +2,8 @@ package slimeknights.tconstruct.gadgets.block;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.BlockLever.EnumOrientation;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
@@ -15,17 +15,17 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -49,7 +49,7 @@ public class BlockRack extends BlockTable {
 
   public BlockRack() {
     super(Material.WOOD);
-    this.setSoundType(SoundType.WOOD);
+    this.setSoundType(BlockSoundGroup.WOOD);
     this.setCreativeTab(TinkerRegistry.tabGadgets);
     this.setHardness(2.0F);
 
@@ -60,7 +60,7 @@ public class BlockRack extends BlockTable {
   }
 
   @Override
-  public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
     list.add(createItemstack(this, 0, Blocks.WOODEN_SLAB, 0));
     list.add(createItemstack(this, 1, Blocks.WOODEN_SLAB, 0));
   }
@@ -84,7 +84,7 @@ public class BlockRack extends BlockTable {
   /* Inventory stuffs */
   @Nonnull
   @Override
-  public TileEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
+  public BlockEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
     if(getStateFromMeta(meta).getValue(DRYING)) {
       return new TileDryingRack();
     }
@@ -101,7 +101,7 @@ public class BlockRack extends BlockTable {
   /* Activation */
   @Override
   public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float clickX, float clickY, float clickZ) {
-    if(!world.isRemote) {
+    if(!world.isClient) {
       TileItemRack tileItemRack = ((TileItemRack) world.getTileEntity(pos));
       if(tileItemRack != null) {
         tileItemRack.interact(player);
@@ -152,7 +152,7 @@ public class BlockRack extends BlockTable {
                               ItemStack stack) {
     super.onBlockPlacedBy(world, pos, state, placer, stack);
 
-    TileEntity te = world.getTileEntity(pos);
+    BlockEntity te = world.getTileEntity(pos);
     if(te != null && te instanceof TileItemRack) {
       TileItemRack rack = (TileItemRack) te;
 
@@ -216,9 +216,9 @@ public class BlockRack extends BlockTable {
    */
   @Nonnull
   @Override
-  public IBlockState withRotation(@Nonnull IBlockState state, Rotation rot) {
+  public IBlockState withRotation(@Nonnull IBlockState state, BlockRotation rot) {
     switch(rot) {
-      case CLOCKWISE_180:
+      case ROT_180:
         switch(state.getValue(ORIENTATION)) {
           case EAST:
             return state.withProperty(ORIENTATION, EnumOrientation.WEST);
@@ -232,7 +232,7 @@ public class BlockRack extends BlockTable {
             return state;
         }
 
-      case COUNTERCLOCKWISE_90:
+      case ROT_270:
         switch(state.getValue(ORIENTATION)) {
           case EAST:
             return state.withProperty(ORIENTATION, EnumOrientation.NORTH);
@@ -252,7 +252,7 @@ public class BlockRack extends BlockTable {
             return state.withProperty(ORIENTATION, EnumOrientation.DOWN_X);
         }
 
-      case CLOCKWISE_90:
+      case ROT_90:
         switch(state.getValue(ORIENTATION)) {
           case EAST:
             return state.withProperty(ORIENTATION, EnumOrientation.SOUTH);
@@ -283,34 +283,34 @@ public class BlockRack extends BlockTable {
    */
   @Nonnull
   @Override
-  public IBlockState withMirror(@Nonnull IBlockState state, Mirror mirrorIn) {
+  public IBlockState withMirror(@Nonnull IBlockState state, BlockMirror mirrorIn) {
     return state.withRotation(mirrorIn.toRotation(state.getValue(ORIENTATION).getFacing()));
   }
 
   /* Bounding boxes */
-  private static final ImmutableMap<EnumOrientation, AxisAlignedBB> BOUNDS;
+  private static final ImmutableMap<EnumOrientation, BoundingBox> BOUNDS;
 
   static {
-    ImmutableMap.Builder<EnumOrientation, AxisAlignedBB> builder = ImmutableMap.builder();
-    builder.put(EnumOrientation.DOWN_X, new AxisAlignedBB(0.375, 0, 0, 0.625, 0.25, 1));
-    builder.put(EnumOrientation.DOWN_Z, new AxisAlignedBB(0, 0, 0.375, 1, 0.25, 0.625));
-    builder.put(EnumOrientation.UP_X, new AxisAlignedBB(0.375, 0.75, 0, 0.625, 1, 1));
-    builder.put(EnumOrientation.UP_Z, new AxisAlignedBB(0, 0.75, 0.375, 1, 1, 0.625));
-    builder.put(EnumOrientation.NORTH, new AxisAlignedBB(0, 0.75, 0, 1, 1, 0.25));
-    builder.put(EnumOrientation.SOUTH, new AxisAlignedBB(0, 0.75, 0.75, 1, 1, 1));
-    builder.put(EnumOrientation.EAST, new AxisAlignedBB(0.75, 0.75, 0, 1, 1, 1));
-    builder.put(EnumOrientation.WEST, new AxisAlignedBB(0, 0.75, 0, 0.25, 1, 1));
+    ImmutableMap.Builder<EnumOrientation, BoundingBox> builder = ImmutableMap.builder();
+    builder.put(EnumOrientation.DOWN_X, new BoundingBox(0.375, 0, 0, 0.625, 0.25, 1));
+    builder.put(EnumOrientation.DOWN_Z, new BoundingBox(0, 0, 0.375, 1, 0.25, 0.625));
+    builder.put(EnumOrientation.UP_X, new BoundingBox(0.375, 0.75, 0, 0.625, 1, 1));
+    builder.put(EnumOrientation.UP_Z, new BoundingBox(0, 0.75, 0.375, 1, 1, 0.625));
+    builder.put(EnumOrientation.NORTH, new BoundingBox(0, 0.75, 0, 1, 1, 0.25));
+    builder.put(EnumOrientation.SOUTH, new BoundingBox(0, 0.75, 0.75, 1, 1, 1));
+    builder.put(EnumOrientation.EAST, new BoundingBox(0.75, 0.75, 0, 1, 1, 1));
+    builder.put(EnumOrientation.WEST, new BoundingBox(0, 0.75, 0, 0.25, 1, 1));
     BOUNDS = builder.build();
   }
 
   @Override
-  public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+  public BoundingBox getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
     return BOUNDS.get(blockState.getValue(ORIENTATION));
   }
 
   @Nonnull
   @Override
-  public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+  public BoundingBox getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
     return BOUNDS.get(state.getValue(ORIENTATION));
   }
 
@@ -332,7 +332,7 @@ public class BlockRack extends BlockTable {
    * Ray traces through the blocks collision from start vector to end vector returning a ray trace hit.
    */
   @Override
-  public RayTraceResult collisionRayTrace(IBlockState blockState, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Vec3d start, @Nonnull Vec3d end) {
+  public HitResult collisionRayTrace(IBlockState blockState, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Vec3d start, @Nonnull Vec3d end) {
     return this.rayTrace(pos, start, end, blockState.getBoundingBox(worldIn, pos));
   }
 
@@ -344,7 +344,7 @@ public class BlockRack extends BlockTable {
   // comparator stuffs
   @Override
   public int getComparatorInputOverride(IBlockState blockState, World world, BlockPos pos) {
-    TileEntity te = world.getTileEntity(pos);
+    BlockEntity te = world.getTileEntity(pos);
     if(!(te instanceof TileDryingRack)) {
       return 0;
     }

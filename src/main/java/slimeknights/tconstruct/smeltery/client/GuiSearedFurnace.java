@@ -1,8 +1,7 @@
 package slimeknights.tconstruct.smeltery.client;
 
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.util.Identifier;
 import slimeknights.mantle.client.gui.GuiElement;
 import slimeknights.mantle.client.gui.GuiElementScalable;
 import slimeknights.tconstruct.library.Util;
@@ -13,7 +12,7 @@ import slimeknights.tconstruct.tools.common.inventory.ContainerSideInventory;
 
 public class GuiSearedFurnace extends GuiHeatingStructureFuelTank {
 
-  public static final ResourceLocation BACKGROUND = Util.getResource("textures/gui/seared_furnace.png");
+  public static final Identifier BACKGROUND = Util.getResource("textures/gui/seared_furnace.png");
 
   protected GuiElement flame = new GuiElementScalable(176, 76, 28, 28, 256, 256);
 

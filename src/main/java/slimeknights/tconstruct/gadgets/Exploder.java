@@ -6,15 +6,15 @@ import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.DamageSource;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -73,7 +73,7 @@ public class Exploder {
   public static void startExplosion(World world, ExplosionEFLN explosion, Entity entity, BlockPos location, double r, double explosionStrength) {
     Exploder exploder = new Exploder(world, explosion, entity, location, r, explosionStrength, Math.max(50, (int) (r * r * r / 10d)));
     exploder.handleEntities();
-    world.playSound(null, location, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F);
+    world.playSound(null, location, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.field_15245, 4.0F, (1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F);
     MinecraftForge.EVENT_BUS.register(exploder);
   }
 
@@ -96,7 +96,7 @@ public class Exploder {
 
     // damage and blast back entities
     List<Entity> list = world.getEntitiesInAABBexcluding(this.exploder,
-                                                         new AxisAlignedBB(x - r - 1,
+                                                         new BoundingBox(x - r - 1,
                                                                            y - r - 1,
                                                                            z - r - 1,
                                                                            x + r + 1,
@@ -233,7 +233,7 @@ public class Exploder {
   private void explodeBlock(BlockPos pos) {
     IBlockState state = world.getBlockState(pos);
     Block block = state.getBlock();
-    if(!world.isRemote && block.canDropFromExplosion(explosion)) {
+    if(!world.isClient && block.canDropFromExplosion(explosion)) {
       List<ItemStack> drops = block.getDrops(world, pos, state, 0);
       ForgeEventFactory.fireBlockHarvesting(drops, world, pos, state, 0, 1f, false, null);
       droppedItems.addAll(drops);

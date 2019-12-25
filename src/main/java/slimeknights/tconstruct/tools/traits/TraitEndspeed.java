@@ -48,16 +48,16 @@ public class TraitEndspeed extends AbstractProjectileTrait {
     double lastParticle = 0d;
     int ticks = projectile.ticksInAir;
     while(!projectile.inGround && projectile.ticksInAir > 1 && sqrDistanceTraveled < 40) {
-      double x = projectile.posX;
-      double y = projectile.posY;
-      double z = projectile.posZ;
+      double x = projectile.x;
+      double y = projectile.y;
+      double z = projectile.z;
 
       projectile.ticksInAir = ticks;
       projectile.updateInAir();
 
-      x -= projectile.posX;
-      y -= projectile.posY;
-      z -= projectile.posZ;
+      x -= projectile.x;
+      y -= projectile.y;
+      z -= projectile.z;
 
       double travelled = x*x + y*y + z*z;
       sqrDistanceTraveled += travelled;
@@ -69,9 +69,9 @@ public class TraitEndspeed extends AbstractProjectileTrait {
       if(lastParticle > 0.3d) {
         TinkerRangedWeapons.proxy.spawnParticle(Particles.ENDSPEED,
                                                 world,
-                                                projectile.posX,
-                                                projectile.posY,
-                                                projectile.posZ);
+                                                projectile.x,
+                                                projectile.y,
+                                                projectile.z);
         lastParticle = 0;
       }
     }

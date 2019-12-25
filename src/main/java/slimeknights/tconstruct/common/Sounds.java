@@ -3,8 +3,8 @@ package slimeknights.tconstruct.common;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.play.server.SPacketSoundEffect;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -39,7 +39,7 @@ public abstract class Sounds {
 
 
   private static SoundEvent sound(String name) {
-    ResourceLocation location = Util.getResource(name);
+    Identifier location = Util.getResource(name);
     SoundEvent event = new SoundEvent(location);
     event.setRegistryName(location);
     sounds.add(event);
@@ -52,7 +52,7 @@ public abstract class Sounds {
 
   public static void PlaySoundForPlayer(Entity entity, SoundEvent sound, float volume, float pitch) {
     if(entity instanceof EntityPlayerMP) {
-      TinkerNetwork.sendPacket(entity, new SPacketSoundEffect(sound, entity.getSoundCategory(), entity.posX, entity.posY, entity.posZ, volume, pitch));
+      TinkerNetwork.sendPacket(entity, new SPacketSoundEffect(sound, entity.getSoundCategory(), entity.x, entity.y, entity.z, volume, pitch));
     }
   }
 

@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.tools.common.network;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -27,7 +27,7 @@ public class ToolStationTextPacket extends AbstractPacketThreadsafe {
 
   @Override
   public void handleClientSafe(NetHandlerPlayClient netHandler) {
-    Container container = Minecraft.getMinecraft().player.openContainer;
+    Container container = MinecraftClient.getMinecraft().player.openContainer;
     if(container instanceof ContainerToolStation) {
       ((ContainerToolStation) container).setToolName(text);
     }

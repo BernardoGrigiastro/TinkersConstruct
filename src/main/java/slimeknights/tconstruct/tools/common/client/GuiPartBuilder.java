@@ -1,15 +1,14 @@
 package slimeknights.tconstruct.tools.common.client;
 
 import com.google.common.collect.Lists;
-
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -41,7 +40,7 @@ import slimeknights.tconstruct.tools.common.tileentity.TilePartBuilder;
 @SideOnly(Side.CLIENT)
 public class GuiPartBuilder extends GuiTinkerStation {
 
-  private static final ResourceLocation BACKGROUND = Util.getResource("textures/gui/partbuilder.png");
+  private static final Identifier BACKGROUND = Util.getResource("textures/gui/partbuilder.png");
 
   public static final int Column_Count = 4;
 
@@ -125,7 +124,7 @@ public class GuiPartBuilder extends GuiTinkerStation {
 
         Item part = Pattern.getPartFromTag(container.getSlot(2).getStack());
         if(part instanceof IToolPart && matchAmount < ((IToolPart) part).getCost()) {
-          amount = TextFormatting.DARK_RED + amount + TextFormatting.RESET;
+          amount = TextFormat.field_1079 + amount + TextFormat.RESET;
         }
       }
     }
@@ -150,7 +149,7 @@ public class GuiPartBuilder extends GuiTinkerStation {
         Material material = toolPart.getMaterial(output);
         // Material for the toolpart does not make sense, can't build anything out of it!
         if(!toolPart.canUseMaterial(material)) {
-          String materialName = material.getLocalizedNameColored() + TextFormatting.WHITE;
+          String materialName = material.getLocalizedNameColored() + TextFormat.field_1068;
           String error = I18n
               .translateToLocalFormatted("gui.error.useless_tool_part", materialName, (new ItemStack(toolPart)).getDisplayName());
           warning(error);
@@ -191,7 +190,7 @@ public class GuiPartBuilder extends GuiTinkerStation {
   public void updateButtons() {
     if(buttons != null) {
       // this needs to be done threadsafe, since the buttons may be getting rendered currently
-      Minecraft.getMinecraft().addScheduledTask(() -> buttons.updatePosition(cornerX, cornerY, realWidth, realHeight));
+      MinecraftClient.getMinecraft().addScheduledTask(() -> buttons.updatePosition(cornerX, cornerY, realWidth, realHeight));
     }
   }
 
@@ -203,7 +202,7 @@ public class GuiPartBuilder extends GuiTinkerStation {
     for(IMaterialStats stat : material.getAllStats()) {
       List<String> info = stat.getLocalizedInfo();
       if(!info.isEmpty()) {
-        stats.add(TextFormatting.UNDERLINE + stat.getLocalizedName());
+        stats.add(TextFormat.field_1073 + stat.getLocalizedName());
         stats.addAll(info);
         stats.add(null);
         tips.add(null);

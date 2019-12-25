@@ -1,11 +1,10 @@
 package slimeknights.tconstruct.library.client.model;
 
 import com.google.common.collect.ImmutableList;
-
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.texture.Sprite;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.model.IModelState;
@@ -22,17 +21,17 @@ public class DummyModel implements IModel {
   public static final DummyModel INSTANCE = new DummyModel();
 
   @Override
-  public Collection<ResourceLocation> getDependencies() {
+  public Collection<Identifier> getDependencies() {
     return ImmutableList.of();
   }
 
   @Override
-  public Collection<ResourceLocation> getTextures() {
+  public Collection<Identifier> getTextures() {
     return ImmutableList.of();
   }
 
   @Override
-  public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+  public IBakedModel bake(IModelState state, VertexFormat format, Function<Identifier, Sprite> bakedTextureGetter) {
     return ModelLoaderRegistry.getMissingModel().bake(ModelLoaderRegistry.getMissingModel().getDefaultState(), format, bakedTextureGetter);
   }
 

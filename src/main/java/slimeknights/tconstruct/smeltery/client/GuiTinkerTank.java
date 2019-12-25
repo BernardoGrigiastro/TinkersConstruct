@@ -3,7 +3,7 @@ package slimeknights.tconstruct.smeltery.client;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.Container;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.fluids.FluidStack;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ import slimeknights.tconstruct.smeltery.tileentity.TileTinkerTank;
 
 public class GuiTinkerTank extends GuiContainer implements IGuiLiquidTank {
 
-  public static final ResourceLocation BACKGROUND = Util.getResource("textures/gui/tinker_tank.png");
+  public static final Identifier BACKGROUND = Util.getResource("textures/gui/tinker_tank.png");
   protected GuiElement scala = new GuiElement(122, 0, 106, 106, 256, 256);
 
   public TileTinkerTank tinkerTank;
@@ -74,7 +74,7 @@ public class GuiTinkerTank extends GuiContainer implements IGuiLiquidTank {
     return GuiUtil.getFluidStackAtPosition(tinkerTank.getTank(), mouseX - guiLeft, mouseY - guiTop, 8, 16, 114, 122);
   }
 
-  protected void drawBackground(ResourceLocation background) {
+  protected void drawBackground(Identifier background) {
     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     this.mc.getTextureManager().bindTexture(background);
     this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);

@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
+import net.minecraft.network.ClientConnection;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -169,7 +169,7 @@ public abstract class TileMultiblock<T extends MultiblockDetection> extends Tile
   }
 
   @Override
-  public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+  public void onDataPacket(ClientConnection net, SPacketUpdateTileEntity pkt) {
     boolean wasActive = active;
 
     readFromNBT(pkt.getNbtCompound());

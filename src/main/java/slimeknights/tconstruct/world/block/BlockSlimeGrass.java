@@ -3,9 +3,9 @@ package slimeknights.tconstruct.world.block;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockGrass;
-import net.minecraft.block.IGrowable;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.BlockRenderLayer;
+import net.minecraft.block.Fertilizable;
+import net.minecraft.block.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
@@ -15,12 +15,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.EnumPlantType;
@@ -35,24 +35,24 @@ import javax.annotation.Nonnull;
 import java.util.Locale;
 import java.util.Random;
 
-public class BlockSlimeGrass extends Block implements IGrowable {
+public class BlockSlimeGrass extends Block implements Fertilizable {
 
   public static PropertyEnum<DirtType> TYPE = PropertyEnum.create("type", DirtType.class);
   public static PropertyEnum<FoliageType> FOLIAGE = PropertyEnum.create("foliage", FoliageType.class);
   public static final PropertyBool SNOWY = PropertyBool.create("snowy");
 
   public BlockSlimeGrass() {
-    super(Material.GRASS);
-    this.setDefaultState(this.blockState.getBaseState().withProperty(SNOWY, Boolean.FALSE));
+    super(Material.ORGANIC);
+    this.setDefaultState(this.stateFactory.getBaseState().withProperty(SNOWY, Boolean.FALSE));
     this.setTickRandomly(true);
     this.setCreativeTab(TinkerRegistry.tabWorld);
     this.setHardness(0.65f);
-    this.setSoundType(SoundType.PLANT);
-    this.slipperiness += 0.05f;
+    this.setSoundType(BlockSoundGroup.GRASS);
+    this.friction += 0.05f;
   }
 
   @Override
-  public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
     for(FoliageType grass : FoliageType.values()) {
       for(DirtType type : DirtType.values()) {
         list.add(new ItemStack(this, 1, getMetaFromState(getDefaultState().withProperty(TYPE, type).withProperty(FOLIAGE, grass))));
@@ -112,7 +112,7 @@ public class BlockSlimeGrass extends Block implements IGrowable {
 
   @Override
   public void updateTick(World worldIn, @Nonnull BlockPos pos, IBlockState state, @Nonnull Random rand) {
-    if(worldIn.isRemote) {
+    if(worldIn.isClient) {
       return;
     }
 
@@ -184,7 +184,7 @@ public class BlockSlimeGrass extends Block implements IGrowable {
 
   @Nonnull
   @Override
-  public ItemStack getPickBlock(@Nonnull IBlockState state, RayTraceResult target, @Nonnull World world, @Nonnull BlockPos pos, EntityPlayer player) {
+  public ItemStack getPickBlock(@Nonnull IBlockState state, HitResult target, @Nonnull World world, @Nonnull BlockPos pos, EntityPlayer player) {
     return this.getSilkTouchDrop(world.getBlockState(pos));
   }
 
@@ -245,10 +245,10 @@ public class BlockSlimeGrass extends Block implements IGrowable {
   @SideOnly(Side.CLIENT)
   public BlockRenderLayer getBlockLayer()
   {
-    return BlockRenderLayer.CUTOUT_MIPPED;
+    return BlockRenderLayer.MIPPED_CUTOUT;
   }
 
-  public enum FoliageType implements IStringSerializable, EnumBlock.IEnumMeta {
+  public enum FoliageType implements StringRepresentable, EnumBlock.IEnumMeta {
     BLUE,
     PURPLE,
     ORANGE;
@@ -272,7 +272,7 @@ public class BlockSlimeGrass extends Block implements IGrowable {
     }
   }
 
-  public enum DirtType implements IStringSerializable {
+  public enum DirtType implements StringRepresentable {
     VANILLA,
     GREEN,
     BLUE,

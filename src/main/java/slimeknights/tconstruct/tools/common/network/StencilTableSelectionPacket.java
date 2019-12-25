@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.tools.common.network;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -30,11 +30,11 @@ public class StencilTableSelectionPacket extends AbstractPacketThreadsafe {
 
   @Override
   public void handleClientSafe(NetHandlerPlayClient netHandler) {
-    Container container = Minecraft.getMinecraft().player.openContainer;
+    Container container = MinecraftClient.getMinecraft().player.openContainer;
     if(container instanceof ContainerStencilTable) {
       ((ContainerStencilTable) container).setOutput(output);
-      if(Minecraft.getMinecraft().currentScreen instanceof GuiStencilTable) {
-        ((GuiStencilTable) Minecraft.getMinecraft().currentScreen).onSelectionPacket(this);
+      if(MinecraftClient.getMinecraft().currentScreen instanceof GuiStencilTable) {
+        ((GuiStencilTable) MinecraftClient.getMinecraft().currentScreen).onSelectionPacket(this);
       }
     }
   }

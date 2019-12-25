@@ -3,13 +3,13 @@ package slimeknights.tconstruct.smeltery.client;
 import javax.annotation.Nonnull;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -24,7 +24,7 @@ import slimeknights.tconstruct.smeltery.block.BlockTinkerTankController;
 import slimeknights.tconstruct.smeltery.tileentity.TileTinkerTank;
 
 public class TinkerTankRenderer extends SmelteryTankRenderer<TileTinkerTank> {
-  protected static Minecraft mc = Minecraft.getMinecraft();
+  protected static MinecraftClient mc = MinecraftClient.getMinecraft();
 
   @Override
   public void render(@Nonnull TileTinkerTank tinkerTank, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -60,14 +60,14 @@ public class TinkerTankRenderer extends SmelteryTankRenderer<TileTinkerTank> {
       Tessellator tessellator = Tessellator.getInstance();
       BufferBuilder renderer = tessellator.getBuffer();
 
-      renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-      mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+      renderer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR_UV_LMAP);
+      mc.textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
       EnumFacing face = world.getBlockState(tilePos).getValue(BlockTinkerTankController.FACING);
 
       // set up data for the sprite rendering
       Fluid fluid = fluidStack.getFluid();
-      TextureAtlasSprite sprite = mc.getTextureMapBlocks().getTextureExtry(fluid.getStill().toString());
+      Sprite sprite = mc.getTextureMapBlocks().getTextureExtry(fluid.getStill().toString());
       int brightness = world.getCombinedLight(tilePos.offset(face), fluid.getLuminosity(fluidStack));
       int color = fluid.getColor(fluidStack);
 

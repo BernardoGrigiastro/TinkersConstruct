@@ -1,8 +1,7 @@
 package slimeknights.tconstruct.plugin.jei.casting;
 
 import com.google.common.collect.ImmutableList;
-
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
@@ -74,16 +73,16 @@ public class CastingRecipeWrapper implements IRecipeWrapper {
   }
 
   @Override
-  public void drawInfo(@Nonnull Minecraft minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
+  public void drawInfo(@Nonnull MinecraftClient minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
     castingBlock.draw(minecraft, 59, 42);
 
     String s = String.format("%d s", recipe.getTime() / 20);
     int x = 92;
-    x -= minecraft.fontRenderer.getStringWidth(s) / 2;
+    x -= minecraft.textRenderer.getStringWidth(s) / 2;
 
-    minecraft.fontRenderer.drawString(s, x, 16, Color.gray.getRGB());
+    minecraft.textRenderer.drawString(s, x, 16, Color.gray.getRGB());
     if(recipe.consumesCast()) {
-      minecraft.fontRenderer.drawString(Util.translate("gui.jei.casting.consume"), 78, 48, 0xaa0000);
+      minecraft.textRenderer.drawString(Util.translate("gui.jei.casting.consume"), 78, 48, 0xaa0000);
     }
   }
 

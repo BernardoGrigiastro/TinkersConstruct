@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.plugin.waila;
 
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
@@ -34,7 +34,7 @@ public class TankDataProvider implements IWailaDataProvider {
   public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
     if(config.getConfig(WailaRegistrar.CONFIG_TANK)) {
 
-      TileEntity te = accessor.getTileEntity();
+      BlockEntity te = accessor.getTileEntity();
 
       if(te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null)) {
         IFluidHandler fluidHandler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
@@ -61,7 +61,7 @@ public class TankDataProvider implements IWailaDataProvider {
   }
 
   @Override
-  public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos) {
+  public NBTTagCompound getNBTData(EntityPlayerMP player, BlockEntity te, NBTTagCompound tag, World world, BlockPos pos) {
     return tag;
   }
 

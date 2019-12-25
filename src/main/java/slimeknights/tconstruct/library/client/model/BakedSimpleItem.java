@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.client.model.ItemLayerModel;
 import net.minecraftforge.client.model.PerspectiveMapWrapper;
@@ -26,7 +26,7 @@ import org.apache.commons.lang3.tuple.Pair;
  */
 public class BakedSimpleItem implements IBakedModel {
   private final ImmutableList<BakedQuad> quads;
-  private final TextureAtlasSprite particle;
+  private final Sprite particle;
   private final ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> transforms;
   private final IBakedModel otherModel;
   private final boolean isCulled;
@@ -36,7 +36,7 @@ public class BakedSimpleItem implements IBakedModel {
       this(quads, original.getParticleTexture(), transforms, original.getOverrides(), null);
   }
 
-  private BakedSimpleItem(ImmutableList<BakedQuad> quads, TextureAtlasSprite particle, ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> transforms, ItemOverrideList overrides, @Nullable IBakedModel unculledModel) {
+  private BakedSimpleItem(ImmutableList<BakedQuad> quads, Sprite particle, ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> transforms, ItemOverrideList overrides, @Nullable IBakedModel unculledModel) {
     this.quads = quads;
     this.particle = particle;
     this.transforms = transforms;
@@ -59,7 +59,7 @@ public class BakedSimpleItem implements IBakedModel {
   public boolean isAmbientOcclusion() { return true; }
   public boolean isGui3d() { return false; }
   public boolean isBuiltInRenderer() { return false; }
-  public TextureAtlasSprite getParticleTexture() { return particle; }
+  public Sprite getParticleTexture() { return particle; }
   public ItemOverrideList getOverrides() { return overrides; }
   public List<BakedQuad> getQuads(@Nullable IBlockState state, @Nullable EnumFacing side, long rand) {
     if(side == null) {

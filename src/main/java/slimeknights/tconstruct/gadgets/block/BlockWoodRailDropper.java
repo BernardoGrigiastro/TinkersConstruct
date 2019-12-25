@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.gadgets.block;
 
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.Hopper;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.IHopper;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -15,10 +15,10 @@ public class BlockWoodRailDropper extends BlockWoodRail {
 
   @Override
   public void onMinecartPass(World world, EntityMinecart cart, BlockPos pos) {
-    if(!cart.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.DOWN) || !(cart instanceof IHopper)) {
+    if(!cart.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.DOWN) || !(cart instanceof Hopper)) {
       return;
     }
-    TileEntity tileEntity = world.getTileEntity(pos.down());
+    BlockEntity tileEntity = world.getTileEntity(pos.down());
     if(tileEntity == null || !tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.DOWN)) {
       return;
     }

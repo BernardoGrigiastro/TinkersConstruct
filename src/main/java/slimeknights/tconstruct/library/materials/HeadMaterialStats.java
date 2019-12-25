@@ -2,11 +2,8 @@ package slimeknights.tconstruct.library.materials;
 
 
 import com.google.common.collect.Lists;
-
-import net.minecraft.util.text.TextFormatting;
-
 import java.util.List;
-
+import net.minecraft.text.TextFormat;
 import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.client.CustomFontColor;
 import slimeknights.tconstruct.library.utils.HarvestLevels;
@@ -63,11 +60,11 @@ public class HeadMaterialStats extends AbstractMaterialStats {
     return String.format("%s: %s",
                          Util.translate(LOC_Durability),
                          CustomFontColor.formatPartialAmount(durability, ref))
-           + TextFormatting.RESET;
+           + TextFormat.RESET;
   }
 
   public static String formatHarvestLevel(int level) {
-    return String.format("%s: %s", Util.translate(LOC_HarvestLevel), HarvestLevels.getHarvestLevelName(level)) + TextFormatting.RESET;
+    return String.format("%s: %s", Util.translate(LOC_HarvestLevel), HarvestLevels.getHarvestLevelName(level)) + TextFormat.RESET;
   }
 
   public static String formatMiningSpeed(float speed) {

@@ -1,11 +1,10 @@
 package slimeknights.tconstruct.tools.common.client;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.util.Identifier;
 import javax.annotation.Nonnull;
 
 import slimeknights.mantle.client.gui.GuiElement;
@@ -25,7 +24,7 @@ public class GuiButtonItem<T> extends GuiButton {
   private GuiElement guiPressed = GUI_Button_pressed;
   private GuiElement guiNormal = GUI_Button_normal;
   private GuiElement guiHover = GUI_Button_hover;
-  private ResourceLocation locBackground = Icons.ICON;
+  private Identifier locBackground = Icons.ICON;
 
   public GuiButtonItem(int buttonId, int x, int y, String displayName, @Nonnull T data) {
     super(buttonId, x, y, 18, 18, displayName);
@@ -41,7 +40,7 @@ public class GuiButtonItem<T> extends GuiButton {
     this.data = data;
   }
 
-  public GuiButtonItem<T> setGraphics(GuiElement normal, GuiElement hover, GuiElement pressed, ResourceLocation background) {
+  public GuiButtonItem<T> setGraphics(GuiElement normal, GuiElement hover, GuiElement pressed, Identifier background) {
     guiPressed = pressed;
     guiNormal = normal;
     guiHover = hover;
@@ -51,7 +50,7 @@ public class GuiButtonItem<T> extends GuiButton {
   }
 
   @Override
-  public void drawButton(@Nonnull Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+  public void drawButton(@Nonnull MinecraftClient mc, int mouseX, int mouseY, float partialTicks) {
     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     mc.getTextureManager().bindTexture(locBackground);
 
@@ -73,7 +72,7 @@ public class GuiButtonItem<T> extends GuiButton {
     }
   }
 
-  protected void drawIcon(Minecraft mc) {
+  protected void drawIcon(MinecraftClient mc) {
     mc.getRenderItem().renderItemIntoGUI(icon, x + 1, y + 1);
   }
 }

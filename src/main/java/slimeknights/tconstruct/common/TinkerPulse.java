@@ -1,12 +1,12 @@
 package slimeknights.tconstruct.common;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.StringRepresentable;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -68,7 +68,7 @@ public abstract class TinkerPulse {
     return block;
   }
 
-  protected static <E extends Enum<E> & EnumBlock.IEnumMeta & IStringSerializable> BlockStairsBase registerBlockStairsFrom(IForgeRegistry<Block> registry, EnumBlock<E> block, E value, String name) {
+  protected static <E extends Enum<E> & EnumBlock.IEnumMeta & StringRepresentable> BlockStairsBase registerBlockStairsFrom(IForgeRegistry<Block> registry, EnumBlock<E> block, E value, String name) {
     return registerBlock(registry, new BlockStairsBase(block.getDefaultState().withProperty(block.prop, value)), name);
   }
 
@@ -140,13 +140,13 @@ public abstract class TinkerPulse {
     return thing;
   }
 
-  protected static <T extends IForgeRegistryEntry<T>> T register(IForgeRegistry<T> registry, T thing, ResourceLocation name) {
+  protected static <T extends IForgeRegistryEntry<T>> T register(IForgeRegistry<T> registry, T thing, Identifier name) {
     thing.setRegistryName(name);
     registry.register(thing);
     return thing;
   }
 
-  protected static void registerTE(Class<? extends TileEntity> teClazz, String name) {
+  protected static void registerTE(Class<? extends BlockEntity> teClazz, String name) {
     if(!name.equals(name.toLowerCase(Locale.US))) {
       throw new IllegalArgumentException(String.format("Unlocalized names need to be all lowercase! TE: %s", name));
     }

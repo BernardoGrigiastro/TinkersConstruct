@@ -2,8 +2,8 @@ package slimeknights.tconstruct.tools.common.debug;
 
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.NonNullList;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.IForgeRegistryEntry.Impl;
 
@@ -14,7 +14,7 @@ import slimeknights.tconstruct.library.modifiers.TinkerGuiException;
 import slimeknights.tconstruct.library.tinkering.TinkersItem;
 import slimeknights.tconstruct.library.utils.ToolBuilder;
 
-public class TempToolModifying extends Impl<IRecipe> implements IRecipe {
+public class TempToolModifying extends Impl<Recipe> implements Recipe {
 
   public TempToolModifying() {
     this.setRegistryName(Util.getResource("mod"));
@@ -31,7 +31,7 @@ public class TempToolModifying extends Impl<IRecipe> implements IRecipe {
   public boolean matches(@Nonnull InventoryCrafting inv, @Nonnull World worldIn) {
     outputTool = null;
 
-    NonNullList<ItemStack> stacks = NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+    DefaultedList<ItemStack> stacks = DefaultedList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
     ItemStack tool = ItemStack.EMPTY;
 
     for(int i = 0; i < inv.getSizeInventory(); i++) {
@@ -63,8 +63,8 @@ public class TempToolModifying extends Impl<IRecipe> implements IRecipe {
 
   @Nonnull
   @Override
-  public NonNullList<ItemStack> getRemainingItems(@Nonnull InventoryCrafting inv) {
-    NonNullList<ItemStack> stacks = NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+  public DefaultedList<ItemStack> getRemainingItems(@Nonnull InventoryCrafting inv) {
+    DefaultedList<ItemStack> stacks = DefaultedList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
     ItemStack tool = null;
 
     for(int i = 0; i < inv.getSizeInventory(); i++) {

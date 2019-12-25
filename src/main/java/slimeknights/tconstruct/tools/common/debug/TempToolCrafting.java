@@ -2,8 +2,8 @@ package slimeknights.tconstruct.tools.common.debug;
 
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.NonNullList;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.IForgeRegistryEntry.Impl;
 
@@ -13,7 +13,7 @@ import slimeknights.tconstruct.library.TinkerRegistry;
 import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.tools.ToolCore;
 
-public class TempToolCrafting extends Impl<IRecipe> implements IRecipe {
+public class TempToolCrafting extends Impl<Recipe> implements Recipe {
 
   public TempToolCrafting() {
     this.setRegistryName(Util.getResource("tool"));
@@ -30,7 +30,7 @@ public class TempToolCrafting extends Impl<IRecipe> implements IRecipe {
   public boolean matches(@Nonnull InventoryCrafting inv, @Nonnull World worldIn) {
     outputTool = ItemStack.EMPTY;
 
-    NonNullList<ItemStack> input = NonNullList.create();
+    DefaultedList<ItemStack> input = DefaultedList.create();
 
     for(int i = 0; i < inv.getSizeInventory(); i++) {
       ItemStack slot = inv.getStackInSlot(i);
@@ -43,7 +43,7 @@ public class TempToolCrafting extends Impl<IRecipe> implements IRecipe {
       input.add(slot);
     }
 
-    NonNullList<ItemStack> inputs = Util.deepCopyFixedNonNullList(input);
+    DefaultedList<ItemStack> inputs = Util.deepCopyFixedNonNullList(input);
     for(ToolCore tool : TinkerRegistry.getTools()) {
       outputTool = tool.buildItemFromStacks(inputs);
       if(!outputTool.isEmpty()) {
@@ -61,8 +61,8 @@ public class TempToolCrafting extends Impl<IRecipe> implements IRecipe {
 
   @Nonnull
   @Override
-  public NonNullList<ItemStack> getRemainingItems(@Nonnull InventoryCrafting inv) {
-    return NonNullList.create();
+  public DefaultedList<ItemStack> getRemainingItems(@Nonnull InventoryCrafting inv) {
+    return DefaultedList.create();
   }
 
   @Override

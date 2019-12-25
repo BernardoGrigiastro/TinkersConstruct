@@ -17,11 +17,11 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.util.DefaultedList;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.StringRepresentable;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent.Register;
 import net.minecraftforge.fluids.Fluid;
@@ -779,7 +779,7 @@ public class TinkerSmeltery extends TinkerPulse {
         }
 
         // find the item
-        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(parts[0], parts[1]));
+        Item item = ForgeRegistries.ITEMS.getValue(new Identifier(parts[0], parts[1]));
         if(item == null || item == Items.AIR) {
           log.error("Invalid oredict melting ignore {}, unknown item", ignore);
           continue;
@@ -794,7 +794,7 @@ public class TinkerSmeltery extends TinkerPulse {
 
     // we go through all recipes, and check if it only consists of one of our known oredict entries
     recipes:
-    for(IRecipe irecipe : CraftingManager.REGISTRY) {
+    for(Recipe irecipe : CraftingManager.REGISTRY) {
       // empty?
       ItemStack output = irecipe.getRecipeOutput();
       if(output.isEmpty()) {
@@ -813,7 +813,7 @@ public class TinkerSmeltery extends TinkerPulse {
         continue;
       }
 
-      NonNullList<Ingredient> inputs = irecipe.getIngredients();
+      DefaultedList<Ingredient> inputs = irecipe.getIngredients();
 
       // this map holds how much of which fluid is known of the recipe
       // if an recipe contains an itemstack that can't be mapped to a fluid calculation is aborted
@@ -881,12 +881,12 @@ public class TinkerSmeltery extends TinkerPulse {
     if (stack.getMetadata() != OreDictionary.WILDCARD_VALUE) {
       return ingredient.apply(stack);
     }
-    NonNullList<ItemStack> stacks = NonNullList.create();
+    DefaultedList<ItemStack> stacks = DefaultedList.create();
     stack.getItem().getSubItems(CreativeTabs.SEARCH, stacks);
     return stacks.stream().anyMatch(ingredient::apply);
   }
 
-  protected static <E extends Enum<E> & EnumBlock.IEnumMeta & IStringSerializable> BlockSearedStairs registerBlockSearedStairsFrom(IForgeRegistry<Block> registry, EnumBlock<E> block, E value, String name) {
+  protected static <E extends Enum<E> & EnumBlock.IEnumMeta & StringRepresentable> BlockSearedStairs registerBlockSearedStairsFrom(IForgeRegistry<Block> registry, EnumBlock<E> block, E value, String name) {
     return registerBlock(registry, new BlockSearedStairs(block.getDefaultState().withProperty(block.prop, value)), name);
   }
 }

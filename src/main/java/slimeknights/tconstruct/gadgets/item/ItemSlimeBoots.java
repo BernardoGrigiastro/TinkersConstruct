@@ -1,16 +1,17 @@
 package slimeknights.tconstruct.gadgets.item;
 
+import ArmorMaterial;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
@@ -92,9 +93,9 @@ public class ItemSlimeBoots extends ItemArmorTooltip {
    * ItemStack sensitive version of getItemAttributeModifiers
    */
   @Override
-  public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack) {
+  public Multimap<String, EntityAttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack) {
     // return an empty map as all our armor values are 0, causing a weird tooltip
-    return HashMultimap.<String, AttributeModifier>create();
+    return HashMultimap.<String, EntityAttributeModifier>create();
   }
 
   @Nonnull
@@ -114,7 +115,7 @@ public class ItemSlimeBoots extends ItemArmorTooltip {
    * returns 16 items)
    */
   @Override
-  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
     if(this.isInCreativeTab(tab)) {
       for(SlimeType type : SlimeType.VISIBLE_COLORS) {
         subItems.add(new ItemStack(this, 1, type.getMeta()));
@@ -135,7 +136,7 @@ public class ItemSlimeBoots extends ItemArmorTooltip {
     }
 
     // thing is wearing slime boots. let's get bouncyyyyy
-    boolean isClient = entity.getEntityWorld().isRemote;
+    boolean isClient = entity.getEntityWorld().isClient;
     if(!entity.isSneaking() && event.getDistance() > 2) {
       event.setDamageMultiplier(0);
       entity.fallDistance = 0;
@@ -146,7 +147,7 @@ public class ItemSlimeBoots extends ItemArmorTooltip {
         //entity.motionZ = entity.posZ - entity.lastTickPosZ;
         //event.entityLiving.motionY *= -1.2;
         //event.entityLiving.motionY += 0.8;
-        entity.isAirBorne = true;
+        entity.velocityDirty = true;
         entity.onGround = false;
         double f = 0.91d + 0.04d;
         //System.out.println((entityLiving.worldObj.isRemote ? "client: " : "server: ") + entityLiving.motionX);

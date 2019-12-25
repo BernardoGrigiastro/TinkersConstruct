@@ -4,8 +4,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
@@ -35,7 +35,7 @@ public class EntityThrowball extends EntityThrowable implements IEntityAdditiona
   }
 
   @Override
-  protected void onImpact(@Nonnull RayTraceResult result) {
+  protected void onImpact(@Nonnull HitResult result) {
     if(type != null) {
       switch(type) {
         case GLOW:
@@ -47,20 +47,20 @@ public class EntityThrowball extends EntityThrowable implements IEntityAdditiona
       }
     }
 
-    if(!this.getEntityWorld().isRemote) {
+    if(!this.getEntityWorld().isClient) {
       this.setDead();
     }
   }
 
-  private void placeGlow(RayTraceResult result) {
-    if(!getEntityWorld().isRemote) {
+  private void placeGlow(HitResult result) {
+    if(!getEntityWorld().isClient) {
       BlockPos pos = result.getBlockPos();
       if(pos == null && result.entityHit != null) {
         pos = result.entityHit.getPosition();
       }
 
       EnumFacing facing = EnumFacing.DOWN;
-      if(result.typeOfHit == RayTraceResult.Type.BLOCK) {
+      if(result.typeOfHit == HitResult.Type.BLOCK) {
         pos = pos.offset(result.sideHit);
         facing = result.sideHit.getOpposite();
       }
@@ -71,10 +71,10 @@ public class EntityThrowball extends EntityThrowable implements IEntityAdditiona
   }
 
   protected void explode(float strength) {
-    if(!getEntityWorld().isRemote) {
-      ExplosionEFLN explosion = new ExplosionEFLN(getEntityWorld(), this, posX, posY, posZ, strength, false, false);
+    if(!getEntityWorld().isClient) {
+      ExplosionEFLN explosion = new ExplosionEFLN(getEntityWorld(), this, x, y, z, strength, false, false);
       if(!ForgeEventFactory.onExplosionStart(world, explosion)) {
-        Exploder.startExplosion(getEntityWorld(), explosion, this, new BlockPos(posX, posY, posZ), strength, strength);
+        Exploder.startExplosion(getEntityWorld(), explosion, this, new BlockPos(x, y, z), strength, strength);
       }
     }
   }

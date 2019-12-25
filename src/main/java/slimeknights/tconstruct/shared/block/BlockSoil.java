@@ -1,7 +1,6 @@
 package slimeknights.tconstruct.shared.block;
 
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -9,13 +8,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureAttribute;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.DamageSource;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -39,14 +39,14 @@ public class BlockSoil extends EnumBlock<BlockSoil.SoilTypes> {
     this.slipperiness = 0.8F;
     this.setHardness(3.0f);
 
-    this.setSoundType(SoundType.SAND);
+    this.setSoundType(BlockSoundGroup.SAND);
 
     setHarvestLevel("shovel", -1);
     setCreativeTab(TinkerRegistry.tabGeneral);
   }
 
   @Override
-  public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
     for(SoilTypes type : SoilTypes.values()) {
       if(isTypeEnabled(type)) {
         list.add(new ItemStack(this, 1, type.getMeta()));
@@ -128,7 +128,7 @@ public class BlockSoil extends EnumBlock<BlockSoil.SoilTypes> {
     return super.canSustainPlant(state, world, pos, direction, plantable);
   }
 
-  public enum SoilTypes implements IStringSerializable, EnumBlock.IEnumMeta {
+  public enum SoilTypes implements StringRepresentable, EnumBlock.IEnumMeta {
     GROUT,
     SLIMY_MUD_GREEN,
     SLIMY_MUD_BLUE,

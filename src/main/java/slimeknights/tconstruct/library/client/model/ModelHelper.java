@@ -6,8 +6,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
-
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemTransformVec3f;
@@ -17,7 +16,7 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.relauncher.Side;
@@ -58,10 +57,10 @@ public class ModelHelper extends slimeknights.mantle.client.ModelHelper {
       .create();
 
   public static IBakedModel getBakedModelForItem(ItemStack stack, World world, EntityLivingBase entity) {
-    IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(stack, world, entity);
+    IBakedModel model = MinecraftClient.getMinecraft().getRenderItem().getItemModelWithOverrides(stack, world, entity);
     if(model == null || model.isBuiltInRenderer()) {
       // missing model so people don't go paranoid when their chests go missing
-      model = Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getModelManager().getMissingModel();
+      model = MinecraftClient.getMinecraft().getRenderItem().getItemModelMesher().getModelManager().getMissingModel();
     }
     else {
       // take color into account
@@ -70,17 +69,17 @@ public class ModelHelper extends slimeknights.mantle.client.ModelHelper {
     return model;
   }
 
-  public static Reader getReaderForResource(ResourceLocation location) throws IOException {
-    return getReaderForResource(location, Minecraft.getMinecraft().getResourceManager());
+  public static Reader getReaderForResource(Identifier location) throws IOException {
+    return getReaderForResource(location, MinecraftClient.getMinecraft().getResourceManager());
   }
 
-  public static Reader getReaderForResource(ResourceLocation location, IResourceManager resourceManager) throws IOException {
-    ResourceLocation file = new ResourceLocation(location.getResourceDomain(), location.getResourcePath() + ".json");
+  public static Reader getReaderForResource(Identifier location, IResourceManager resourceManager) throws IOException {
+    Identifier file = new Identifier(location.getResourceDomain(), location.getResourcePath() + ".json");
     IResource iresource = resourceManager.getResource(file);
     return new BufferedReader(new InputStreamReader(iresource.getInputStream(), Charsets.UTF_8));
   }
 
-  public static Map<String, String> loadTexturesFromJson(ResourceLocation location) throws IOException {
+  public static Map<String, String> loadTexturesFromJson(Identifier location) throws IOException {
     Reader reader = getReaderForResource(location);
     try {
       return GSON.fromJson(reader, ModelTextureDeserializer.TYPE);
@@ -89,7 +88,7 @@ public class ModelHelper extends slimeknights.mantle.client.ModelHelper {
     }
   }
 
-  public static Offset loadOffsetFromJson(ResourceLocation location) throws IOException {
+  public static Offset loadOffsetFromJson(Identifier location) throws IOException {
     Reader reader = getReaderForResource(location);
     try {
       return GSON.fromJson(reader, Offset.OffsetDeserializer.TYPE);
@@ -98,7 +97,7 @@ public class ModelHelper extends slimeknights.mantle.client.ModelHelper {
     }
   }
 
-  public static AmmoPosition loadAmmoPositionFromJson(ResourceLocation location) throws IOException {
+  public static AmmoPosition loadAmmoPositionFromJson(Identifier location) throws IOException {
     Reader reader = getReaderForResource(location);
     try {
       return GSON.fromJson(reader, AmmoPosition.AmmoPositionDeserializer.TYPE);
@@ -107,7 +106,7 @@ public class ModelHelper extends slimeknights.mantle.client.ModelHelper {
     }
   }
 
-  public static ImmutableList<ToolModelOverride> loadToolModelOverridesFromJson(ResourceLocation location) throws IOException {
+  public static ImmutableList<ToolModelOverride> loadToolModelOverridesFromJson(Identifier location) throws IOException {
     Reader reader = getReaderForResource(location);
     try {
       return GSON.fromJson(reader, ToolModelOverride.ToolModelOverrideListDeserializer.TYPE);
@@ -116,12 +115,12 @@ public class ModelHelper extends slimeknights.mantle.client.ModelHelper {
     }
   }
 
-  public static ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> loadTransformFromJson(ResourceLocation location)
+  public static ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> loadTransformFromJson(Identifier location)
       throws IOException {
     return loadTransformFromJson(location, "display");
   }
 
-  public static ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> loadTransformFromJson(ResourceLocation location, String tag)
+  public static ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> loadTransformFromJson(Identifier location, String tag)
       throws IOException {
     Reader reader = getReaderForResource(location);
     try {
@@ -142,7 +141,7 @@ public class ModelHelper extends slimeknights.mantle.client.ModelHelper {
     }
   }
 
-  public static ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> loadTransformFromJsonBackup(ResourceLocation location)
+  public static ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> loadTransformFromJsonBackup(Identifier location)
       throws IOException {
     Reader reader = getReaderForResource(location);
     try {
@@ -172,16 +171,16 @@ public class ModelHelper extends slimeknights.mantle.client.ModelHelper {
     return builder.build();
   }
 
-  public static ImmutableList<ResourceLocation> loadTextureListFromJson(ResourceLocation location) throws IOException {
-    ImmutableList.Builder<ResourceLocation> builder = ImmutableList.builder();
+  public static ImmutableList<Identifier> loadTextureListFromJson(Identifier location) throws IOException {
+    ImmutableList.Builder<Identifier> builder = ImmutableList.builder();
     for(String s : loadTexturesFromJson(location).values()) {
-      builder.add(new ResourceLocation(s));
+      builder.add(new Identifier(s));
     }
 
     return builder.build();
   }
 
-  public static Float[] loadLayerRotations(ResourceLocation location) throws IOException {
+  public static Float[] loadLayerRotations(Identifier location) throws IOException {
     JsonReader reader = new JsonReader(getReaderForResource(location));
     try {
       reader.beginObject();
@@ -199,8 +198,8 @@ public class ModelHelper extends slimeknights.mantle.client.ModelHelper {
     return new Float[0];
   }
 
-  public static ResourceLocation getModelLocation(ResourceLocation location) {
-    return new ResourceLocation(location.getResourceDomain(), "models/" + location.getResourcePath() + ".json");
+  public static Identifier getModelLocation(Identifier location) {
+    return new Identifier(location.getResourceDomain(), "models/" + location.getResourcePath() + ".json");
   }
 
 }

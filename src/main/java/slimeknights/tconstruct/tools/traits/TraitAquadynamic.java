@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools.traits;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
 import slimeknights.tconstruct.library.traits.AbstractTrait;
@@ -12,7 +12,7 @@ import slimeknights.tconstruct.library.traits.AbstractTrait;
 public class TraitAquadynamic extends AbstractTrait {
 
   public TraitAquadynamic() {
-    super("aquadynamic", TextFormatting.AQUA);
+    super("aquadynamic", TextFormat.field_1075);
   }
 
   @Override

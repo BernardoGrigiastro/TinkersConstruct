@@ -1,8 +1,7 @@
 package slimeknights.tconstruct.plugin.jei.drying;
 
 import com.google.common.collect.ImmutableList;
-
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 
 import java.awt.*;
@@ -33,7 +32,7 @@ public class DryingRecipeWrapper implements IRecipeWrapper {
   }
 
   @Override
-  public void drawInfo(@Nonnull Minecraft minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
+  public void drawInfo(@Nonnull MinecraftClient minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
     String minStr = "", secStr = "";
 
     // minutes is time divided by 20 ticks and 60 seconds
@@ -55,7 +54,7 @@ public class DryingRecipeWrapper implements IRecipeWrapper {
 
     // center the string above the recipe then draw it
     String timeStr = minStr + secStr;
-    int x = 80 - minecraft.fontRenderer.getStringWidth(timeStr) / 2;
-    minecraft.fontRenderer.drawString(timeStr, x, 5, Color.gray.getRGB());
+    int x = 80 - minecraft.textRenderer.getStringWidth(timeStr) / 2;
+    minecraft.textRenderer.drawString(timeStr, x, 5, Color.gray.getRGB());
   }
 }

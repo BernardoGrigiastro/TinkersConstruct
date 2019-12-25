@@ -4,18 +4,17 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
+import net.minecraft.network.ClientConnection;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
@@ -114,7 +113,7 @@ public class TileChannel extends MantleTileEntity implements ITickable, IFluidPa
     }
 
     // what are we flowing into
-    TileEntity te = world.getTileEntity(pos.offset(side));
+    BlockEntity te = world.getTileEntity(pos.offset(side));
     // for channels, we have slightly quicker logic
     if(te instanceof TileChannel) {
       TileChannel channel = (TileChannel)te;
@@ -151,14 +150,14 @@ public class TileChannel extends MantleTileEntity implements ITickable, IFluidPa
   }
 
   protected TileChannel getChannel(BlockPos pos) {
-    TileEntity te = getWorld().getTileEntity(pos);
+    BlockEntity te = getWorld().getTileEntity(pos);
     if(te != null && te instanceof TileChannel) {
       return (TileChannel) te;
     }
     return null;
   }
 
-  protected IFluidHandler getFluidHandler(TileEntity te, EnumFacing direction) {
+  protected IFluidHandler getFluidHandler(BlockEntity te, EnumFacing direction) {
     if(te != null && te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction)) {
       return te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction);
     }
@@ -198,7 +197,7 @@ public class TileChannel extends MantleTileEntity implements ITickable, IFluidPa
     EnumFacing side = hit.getOpposite();
 
     // if placed below a TE, update to connect to it
-    TileEntity te = world.getTileEntity(pos.offset(side));
+    BlockEntity te = world.getTileEntity(pos.offset(side));
     if(te == null) {
       return;
     }
@@ -245,7 +244,7 @@ public class TileChannel extends MantleTileEntity implements ITickable, IFluidPa
     if(side != null && side != EnumFacing.UP) {
       boolean isValid = false;
       boolean shouldOutput = false;
-      TileEntity te = world.getTileEntity(fromPos);
+      BlockEntity te = world.getTileEntity(fromPos);
       if(te instanceof TileChannel) {
         isValid = true;
       } else if(te != null && te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite())) {
@@ -270,7 +269,7 @@ public class TileChannel extends MantleTileEntity implements ITickable, IFluidPa
 
     // redstone power
     if(isPowered != wasPowered && side != null && side != EnumFacing.DOWN) {
-      TileEntity te = world.getTileEntity(pos.down());
+      BlockEntity te = world.getTileEntity(pos.down());
       boolean isValid2 = te != null && (te instanceof TileChannel || te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite()));
       this.connectedDown = isValid2 && isPowered;
 
@@ -286,7 +285,7 @@ public class TileChannel extends MantleTileEntity implements ITickable, IFluidPa
    */
   public boolean interact(EntityPlayer player, EnumFacing side) {
     // if placed below a channel, connect it to us
-    TileEntity te = world.getTileEntity(pos.offset(side));
+    BlockEntity te = world.getTileEntity(pos.offset(side));
 
     // if the TE is a channel, note that for later
     boolean isChannel = false;
@@ -471,8 +470,8 @@ public class TileChannel extends MantleTileEntity implements ITickable, IFluidPa
 
   @Override
   @SideOnly(Side.CLIENT)
-  public AxisAlignedBB getRenderBoundingBox() {
-    return new AxisAlignedBB(pos.getX(), pos.getY() - 1, pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
+  public BoundingBox getRenderBoundingBox() {
+    return new BoundingBox(pos.getX(), pos.getY() - 1, pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
   }
 
 
@@ -565,7 +564,7 @@ public class TileChannel extends MantleTileEntity implements ITickable, IFluidPa
   }
 
   @Override
-  public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+  public void onDataPacket(ClientConnection net, SPacketUpdateTileEntity pkt) {
     super.onDataPacket(net, pkt);
     readFromNBT(pkt.getNbtCompound());
   }
@@ -582,7 +581,7 @@ public class TileChannel extends MantleTileEntity implements ITickable, IFluidPa
     readFromNBT(tag);
   }
 
-  public static enum ChannelConnection implements IStringSerializable {
+  public static enum ChannelConnection implements StringRepresentable {
     NONE,
     IN,
     OUT;

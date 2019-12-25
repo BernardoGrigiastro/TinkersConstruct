@@ -1,13 +1,12 @@
 package slimeknights.tconstruct.gadgets;
 
 import com.google.common.collect.ImmutableSet;
-
-import net.minecraft.world.storage.loot.LootEntry;
+import net.minecraft.world.loot.LootPool;
+import net.minecraft.world.loot.UniformLootTableRange;
+import net.minecraft.world.loot.condition.RandomChanceLootCondition;
+import net.minecraft.world.loot.entry.LootEntry;
 import net.minecraft.world.storage.loot.LootEntryItem;
-import net.minecraft.world.storage.loot.LootPool;
-import net.minecraft.world.storage.loot.RandomValueRange;
 import net.minecraft.world.storage.loot.conditions.LootCondition;
-import net.minecraft.world.storage.loot.conditions.RandomChance;
 import net.minecraft.world.storage.loot.functions.LootFunction;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -29,8 +28,8 @@ public class GadgetEvents {
 
   public GadgetEvents() {
     LootEntry entry = new LootEntryItem(TinkerGadgets.spaghetti, 1, 1, new LootFunction[0], new LootCondition[0], "moms_spaghetti");
-    LootCondition chance = new RandomChance(0.05f);
-    pool = new LootPool(new LootEntry[] {entry}, new LootCondition[] {chance}, new RandomValueRange(1), new RandomValueRange(0), "moms_spaghetti");
+    LootCondition chance = new RandomChanceLootCondition(0.05f);
+    pool = new LootPool(new LootEntry[] {entry}, new LootCondition[] {chance}, new UniformLootTableRange(1), new UniformLootTableRange(0), "moms_spaghetti");
   }
 
   @SubscribeEvent

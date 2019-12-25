@@ -7,7 +7,7 @@ import com.google.gson.JsonParseException;
 import gnu.trove.map.hash.THashMap;
 
 import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.client.model.ICustomModelLoader;
 import net.minecraftforge.client.model.IModel;
 
@@ -35,22 +35,22 @@ public class ModifierModelLoader implements ICustomModelLoader {
   private static final Logger log = Util.getLogger("modifier");
 
   // holds additional json files that shall be loaded for a specific modifier
-  protected Map<String, List<ResourceLocation>> locations = Maps.newHashMap();
+  protected Map<String, List<Identifier>> locations = Maps.newHashMap();
   protected Map<String, Map<String, String>> cache;
 
   /**
    * Use {@link #getLocationForToolModifiers(String, String)} instead
    */
   @Deprecated
-  public static ResourceLocation getLocationForToolModifiers(String toolName) {
-    return new ResourceLocation(Util.RESOURCE, "modifiers/" + toolName + ModifierModelLoader.EXTENSION);
+  public static Identifier getLocationForToolModifiers(String toolName) {
+    return new Identifier(Util.RESOURCE, "modifiers/" + toolName + ModifierModelLoader.EXTENSION);
   }
-  public static ResourceLocation getLocationForToolModifiers(String domain, String toolName) {
-    return new ResourceLocation(domain, "modifiers/" + toolName + ModifierModelLoader.EXTENSION);
+  public static Identifier getLocationForToolModifiers(String domain, String toolName) {
+    return new Identifier(domain, "modifiers/" + toolName + ModifierModelLoader.EXTENSION);
   }
 
-  public void registerModifierFile(String modifier, ResourceLocation location) {
-    List<ResourceLocation> files = locations.get(modifier);
+  public void registerModifierFile(String modifier, Identifier location) {
+    List<Identifier> files = locations.get(modifier);
     if(files == null) {
       files = Lists.newLinkedList();
       locations.put(modifier, files);
@@ -60,12 +60,12 @@ public class ModifierModelLoader implements ICustomModelLoader {
   }
 
   @Override
-  public boolean accepts(ResourceLocation modelLocation) {
+  public boolean accepts(Identifier modelLocation) {
     return modelLocation.getResourcePath().endsWith(EXTENSION); // tinkermodifier extension. Foo.mod.json
   }
 
   @Override
-  public IModel loadModel(ResourceLocation modelLocation) {
+  public IModel loadModel(Identifier modelLocation) {
     // this function is actually getting called on a PER TOOL basis, not per modifier
     // we therefore need to look through all modifiers to construct a model containing all modifiers for that tool
 
@@ -80,7 +80,7 @@ public class ModifierModelLoader implements ICustomModelLoader {
 
     // next, try overrides from the tool .mod files
     String location = modelLocation.getResourcePath().substring(17); // remove models/modifiers/
-    ResourceLocation toolModifiers = new ResourceLocation(modelLocation.getResourceDomain(), "models/item/" + location);
+    Identifier toolModifiers = new Identifier(modelLocation.getResourceDomain(), "models/item/" + location);
     try {
       Map<String, String> textureEntries = ModelHelper.loadTexturesFromJson(toolModifiers);
 
@@ -120,7 +120,7 @@ public class ModifierModelLoader implements ICustomModelLoader {
 
         // register per-material modifiers for texture creation
         if(mod != null && mod.hasTexturePerMaterial()) {
-          CustomTextureCreator.registerTexture(new ResourceLocation(entry.getValue()));
+          CustomTextureCreator.registerTexture(new Identifier(entry.getValue()));
         }
       }
     }
@@ -141,10 +141,10 @@ public class ModifierModelLoader implements ICustomModelLoader {
     cache.put(defaultName, new THashMap<>());
 
     // loop through all knows modifier-model-files
-    for(Map.Entry<String, List<ResourceLocation>> entry : locations.entrySet()) {
+    for(Map.Entry<String, List<Identifier>> entry : locations.entrySet()) {
       String modifier = entry.getKey();
-      List<ResourceLocation> modLocations = entry.getValue();
-      for(ResourceLocation location : modLocations) {
+      List<Identifier> modLocations = entry.getValue();
+      for(Identifier location : modLocations) {
         try {
           // load the entries in the json file
           Map<String, String> textureEntries = ModelHelper.loadTexturesFromJson(location);

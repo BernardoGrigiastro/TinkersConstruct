@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.library.tools;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -13,10 +13,10 @@ import slimeknights.tconstruct.library.tinkering.PartMaterialType;
 public abstract class SwordCore extends TinkerToolCore {
 
   public static final ImmutableSet<Material> effective_materials =
-      ImmutableSet.of(Material.WEB,
-                      Material.VINE,
-                      Material.CORAL,
-                      Material.GOURD,
+      ImmutableSet.of(Material.COBWEB,
+                      Material.REPLACEABLE_PLANT,
+                      Material.UNUSED_PLANT,
+                      Material.PUMPKIN,
                       Material.LEAVES);
 
   public SwordCore(PartMaterialType... requiredComponents) {

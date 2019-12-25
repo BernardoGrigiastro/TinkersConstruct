@@ -2,11 +2,11 @@ package slimeknights.tconstruct.tools.traits;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.EntityDamageSource;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSource;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 
@@ -18,7 +18,7 @@ import slimeknights.tconstruct.tools.TinkerTools;
 public class TraitSpiky extends AbstractTrait {
 
   public TraitSpiky() {
-    super("spiky", TextFormatting.DARK_GREEN);
+    super("spiky", TextFormat.field_1077);
     MinecraftForge.EVENT_BUS.register(this);
   }
 
@@ -39,16 +39,16 @@ public class TraitSpiky extends AbstractTrait {
       if(!isBlocking) {
         damage /= 2;
       }
-      EntityDamageSource damageSource = new EntityDamageSource(DamageSource.CACTUS.damageType, player);
+      EntityDamageSource damageSource = new EntityDamageSource(DamageSource.CACTUS.name, player);
       damageSource.setDamageBypassesArmor();
       damageSource.setDamageIsAbsolute();
       damageSource.setIsThornsDamage();
 
-      int oldHurtResistantTime = target.hurtResistantTime;
+      int oldHurtResistantTime = target.field_6008;
       if(attackEntitySecondary(damageSource, damage, target, true, false)) {
         TinkerTools.proxy.spawnEffectParticle(ParticleEffect.Type.HEART_CACTUS, target, 1);
       }
-      target.hurtResistantTime = oldHurtResistantTime; // reset to old time
+      target.field_6008 = oldHurtResistantTime; // reset to old time
     }
   }
 

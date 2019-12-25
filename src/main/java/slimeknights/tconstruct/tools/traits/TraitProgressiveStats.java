@@ -2,8 +2,7 @@ package slimeknights.tconstruct.tools.traits;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextFormatting;
-
+import net.minecraft.text.TextFormat;
 import slimeknights.tconstruct.library.modifiers.ModifierNBT;
 import slimeknights.tconstruct.library.tools.ToolNBT;
 import slimeknights.tconstruct.library.traits.AbstractTrait;
@@ -23,7 +22,7 @@ public abstract class TraitProgressiveStats extends AbstractTrait {
   protected final String pool_key;    // Key to the tag that contains the free unassigned
   protected final String applied_key; // Key to the tag that contains the already applied bonus stats
 
-  public TraitProgressiveStats(String identifier, TextFormatting color) {
+  public TraitProgressiveStats(String identifier, TextFormat color) {
     super(identifier, color);
 
     pool_key = identifier + "StatPool";

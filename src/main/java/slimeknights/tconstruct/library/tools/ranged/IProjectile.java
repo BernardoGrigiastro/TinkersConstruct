@@ -4,7 +4,7 @@ import com.google.common.collect.Multimap;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -14,5 +14,5 @@ public interface IProjectile {
 
   boolean dealDamageRanged(ItemStack stack, Entity projectile, EntityLivingBase player, Entity entity, float damage);
 
-  Multimap<String, AttributeModifier> getProjectileAttributeModifier(ItemStack stack);
+  Multimap<String, EntityAttributeModifier> getProjectileAttributeModifier(ItemStack stack);
 }

@@ -1,13 +1,13 @@
 package slimeknights.tconstruct.library.client.renderer;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 
@@ -71,11 +71,11 @@ public class RenderProjectileBase<T extends EntityProjectileBase> extends Render
     renderManager.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
     if(!itemStack.isEmpty()) {
-      Minecraft.getMinecraft().getRenderItem().renderItem(itemStack, ItemCameraTransforms.TransformType.NONE);
+      MinecraftClient.getMinecraft().getRenderItem().renderItem(itemStack, ItemCameraTransforms.TransformType.NONE);
     }
     else {
       ItemStack dummy = new ItemStack(Items.STICK);
-      Minecraft.getMinecraft().getRenderItem().renderItem(dummy, Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getModelManager().getMissingModel());
+      MinecraftClient.getMinecraft().getRenderItem().renderItem(dummy, MinecraftClient.getMinecraft().getRenderItem().getItemModelMesher().getModelManager().getMissingModel());
     }
 
     GL11.glDisable(GL12.GL_RESCALE_NORMAL);
@@ -88,8 +88,8 @@ public class RenderProjectileBase<T extends EntityProjectileBase> extends Render
     // flip it, flop it, pop it, pull it, push it, rotate it, translate it, TECHNOLOGY
 
     // rotate it into the direction we threw it
-    GL11.glRotatef(entity.rotationYaw, 0f, 1f, 0f);
-    GL11.glRotatef(-entity.rotationPitch, 1f, 0f, 0f);
+    GL11.glRotatef(entity.yaw, 0f, 1f, 0f);
+    GL11.glRotatef(-entity.pitch, 1f, 0f, 0f);
 
     // adjust "stuck" depth
     if(entity.inGround) {
@@ -110,7 +110,7 @@ public class RenderProjectileBase<T extends EntityProjectileBase> extends Render
 
   @Nonnull
   @Override
-  protected ResourceLocation getEntityTexture(@Nonnull T entity) {
+  protected Identifier getEntityTexture(@Nonnull T entity) {
     return TextureMap.LOCATION_MISSING_TEXTURE;
   }
 

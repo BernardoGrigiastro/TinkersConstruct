@@ -5,8 +5,8 @@ import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StringUtils;
+import net.minecraft.util.ChatUtil;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -30,7 +30,7 @@ public final class ModelRegisterUtil {
   // Regular ITEM MODELS //
 
   /** Registers the item-meta combo in the itemstack with the given location for the inventory-variant */
-  public static void registerItemModel(ItemStack itemStack, ResourceLocation name) {
+  public static void registerItemModel(ItemStack itemStack, Identifier name) {
     if(!itemStack.isEmpty() && name != null) {
       // tell the loader to load the model
       ModelLoader.registerItemVariants(itemStack.getItem(), name);
@@ -40,8 +40,8 @@ public final class ModelRegisterUtil {
   }
 
   /** Registers the given item with its registry name for all metadata values for the inventory variant */
-  public static ResourceLocation registerItemModel(Item item) {
-    ResourceLocation itemLocation = null;
+  public static Identifier registerItemModel(Item item) {
+    Identifier itemLocation = null;
     if(item != null) {
       itemLocation = item.getRegistryName();
     }
@@ -53,7 +53,7 @@ public final class ModelRegisterUtil {
   }
 
   /** Registers the item of the given block with its registry name for all metadata values for the inventory variant */
-  public static ResourceLocation registerItemModel(Block block) {
+  public static Identifier registerItemModel(Block block) {
     return registerItemModel(Item.getItemFromBlock(block));
   }
 
@@ -83,8 +83,8 @@ public final class ModelRegisterUtil {
   }
 
   /** Registers the given item/meta combination with the model at the given location, and the given variant */
-  public static void registerItemModel(Item item, int meta, ResourceLocation location, String variant) {
-    if(item != null && !StringUtils.isNullOrEmpty(variant)) {
+  public static void registerItemModel(Item item, int meta, Identifier location, String variant) {
+    if(item != null && !ChatUtil.isNullOrEmpty(variant)) {
       //ModelLoader.registerItemVariants(item, location);
       ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(item.getRegistryName(), variant));
     }
@@ -96,21 +96,21 @@ public final class ModelRegisterUtil {
    * Registers a multimodel that should be loaded via our multimodel loader.
    * The model-string is obtained through the items registry name.
    */
-  public static ResourceLocation registerToolModel(ToolCore tool) {
+  public static Identifier registerToolModel(ToolCore tool) {
     if(tool == null || tool.getRegistryName() == null) {
       return null;
     }
-    ResourceLocation itemLocation = tool.getRegistryName();
+    Identifier itemLocation = tool.getRegistryName();
     String path = "tools/" + itemLocation.getResourcePath() + ToolModelLoader.EXTENSION;
 
-    ResourceLocation location = new ResourceLocation(itemLocation.getResourceDomain(), path);
+    Identifier location = new Identifier(itemLocation.getResourceDomain(), path);
     ToolModelLoader.addPartMapping(location, tool);
 
     return registerToolModel(tool, location);
   }
 
   /** Manual registration of a tool model. You probably shouldn't be using this. */
-  public static ResourceLocation registerToolModel(Item item, final ResourceLocation location) {
+  public static Identifier registerToolModel(Item item, final Identifier location) {
     if(!location.getResourcePath().endsWith(ToolModelLoader.EXTENSION)) {
       TConstruct.log.error("The material-model " + location.toString() + " does not end with '"
                            + ToolModelLoader.EXTENSION
@@ -123,14 +123,14 @@ public final class ModelRegisterUtil {
   // TOOL PART MODELS //
 
   /** Register a toolpart to be loaded via the material model loader by its registry name */
-  public static <T extends Item & IToolPart> ResourceLocation registerPartModel(T item) {
+  public static <T extends Item & IToolPart> Identifier registerPartModel(T item) {
     if(item == null || item.getRegistryName() == null) {
       return null;
     }
-    ResourceLocation itemLocation = item.getRegistryName();
+    Identifier itemLocation = item.getRegistryName();
 
     String path = "parts/" + itemLocation.getResourcePath() + MaterialModelLoader.EXTENSION;
-    ResourceLocation location = new ResourceLocation(itemLocation.getResourceDomain(), path);
+    Identifier location = new Identifier(itemLocation.getResourceDomain(), path);
 
     MaterialModelLoader.addPartMapping(location, item);
 
@@ -140,19 +140,19 @@ public final class ModelRegisterUtil {
   // GENERAL MATERIAL MODELS //
 
   /** Registers a material model to be loaded via the material modelloader */
-  public static ResourceLocation registerMaterialItemModel(Item item) {
+  public static Identifier registerMaterialItemModel(Item item) {
     if(item == null || item.getRegistryName() == null) {
       return null;
     }
-    ResourceLocation itemLocation = item.getRegistryName();
-    itemLocation = new ResourceLocation(itemLocation.getResourceDomain(),
+    Identifier itemLocation = item.getRegistryName();
+    itemLocation = new Identifier(itemLocation.getResourceDomain(),
                                         itemLocation.getResourcePath() + MaterialModelLoader.EXTENSION);
 
     return registerMaterialModel(item, itemLocation);
   }
 
   /** Manual registration of a material model. You probably shouldn't be using this. */
-  static ResourceLocation registerMaterialModel(Item item, final ResourceLocation location) {
+  static Identifier registerMaterialModel(Item item, final Identifier location) {
     if(!location.getResourcePath().endsWith(MaterialModelLoader.EXTENSION)) {
       TConstruct.log.error("The material-model " + location.toString() + " does not end with '"
                            + MaterialModelLoader.EXTENSION
@@ -165,13 +165,13 @@ public final class ModelRegisterUtil {
   // MODIFIER MODELS //
 
   /** Registers a modifier to be loaded via the modifier model loader */
-  public static void registerModifierModel(IModifier modifier, ResourceLocation location) {
+  public static void registerModifierModel(IModifier modifier, Identifier location) {
     ClientProxy.modifierLoader.registerModifierFile(modifier.getIdentifier(), location);
   }
 
   // INTERNAL //
 
-  private static ResourceLocation registerIt(Item item, final ResourceLocation location) {
+  private static Identifier registerIt(Item item, final Identifier location) {
     // plop it in.
     // This here is needed for the model to be found ingame when the game looks for a model to render an Itemstack
     // we use an ItemMeshDefinition because it allows us to do it no matter what metadata we use

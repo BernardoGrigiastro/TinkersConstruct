@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools.common.item;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -29,7 +29,7 @@ public class ItemBlockTable extends ItemBlockMeta {
   }
 
   @Override
-  public void addInformation(@Nonnull ItemStack stack, @Nullable World worldIn, @Nonnull List<String> tooltip, ITooltipFlag flagIn) {
+  public void addInformation(@Nonnull ItemStack stack, @Nullable World worldIn, @Nonnull List<String> tooltip, TooltipContext flagIn) {
     super.addInformation(stack, worldIn, tooltip, flagIn);
     if(!stack.hasTagCompound()) {
       return;
@@ -55,7 +55,7 @@ public class ItemBlockTable extends ItemBlockMeta {
     return new ItemStack(tag);
   }
 
-  protected void addInventoryInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+  protected void addInventoryInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, TooltipContext flagIn) {
     // get the inventory, so we can inspect its items
     NBTTagCompound inventory = stack.getTagCompound().getCompoundTag("inventory");
 

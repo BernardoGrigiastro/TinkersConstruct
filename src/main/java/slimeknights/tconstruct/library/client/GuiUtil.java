@@ -3,14 +3,13 @@ package slimeknights.tconstruct.library.client;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.client.texture.Sprite;
+import net.minecraft.text.TextFormat;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
@@ -39,14 +38,14 @@ public class GuiUtil {
   private GuiUtil() {
   }
 
-  protected static Minecraft mc = Minecraft.getMinecraft();
+  protected static MinecraftClient mc = MinecraftClient.getMinecraft();
 
   /** Renders the given texture tiled into a GUI */
-  public static void renderTiledTextureAtlas(int x, int y, int width, int height, float depth, TextureAtlasSprite sprite, boolean upsideDown) {
+  public static void renderTiledTextureAtlas(int x, int y, int width, int height, float depth, Sprite sprite, boolean upsideDown) {
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder worldrenderer = tessellator.getBuffer();
-    worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-    mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+    worldrenderer.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV);
+    mc.textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
     putTiledTextureQuads(worldrenderer, x, y, width, height, depth, sprite, upsideDown);
 
@@ -54,13 +53,13 @@ public class GuiUtil {
   }
 
   public static void renderTiledFluid(int x, int y, int width, int height, float depth, FluidStack fluidStack) {
-    TextureAtlasSprite fluidSprite = mc.getTextureMapBlocks().getAtlasSprite(fluidStack.getFluid().getStill(fluidStack).toString());
+    Sprite fluidSprite = mc.getTextureMapBlocks().getAtlasSprite(fluidStack.getFluid().getStill(fluidStack).toString());
     RenderUtil.setColorRGBA(fluidStack.getFluid().getColor(fluidStack));
     renderTiledTextureAtlas(x, y, width, height, depth, fluidSprite, fluidStack.getFluid().isGaseous(fluidStack));
   }
 
   /** Adds a quad to the rendering pipeline. Call startDrawingQuads beforehand. You need to call draw() yourself. */
-  public static void putTiledTextureQuads(BufferBuilder renderer, int x, int y, int width, int height, float depth, TextureAtlasSprite sprite, boolean upsideDown) {
+  public static void putTiledTextureQuads(BufferBuilder renderer, int x, int y, int width, int height, float depth, Sprite sprite, boolean upsideDown) {
     float u1 = sprite.getMinU();
     float v1 = sprite.getMinV();
 
@@ -119,7 +118,7 @@ public class GuiUtil {
       if(hovered == null) {
         int usedCap = tank.getFluidAmount();
         int maxCap = tank.getCapacity();
-        text.add(TextFormatting.WHITE + Util.translate("gui.smeltery.capacity"));
+        text.add(TextFormat.field_1068 + Util.translate("gui.smeltery.capacity"));
         stringFn.accept(maxCap);
         text.add(Util.translateFormatted("gui.smeltery.capacity_available"));
         stringFn.accept(maxCap - usedCap);
@@ -131,7 +130,7 @@ public class GuiUtil {
         }
       }
       else {
-        text.add(TextFormatting.WHITE + hovered.getLocalizedName());
+        text.add(TextFormat.field_1068 + hovered.getLocalizedName());
         GuiUtil.liquidToString(hovered, text);
       }
 
@@ -333,7 +332,7 @@ public class GuiUtil {
   private static int calcLiquidText(int amount, int divider, String unit, List<String> text) {
     int full = amount / divider;
     if(full > 0) {
-      text.add(String.format("%s%d %s", TextFormatting.GRAY, full, unit));
+      text.add(String.format("%s%d %s", TextFormat.field_1080, full, unit));
     }
 
     return amount % divider;

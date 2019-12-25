@@ -1,10 +1,6 @@
 package slimeknights.tconstruct.plugin.jei.smelting;
 
 import com.google.common.collect.ImmutableList;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
-
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -16,6 +12,8 @@ import mezz.jei.api.gui.IGuiItemStackGroup;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.IRecipeCategory;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.Identifier;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.client.GuiUtil;
@@ -24,7 +22,7 @@ import slimeknights.tconstruct.library.materials.Material;
 public class SmeltingRecipeCategory implements IRecipeCategory<SmeltingRecipeWrapper> {
 
   public static String CATEGORY = Util.prefix("smeltery");
-  public static ResourceLocation background_loc = Util.getResource("textures/gui/jei/smeltery.png");
+  public static Identifier background_loc = Util.getResource("textures/gui/jei/smeltery.png");
 
   private final IDrawable background;
   private final IDrawable tankOverlay;
@@ -53,7 +51,7 @@ public class SmeltingRecipeCategory implements IRecipeCategory<SmeltingRecipeWra
   }
 
   @Override
-  public void drawExtras(@Nonnull Minecraft minecraft) {
+  public void drawExtras(@Nonnull MinecraftClient minecraft) {
 
   }
 

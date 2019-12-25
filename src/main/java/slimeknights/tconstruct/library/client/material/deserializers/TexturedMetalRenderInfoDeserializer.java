@@ -1,7 +1,6 @@
 package slimeknights.tconstruct.library.client.material.deserializers;
 
-import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.util.Identifier;
 import slimeknights.tconstruct.library.client.MaterialRenderInfo;
 
 public class TexturedMetalRenderInfoDeserializer extends MetalRenderInfoDeserializer {
@@ -10,6 +9,6 @@ public class TexturedMetalRenderInfoDeserializer extends MetalRenderInfoDeserial
 
   @Override
   public MaterialRenderInfo getMaterialRenderInfo() {
-    return new MaterialRenderInfo.MetalTextured(new ResourceLocation(texture), fromHex(color), shinyness, brightness, hueshift);
+    return new MaterialRenderInfo.MetalTextured(new Identifier(texture), fromHex(color), shinyness, brightness, hueshift);
   }
 }

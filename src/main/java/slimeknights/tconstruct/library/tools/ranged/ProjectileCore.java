@@ -4,13 +4,13 @@ import com.google.common.collect.Multimap;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.EntityDamageSource;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.world.World;
 
@@ -117,7 +117,7 @@ public abstract class ProjectileCore extends TinkerToolCore implements IProjecti
     setAmmo(1, reference);
 
     // prevent a positive feedback loop with picking up ammo + durability retaining modifiers like reinforced
-    if(!player.capabilities.isCreativeMode && !world.isRemote && !usedAmmo) {
+    if(!player.capabilities.isCreativeMode && !world.isClient && !usedAmmo) {
       setAmmo(0, reference);
     }
 
@@ -180,13 +180,13 @@ public abstract class ProjectileCore extends TinkerToolCore implements IProjecti
 
   @Nonnull
   @Override
-  public Multimap<String, AttributeModifier> getAttributeModifiers(@Nonnull EntityEquipmentSlot slot, ItemStack stack) {
+  public Multimap<String, EntityAttributeModifier> getAttributeModifiers(@Nonnull EntityEquipmentSlot slot, ItemStack stack) {
     // no special attributes for ranged weapons
     return this.getItemAttributeModifiers(slot);
   }
 
   @Override
-  public Multimap<String, AttributeModifier> getProjectileAttributeModifier(ItemStack stack) {
+  public Multimap<String, EntityAttributeModifier> getProjectileAttributeModifier(ItemStack stack) {
     // return the standard damage map
     return super.getAttributeModifiers(EntityEquipmentSlot.MAINHAND, stack);
   }

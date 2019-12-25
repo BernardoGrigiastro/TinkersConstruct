@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.gadgets.client;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -35,7 +35,7 @@ public class RenderThrowball extends RenderSnowball<EntityThrowball> {
 
     @Override
     public Render<? super EntityThrowball> createRenderFor(RenderManager manager) {
-      return new RenderThrowball(manager, TinkerGadgets.throwball, Minecraft.getMinecraft().getRenderItem());
+      return new RenderThrowball(manager, TinkerGadgets.throwball, MinecraftClient.getMinecraft().getRenderItem());
     }
   }
 }

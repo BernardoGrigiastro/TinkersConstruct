@@ -32,7 +32,7 @@ public class SlimeBounceHandler {
     this.bounce = bounce;
 
     if(bounce != 0) {
-      bounceTick = entityLiving.ticksExisted;
+      bounceTick = entityLiving.age;
     }
     else {
       bounceTick = 0;
@@ -47,19 +47,19 @@ public class SlimeBounceHandler {
     // this is only relevant for the local player
     if(event.phase == TickEvent.Phase.END && event.player == entityLiving && !event.player.isElytraFlying()) {
       // bounce up. This is to pcircumvent the logic that resets y motion after landing
-      if(event.player.ticksExisted == bounceTick) {
+      if(event.player.age == bounceTick) {
         event.player.motionY = bounce;
         bounceTick = 0;
       }
 
       // preserve motion
-      if(!entityLiving.onGround && entityLiving.ticksExisted != bounceTick) {
+      if(!entityLiving.onGround && entityLiving.age != bounceTick) {
         if(lastMovX != entityLiving.motionX || lastMovZ != entityLiving.motionZ) {
           double f = 0.91d + 0.025d;
           //System.out.println((entityLiving.worldObj.isRemote ? "client: " : "server: ") + entityLiving.motionX);
           entityLiving.motionX /= f;
           entityLiving.motionZ /= f;
-          entityLiving.isAirBorne = true;
+          entityLiving.velocityDirty = true;
           lastMovX = entityLiving.motionX;
           lastMovZ = entityLiving.motionZ;
         }
@@ -68,9 +68,9 @@ public class SlimeBounceHandler {
       // timing the effect out
       if(wasInAir && entityLiving.onGround) {
         if(timer == 0) {
-          timer = entityLiving.ticksExisted;
+          timer = entityLiving.age;
         }
-        else if(entityLiving.ticksExisted - timer > 5) {
+        else if(entityLiving.age - timer > 5) {
           MinecraftForge.EVENT_BUS.unregister(this);
           bouncingEntities.remove(entityLiving);
           //entityLiving.addChatMessage(new ChatComponentText("removed " + entityLiving.worldObj.isRemote));
@@ -100,7 +100,7 @@ public class SlimeBounceHandler {
     else if(bounce != 0) {
       // updated bounce if needed
       handler.bounce = bounce;
-      handler.bounceTick = entity.ticksExisted;
+      handler.bounceTick = entity.age;
     }
   }
 }

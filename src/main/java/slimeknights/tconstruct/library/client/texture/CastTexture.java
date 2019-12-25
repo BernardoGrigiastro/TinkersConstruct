@@ -1,12 +1,11 @@
 package slimeknights.tconstruct.library.client.texture;
 
-import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.util.Identifier;
 import slimeknights.tconstruct.library.client.RenderUtil;
 
 public class CastTexture extends TextureColoredTexture {
 
-  public CastTexture(ResourceLocation addTextureLocation, ResourceLocation baseTexture, String spriteName) {
+  public CastTexture(Identifier addTextureLocation, Identifier baseTexture, String spriteName) {
     super(addTextureLocation, baseTexture, spriteName);
   }
 

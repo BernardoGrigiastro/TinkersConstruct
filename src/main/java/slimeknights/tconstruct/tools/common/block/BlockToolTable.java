@@ -2,8 +2,8 @@ package slimeknights.tconstruct.tools.common.block;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
@@ -12,14 +12,14 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -51,7 +51,7 @@ public class BlockToolTable extends BlockTable implements ITinkerStationBlock {
     super(Material.WOOD);
     this.setCreativeTab(TinkerRegistry.tabGeneral);
 
-    this.setSoundType(SoundType.WOOD);
+    this.setSoundType(BlockSoundGroup.WOOD);
     this.setResistance(5f);
     this.setHardness(1f);
 
@@ -61,7 +61,7 @@ public class BlockToolTable extends BlockTable implements ITinkerStationBlock {
 
   @Nonnull
   @Override
-  public TileEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
+  public BlockEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
     switch(TableTypes.fromMeta(meta)) {
       case CraftingStation:
         return new TileCraftingStation();
@@ -82,7 +82,7 @@ public class BlockToolTable extends BlockTable implements ITinkerStationBlock {
 
   @Override
   public boolean openGui(EntityPlayer player, World world, BlockPos pos) {
-    if(!world.isRemote) {
+    if(!world.isClient) {
       player.openGui(TConstruct.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
       if(player.openContainer instanceof BaseContainer) {
         ((BaseContainer) player.openContainer).syncOnOpen((EntityPlayerMP) player);
@@ -93,7 +93,7 @@ public class BlockToolTable extends BlockTable implements ITinkerStationBlock {
 
   @Override
   public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float clickX, float clickY, float clickZ) {
-    TileEntity te = world.getTileEntity(pos);
+    BlockEntity te = world.getTileEntity(pos);
     ItemStack heldItem = player.inventory.getCurrentItem();
     if(!heldItem.isEmpty() && te instanceof TileTinkerChest) {
         IItemHandlerModifiable itemHandler = ((TileTinkerChest) te).getItemHandler();
@@ -109,7 +109,7 @@ public class BlockToolTable extends BlockTable implements ITinkerStationBlock {
   }
 
   @Override
-  public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
     // crafting station is boring
     list.add(new ItemStack(this, 1, TableTypes.CraftingStation.meta));
 
@@ -129,13 +129,13 @@ public class BlockToolTable extends BlockTable implements ITinkerStationBlock {
 
   }
 
-  private void addBlocksFromOredict(String oredict, int meta, NonNullList<ItemStack> list) {
+  private void addBlocksFromOredict(String oredict, int meta, DefaultedList<ItemStack> list) {
     for(ItemStack stack : OreDictionary.getOres(oredict)) {
       Block block = getBlockFromItem(stack.getItem());
       int blockMeta = stack.getItemDamage();
 
       if(blockMeta == OreDictionary.WILDCARD_VALUE) {
-        NonNullList<ItemStack> subBlocks = NonNullList.create();
+        DefaultedList<ItemStack> subBlocks = DefaultedList.create();
         block.getSubBlocks(null, subBlocks);
 
         for(ItemStack subBlock : subBlocks) {
@@ -178,17 +178,17 @@ public class BlockToolTable extends BlockTable implements ITinkerStationBlock {
   }
 
   /* Bounds */
-  private static ImmutableList<AxisAlignedBB> BOUNDS_Chest = ImmutableList.of(
-      new AxisAlignedBB(0, 0.9375, 0, 1, 1, 1), // top
-      new AxisAlignedBB(0.0625, 0.1875, 0.0625, 0.9375, 1, 0.9375), // middle
-      new AxisAlignedBB(0.03125, 0, 0.03125, 0.15625, 0.75, 0.15625),
-      new AxisAlignedBB(0.84375, 0, 0.03125, 0.96875, 0.75, 0.15625),
-      new AxisAlignedBB(0.84375, 0, 0.84375, 0.96875, 0.75, 0.96875),
-      new AxisAlignedBB(0.03125, 0, 0.84375, 0.15625, 0.75, 0.96875)
+  private static ImmutableList<BoundingBox> BOUNDS_Chest = ImmutableList.of(
+      new BoundingBox(0, 0.9375, 0, 1, 1, 1), // top
+      new BoundingBox(0.0625, 0.1875, 0.0625, 0.9375, 1, 0.9375), // middle
+      new BoundingBox(0.03125, 0, 0.03125, 0.15625, 0.75, 0.15625),
+      new BoundingBox(0.84375, 0, 0.03125, 0.96875, 0.75, 0.15625),
+      new BoundingBox(0.84375, 0, 0.84375, 0.96875, 0.75, 0.96875),
+      new BoundingBox(0.03125, 0, 0.84375, 0.15625, 0.75, 0.96875)
   );
 
   @Override
-  public RayTraceResult collisionRayTrace(IBlockState blockState, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Vec3d start, @Nonnull Vec3d end) {
+  public HitResult collisionRayTrace(IBlockState blockState, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Vec3d start, @Nonnull Vec3d end) {
     if(blockState.getValue(TABLES).isChest) {
       return raytraceMultiAABB(BOUNDS_Chest, pos, start, end);
     }
@@ -216,7 +216,7 @@ public class BlockToolTable extends BlockTable implements ITinkerStationBlock {
     }
   }
 
-  public enum TableTypes implements IStringSerializable {
+  public enum TableTypes implements StringRepresentable {
     CraftingStation,
     StencilTable,
     PartBuilder,

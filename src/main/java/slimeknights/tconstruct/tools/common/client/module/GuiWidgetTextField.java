@@ -1,8 +1,7 @@
 package slimeknights.tconstruct.tools.common.client.module;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import slimeknights.mantle.client.gui.GuiElement;
 import slimeknights.mantle.client.gui.GuiElementScalable;
 import slimeknights.mantle.client.gui.GuiWidget;
@@ -24,7 +23,7 @@ public class GuiWidgetTextField extends GuiWidget {
   public boolean highlighted;
   public String text;
 
-  public FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
+  public TextRenderer fontRenderer = MinecraftClient.getMinecraft().textRenderer;
 
   @Override
   public void draw() {

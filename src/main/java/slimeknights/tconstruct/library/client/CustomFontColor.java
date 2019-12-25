@@ -1,8 +1,7 @@
 package slimeknights.tconstruct.library.client;
 
+import net.minecraft.text.TextFormat;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextFormatting;
-
 import java.awt.*;
 
 import slimeknights.tconstruct.library.Util;
@@ -51,9 +50,9 @@ public class CustomFontColor {
     return String.format("%s%s%s/%s%s",
                          CustomFontColor.valueToColorCode((float) value / (float) max),
                          Util.df.format(value),
-                         TextFormatting.GRAY.toString(),
+                         TextFormat.field_1080.toString(),
                          CustomFontColor.valueToColorCode(1f),
                          Util.df.format(max))
-           + TextFormatting.RESET;
+           + TextFormat.RESET;
   }
 }

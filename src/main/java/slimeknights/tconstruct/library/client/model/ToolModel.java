@@ -6,13 +6,12 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 import gnu.trove.map.hash.THashMap;
-
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.texture.Sprite;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ItemLayerModel;
 import net.minecraftforge.client.model.ModelStateComposition;
@@ -36,10 +35,10 @@ public class ToolModel implements IModel {
   private final ModifierModel modifiers;
   private final ImmutableMap<TransformType, TRSRTransformation> transforms;
   private final ImmutableList<ToolModelOverride> overrides;
-  private final ImmutableList<ResourceLocation> textures;
+  private final ImmutableList<Identifier> textures;
   private final AmmoPosition ammoPosition;
 
-  public ToolModel(ImmutableList<ResourceLocation> defaultTextures,
+  public ToolModel(ImmutableList<Identifier> defaultTextures,
                    List<MaterialModel> parts,
                    List<MaterialModel> brokenPartBlocks,
                    Float[] layerRotations,
@@ -57,13 +56,13 @@ public class ToolModel implements IModel {
   }
 
   @Override
-  public Collection<ResourceLocation> getDependencies() {
+  public Collection<Identifier> getDependencies() {
     return ImmutableList.of();
   }
 
   @Override
-  public Collection<ResourceLocation> getTextures() {
-    ImmutableSet.Builder<ResourceLocation> builder = ImmutableSet.builder();
+  public Collection<Identifier> getTextures() {
+    ImmutableSet.Builder<Identifier> builder = ImmutableSet.builder();
 
     builder.addAll(textures);
 
@@ -85,7 +84,7 @@ public class ToolModel implements IModel {
   }
 
   @Override
-  public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+  public IBakedModel bake(IModelState state, VertexFormat format, Function<Identifier, Sprite> bakedTextureGetter) {
     IBakedModel base = new ItemLayerModel(textures).bake(state, format, bakedTextureGetter);
 
     BakedMaterialModel[] partModels = new BakedMaterialModel[partBlocks.size()];

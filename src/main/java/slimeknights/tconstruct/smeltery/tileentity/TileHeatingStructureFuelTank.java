@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.smeltery.tileentity;
 
 import com.google.common.collect.Lists;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -59,7 +59,7 @@ public abstract class TileHeatingStructureFuelTank<T extends MultiblockDetection
     // got a tank?
     if(currentTank != null) {
       // consume fuel!
-      TileEntity te = getWorld().getTileEntity(currentTank);
+      BlockEntity te = getWorld().getTileEntity(currentTank);
       if(te instanceof TileTank) {
         IFluidTank tank = ((TileTank) te).getInternalTank();
 
@@ -179,7 +179,7 @@ public abstract class TileHeatingStructureFuelTank<T extends MultiblockDetection
    * Grabs the tank at the given location (if present)
    */
   private IFluidTank getTankAt(BlockPos pos) {
-    TileEntity te = getWorld().getTileEntity(pos);
+    BlockEntity te = getWorld().getTileEntity(pos);
     if(te instanceof TileTank) {
       return ((TileTank) te).getInternalTank();
     }

@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.smeltery.block;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
 import slimeknights.mantle.block.BlockStairsBase;
 import slimeknights.tconstruct.smeltery.tileentity.TileSmelteryComponent;
 
-public class BlockSearedStairs extends BlockStairsBase implements ITileEntityProvider {
+public class BlockSearedStairs extends BlockStairsBase implements BlockEntityProvider {
 
   private Block block;
 
@@ -26,7 +26,7 @@ public class BlockSearedStairs extends BlockStairsBase implements ITileEntityPro
 
   @Nonnull
   @Override
-  public TileEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
+  public BlockEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
     return new TileSmelteryComponent();
   }
 

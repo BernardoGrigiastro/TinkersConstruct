@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.smeltery.network;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import slimeknights.mantle.network.AbstractPacketThreadsafe;
@@ -26,7 +26,7 @@ public class ChannelFlowPacket extends AbstractPacketThreadsafe {
 
   @Override
   public void handleClientSafe(NetHandlerPlayClient netHandler) {
-    TileEntity te = Minecraft.getMinecraft().world.getTileEntity(pos);
+    BlockEntity te = MinecraftClient.getMinecraft().world.getTileEntity(pos);
     if(te instanceof TileChannel) {
       ((TileChannel) te).updateFlow(side, flow);
     }

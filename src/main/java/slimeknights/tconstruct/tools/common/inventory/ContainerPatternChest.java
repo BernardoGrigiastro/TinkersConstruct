@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools.common.inventory;
 
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -27,7 +27,7 @@ public class ContainerPatternChest extends ContainerTinkerStation<TilePatternChe
 
   public static class DynamicChestInventory extends ContainerSideInventory<TilePatternChest> {
 
-    public DynamicChestInventory(TilePatternChest tile, IInventory inventory, int x, int y, int columns) {
+    public DynamicChestInventory(TilePatternChest tile, Inventory inventory, int x, int y, int columns) {
       super(tile, x, y, columns);
 
       // add the theoretically possible slots

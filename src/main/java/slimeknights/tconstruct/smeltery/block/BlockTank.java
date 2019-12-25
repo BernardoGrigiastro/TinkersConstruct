@@ -1,7 +1,8 @@
 package slimeknights.tconstruct.smeltery.block;
 
 import com.google.common.collect.Lists;
-
+import net.minecraft.block.BlockRenderLayer;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
@@ -12,11 +13,9 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -50,7 +49,7 @@ public class BlockTank extends BlockEnumSmeltery<BlockTank.TankType> implements 
 
   @Nonnull
   @Override
-  public TileEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
+  public BlockEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
     return new TileTank();
   }
 
@@ -79,7 +78,7 @@ public class BlockTank extends BlockEnumSmeltery<BlockTank.TankType> implements 
 
   @Override
   public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-    TileEntity te = worldIn.getTileEntity(pos);
+    BlockEntity te = worldIn.getTileEntity(pos);
     if(te == null || !te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing)) {
       return false;
     }
@@ -98,7 +97,7 @@ public class BlockTank extends BlockEnumSmeltery<BlockTank.TankType> implements 
 
   @Override
   public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-    TileEntity te = world.getTileEntity(pos);
+    BlockEntity te = world.getTileEntity(pos);
     if(te instanceof TileTank && stack != null && stack.hasTagCompound()) {
       ((TileTank) te).readTankFromNBT(stack.getTagCompound());
     }
@@ -109,7 +108,7 @@ public class BlockTank extends BlockEnumSmeltery<BlockTank.TankType> implements 
   public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, @Nonnull IBlockState state, int fortune) {
     // standard drop logic
     List<ItemStack> ret = Lists.newArrayList();
-    Random rand = world instanceof World ? ((World) world).rand : RANDOM;
+    Random rand = world instanceof World ? ((World) world).random : RANDOM;
     Item item = this.getItemDropped(state, rand, fortune);
     ItemStack stack = ItemStack.EMPTY;
     if(item != Items.AIR) {
@@ -118,7 +117,7 @@ public class BlockTank extends BlockEnumSmeltery<BlockTank.TankType> implements 
     }
 
     // save liquid data on the stack
-    TileEntity te = world.getTileEntity(pos);
+    BlockEntity te = world.getTileEntity(pos);
     if(te instanceof TileTank && !stack.isEmpty()) {
       if(((TileTank) te).containsFluid()) {
         NBTTagCompound tag = new NBTTagCompound();
@@ -150,7 +149,7 @@ public class BlockTank extends BlockEnumSmeltery<BlockTank.TankType> implements 
 
   @Override
   public int getLightValue(@Nonnull IBlockState state, IBlockAccess world, @Nonnull BlockPos pos) {
-    TileEntity te = world.getTileEntity(pos);
+    BlockEntity te = world.getTileEntity(pos);
     if(!(te instanceof TileTank)) {
       return 0;
     }
@@ -182,7 +181,7 @@ public class BlockTank extends BlockEnumSmeltery<BlockTank.TankType> implements 
 
   @Override
   public int getComparatorInputOverride(IBlockState blockState, World world, BlockPos pos) {
-    TileEntity te = world.getTileEntity(pos);
+    BlockEntity te = world.getTileEntity(pos);
     if(!(te instanceof TileTank)) {
       return 0;
     }
@@ -195,7 +194,7 @@ public class BlockTank extends BlockEnumSmeltery<BlockTank.TankType> implements 
     return 1;
   }
 
-  public enum TankType implements IStringSerializable, EnumBlock.IEnumMeta {
+  public enum TankType implements StringRepresentable, EnumBlock.IEnumMeta {
     TANK,
     GAUGE,
     WINDOW;

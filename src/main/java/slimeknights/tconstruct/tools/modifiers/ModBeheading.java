@@ -1,12 +1,12 @@
 package slimeknights.tconstruct.tools.modifiers;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -96,7 +96,7 @@ public class ModBeheading extends ToolModifier {
     if(shouldDropHead(level)) {
       ItemStack head = TinkerRegistry.getHeadDrop(event.getEntityLiving());
       if(!head.isEmpty() && !alreadyContainsDrop(event, head)) {
-        EntityItem entityitem = new EntityItem(event.getEntityLiving().getEntityWorld(), event.getEntityLiving().posX, event.getEntityLiving().posY, event.getEntityLiving().posZ, head);
+        EntityItem entityitem = new EntityItem(event.getEntityLiving().getEntityWorld(), event.getEntityLiving().x, event.getEntityLiving().y, event.getEntityLiving().z, head);
         entityitem.setDefaultPickupDelay();
         event.getDrops().add(entityitem);
       }

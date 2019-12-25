@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.text.translation.I18n;
 
 import org.apache.logging.log4j.Logger;
@@ -50,7 +50,7 @@ public final class ToolBuilder {
   }
 
   @Nonnull
-  public static ItemStack tryBuildTool(NonNullList<ItemStack> stacks, String name) {
+  public static ItemStack tryBuildTool(DefaultedList<ItemStack> stacks, String name) {
     return tryBuildTool(stacks, name, TinkerRegistry.getTools());
   }
 
@@ -61,9 +61,9 @@ public final class ToolBuilder {
    * @return The built tool or null if none could be built.
    */
   @Nonnull
-  public static ItemStack tryBuildTool(NonNullList<ItemStack> stacks, String name, Collection<ToolCore> possibleTools) {
+  public static ItemStack tryBuildTool(DefaultedList<ItemStack> stacks, String name, Collection<ToolCore> possibleTools) {
     int length = -1;
-    NonNullList<ItemStack> input;
+    DefaultedList<ItemStack> input;
     // remove trailing empty slots
     for(int i = 0; i < stacks.size(); i++) {
       if(stacks.get(i).isEmpty()) {
@@ -140,7 +140,7 @@ public final class ToolBuilder {
   }
 
   @Nonnull
-  public static ItemStack tryRepairTool(NonNullList<ItemStack> stacks, ItemStack toolStack, boolean removeItems) {
+  public static ItemStack tryRepairTool(DefaultedList<ItemStack> stacks, ItemStack toolStack, boolean removeItems) {
     if(toolStack == null || !(toolStack.getItem() instanceof IRepairable)) {
       return ItemStack.EMPTY;
     }
@@ -164,13 +164,13 @@ public final class ToolBuilder {
    * @throws TinkerGuiException Thrown when not matching modifiers could be applied. Contains extra-information why the process failed.
    */
   @Nonnull
-  public static ItemStack tryModifyTool(NonNullList<ItemStack> input, ItemStack toolStack, boolean removeItems)
+  public static ItemStack tryModifyTool(DefaultedList<ItemStack> input, ItemStack toolStack, boolean removeItems)
       throws TinkerGuiException {
     ItemStack copy = toolStack.copy();
 
     // obtain a working copy of the items if the originals shouldn't be modified
-    NonNullList<ItemStack> stacks = Util.deepCopyFixedNonNullList(input);
-    NonNullList<ItemStack> usedStacks = Util.deepCopyFixedNonNullList(input);
+    DefaultedList<ItemStack> stacks = Util.deepCopyFixedNonNullList(input);
+    DefaultedList<ItemStack> usedStacks = Util.deepCopyFixedNonNullList(input);
 
     Set<IModifier> appliedModifiers = Sets.newHashSet();
     for(IModifier modifier : TinkerRegistry.getAllModifiers()) {
@@ -270,20 +270,20 @@ public final class ToolBuilder {
    * @return The tool with the replaced parts or null if the conditions have not been met.
    */
   @Nonnull
-  public static ItemStack tryReplaceToolParts(ItemStack toolStack, final NonNullList<ItemStack> toolPartsIn, final boolean removeItems)
+  public static ItemStack tryReplaceToolParts(ItemStack toolStack, final DefaultedList<ItemStack> toolPartsIn, final boolean removeItems)
       throws TinkerGuiException {
     if(toolStack == null || !(toolStack.getItem() instanceof TinkersItem)) {
       return ItemStack.EMPTY;
     }
 
     // we never modify the original. Caller can remove all of them if we return a result
-    NonNullList<ItemStack> inputItems = ItemStackList.of(Util.deepCopyFixedNonNullList(toolPartsIn));
+    DefaultedList<ItemStack> inputItems = ItemStackList.of(Util.deepCopyFixedNonNullList(toolPartsIn));
     if(!TinkerEvent.OnToolPartReplacement.fireEvent(inputItems, toolStack)) {
       // event cancelled
       return ItemStack.EMPTY;
     }
     // technically we don't need a deep copy here, but meh. less code.
-    final NonNullList<ItemStack> toolParts = Util.deepCopyFixedNonNullList(inputItems);
+    final DefaultedList<ItemStack> toolParts = Util.deepCopyFixedNonNullList(inputItems);
 
     TIntIntMap assigned = new TIntIntHashMap();
     TinkersItem tool = (TinkersItem) toolStack.getItem();
@@ -403,7 +403,7 @@ public final class ToolBuilder {
    * @param removeItems   If true the match will be removed from the passed items
    * @return ItemStack[2] Array containing the built item in the first slot and eventual secondary output in the second one. Null if no item could be built.
    */
-  public static NonNullList<ItemStack> tryBuildToolPart(ItemStack pattern, NonNullList<ItemStack> materialItems, boolean removeItems)
+  public static DefaultedList<ItemStack> tryBuildToolPart(ItemStack pattern, DefaultedList<ItemStack> materialItems, boolean removeItems)
       throws TinkerGuiException {
     Item itemPart = Pattern.getPartFromTag(pattern);
     if(itemPart == null || !(itemPart instanceof MaterialItem) || !(itemPart instanceof IToolPart)) {

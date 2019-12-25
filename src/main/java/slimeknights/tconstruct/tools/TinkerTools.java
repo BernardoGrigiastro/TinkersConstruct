@@ -6,7 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.recipe.Recipe;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.CraftingHelper;
@@ -161,8 +161,8 @@ public class TinkerTools extends AbstractToolPulse {
   }
 
   @SubscribeEvent
-  public void registerRecipes(Register<IRecipe> event) {
-    IForgeRegistry<IRecipe> registry = event.getRegistry();
+  public void registerRecipes(Register<Recipe> event) {
+    IForgeRegistry<Recipe> registry = event.getRegistry();
 
     registry.register(new RepairRecipe());
   }
@@ -243,14 +243,14 @@ public class TinkerTools extends AbstractToolPulse {
    * @param registry IForgeRegistry to register the recipe
    * @param oredict oredict string for the block to add
    */
-  public static void registerToolForgeBlock(IForgeRegistry<IRecipe> registry, String oredict) {
+  public static void registerToolForgeBlock(IForgeRegistry<Recipe> registry, String oredict) {
     if(toolForge != null) {
       toolForge.baseBlocks.add(oredict);
       registerToolForgeRecipe(registry, oredict);
     }
   }
 
-  private static void registerToolForgeRecipe(IForgeRegistry<IRecipe> registry, String oredict) {
+  private static void registerToolForgeRecipe(IForgeRegistry<Recipe> registry, String oredict) {
     // determine the brick we will use
     Block brick = TinkerSmeltery.searedBlock;
     if(brick == null) {

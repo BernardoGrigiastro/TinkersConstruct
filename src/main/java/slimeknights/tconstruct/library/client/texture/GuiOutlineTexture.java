@@ -1,12 +1,11 @@
 package slimeknights.tconstruct.library.client.texture;
 
-import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.util.Identifier;
 import slimeknights.tconstruct.library.client.RenderUtil;
 
 public class GuiOutlineTexture extends ExtraUtilityTexture {
 
-  public GuiOutlineTexture(ResourceLocation baseTexture, String spriteName) {
+  public GuiOutlineTexture(Identifier baseTexture, String spriteName) {
     super(baseTexture, spriteName);
   }
 

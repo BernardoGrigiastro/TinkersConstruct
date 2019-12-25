@@ -3,7 +3,7 @@ package slimeknights.tconstruct.world.client;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
 import java.io.IOException;
@@ -20,10 +20,10 @@ public class SlimeColorizer implements IResourceManagerReloadListener {
   public static int colorPurple = 0xa92dff;
   public static int colorOrange = 0xd09800;
 
-  private static final ResourceLocation LOC_SLIME_BLUE_PNG = Util.getResource("textures/colormap/slimegrasscolor.png");
-  private static final ResourceLocation LOC_SLIME_PURPLE_PNG =
+  private static final Identifier LOC_SLIME_BLUE_PNG = Util.getResource("textures/colormap/slimegrasscolor.png");
+  private static final Identifier LOC_SLIME_PURPLE_PNG =
       Util.getResource("textures/colormap/purplegrasscolor.png");
-  private static final ResourceLocation LOC_SLIME_ORANGE_PNG =
+  private static final Identifier LOC_SLIME_ORANGE_PNG =
       Util.getResource("textures/colormap/orangegrasscolor.png");
 
   private static int[] colorBufferBlue = new int[65536];

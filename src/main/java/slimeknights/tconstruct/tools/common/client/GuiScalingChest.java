@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.tools.common.client;
 
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.Slot;
 
 import slimeknights.mantle.client.gui.GuiMultiModule;
@@ -8,12 +8,12 @@ import slimeknights.mantle.inventory.BaseContainer;
 
 public class GuiScalingChest extends GuiDynInventory {
 
-  protected final IInventory inventory;
+  protected final Inventory inventory;
 
   public GuiScalingChest(GuiMultiModule parent, BaseContainer container) {
     super(parent, container);
 
-    inventory = (IInventory) container.getTile();
+    inventory = (Inventory) container.getTile();
     slotCount = inventory.getSizeInventory();
     sliderActive = true;
   }

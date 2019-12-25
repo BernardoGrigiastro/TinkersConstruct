@@ -3,8 +3,7 @@ package slimeknights.tconstruct.gadgets.block;
 import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockFaceShape;
@@ -12,14 +11,15 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.DamageSource;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -41,8 +41,8 @@ public class BlockPunji extends Block {
   public static final PropertyBool NORTHWEST = PropertyBool.create("northwest");
 
   public BlockPunji() {
-    super(Material.PLANTS);
-    this.setSoundType(SoundType.PLANT);
+    super(Material.PLANT);
+    this.setSoundType(BlockSoundGroup.GRASS);
     this.setCreativeTab(TinkerRegistry.tabGadgets);
     this.setHardness(3.0f);
 
@@ -145,22 +145,22 @@ public class BlockPunji extends Block {
   }
 
   /* Bounds */
-  private static final ImmutableMap<EnumFacing, AxisAlignedBB> BOUNDS;
+  private static final ImmutableMap<EnumFacing, BoundingBox> BOUNDS;
   static {
-    ImmutableMap.Builder<EnumFacing, AxisAlignedBB> builder = ImmutableMap.builder();
-    builder.put(EnumFacing.DOWN,  new AxisAlignedBB(0.1875, 0,      0.1875,  0.8125, 0.375, 0.8125));
-    builder.put(EnumFacing.UP,    new AxisAlignedBB(0.1875, 0.625,  0.1875,  0.8125, 1,     0.8125));
-    builder.put(EnumFacing.NORTH, new AxisAlignedBB(0.1875, 0.1875, 0,       0.8125, 0.8125, 0.375));
-    builder.put(EnumFacing.SOUTH, new AxisAlignedBB(0.1875, 0.1875, 0.625,   0.8125, 0.8125, 1));
-    builder.put(EnumFacing.EAST,  new AxisAlignedBB(0.625,  0.1875, 0.1875,  1,      0.8125, 0.8125));
-    builder.put(EnumFacing.WEST,  new AxisAlignedBB(0,      0.1875, 0.1875,  0.375,  0.8125, 0.8125));
+    ImmutableMap.Builder<EnumFacing, BoundingBox> builder = ImmutableMap.builder();
+    builder.put(EnumFacing.DOWN,  new BoundingBox(0.1875, 0,      0.1875,  0.8125, 0.375, 0.8125));
+    builder.put(EnumFacing.UP,    new BoundingBox(0.1875, 0.625,  0.1875,  0.8125, 1,     0.8125));
+    builder.put(EnumFacing.NORTH, new BoundingBox(0.1875, 0.1875, 0,       0.8125, 0.8125, 0.375));
+    builder.put(EnumFacing.SOUTH, new BoundingBox(0.1875, 0.1875, 0.625,   0.8125, 0.8125, 1));
+    builder.put(EnumFacing.EAST,  new BoundingBox(0.625,  0.1875, 0.1875,  1,      0.8125, 0.8125));
+    builder.put(EnumFacing.WEST,  new BoundingBox(0,      0.1875, 0.1875,  0.375,  0.8125, 0.8125));
 
     BOUNDS = builder.build();
   }
 
   @Nonnull
   @Override
-  public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+  public BoundingBox getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
     return BOUNDS.get(state.getValue(FACING));
   }
 
@@ -192,7 +192,7 @@ public class BlockPunji extends Block {
     return BlockFaceShape.UNDEFINED;
   }
 
-  private enum Corner implements IStringSerializable {
+  private enum Corner implements StringRepresentable {
     NONE_UP,
     NORTH_DOWN,
     EAST_UP,

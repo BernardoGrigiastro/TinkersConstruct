@@ -7,14 +7,14 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.text.translation.I18n;
 
 import java.util.Arrays;
@@ -271,7 +271,7 @@ public abstract class Modifier extends RecipeMatchRegistry implements IModifier 
     Optional<EntityLivingBase> entityLivingBase = Optional.of(entity)
                                                           .filter(e -> e instanceof EntityLivingBase)
                                                           .map(e -> (EntityLivingBase) e);
-    Optional<IAttributeInstance> knockbackAttribute = entityLivingBase.map(living -> living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE))
+    Optional<EntityAttributeInstance> knockbackAttribute = entityLivingBase.map(living -> living.getEntityAttribute(EntityAttributes.KNOCKBACK_RESISTANCE))
                                                                       .filter(attribute -> !attribute.hasModifier(ANTI_KNOCKBACK_MOD));
     float oldLastDamage = entityLivingBase.map(living -> living.lastDamage).orElse(0f);
 
@@ -281,7 +281,7 @@ public abstract class Modifier extends RecipeMatchRegistry implements IModifier 
 
     // set hurt resistance time to 0 because we always want to deal damage in traits
     if(ignoreInvulv) {
-      entity.hurtResistantTime = 0;
+      entity.field_6008 = 0;
     }
     boolean hit = entity.attackEntityFrom(source, damage);
     // set total received damage, important for AI and stuff
@@ -289,7 +289,7 @@ public abstract class Modifier extends RecipeMatchRegistry implements IModifier 
 
     // reset hurt resistance time if desired
     if(hit && resetInvulv) {
-      entity.hurtResistantTime = 0;
+      entity.field_6008 = 0;
     }
 
     if(noKnockback) {
@@ -304,6 +304,6 @@ public abstract class Modifier extends RecipeMatchRegistry implements IModifier 
     return !items.isEmpty();
   }
 
-  private static final AttributeModifier ANTI_KNOCKBACK_MOD = new AttributeModifier("Anti Modifier Knockback", 1f, 0);
+  private static final EntityAttributeModifier ANTI_KNOCKBACK_MOD = new EntityAttributeModifier("Anti Modifier Knockback", 1f, 0);
 
 }

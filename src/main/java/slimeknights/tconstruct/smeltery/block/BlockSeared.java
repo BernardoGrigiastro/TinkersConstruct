@@ -1,10 +1,9 @@
 package slimeknights.tconstruct.smeltery.block;
 
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.util.IStringSerializable;
-
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.StringRepresentable;
 import java.util.Locale;
 
 import slimeknights.mantle.block.EnumBlock;
@@ -15,14 +14,14 @@ public class BlockSeared extends BlockEnumSmeltery<BlockSeared.SearedType> {
   public final static PropertyEnum<SearedType> TYPE = PropertyEnum.create("type", SearedType.class);
 
   public BlockSeared() {
-    super(Material.ROCK, TYPE, SearedType.class);
+    super(Material.STONE, TYPE, SearedType.class);
     this.setCreativeTab(TinkerRegistry.tabSmeltery);
     this.setHardness(3F);
     this.setResistance(20F);
-    this.setSoundType(SoundType.METAL);
+    this.setSoundType(BlockSoundGroup.METAL);
   }
 
-  public enum SearedType implements IStringSerializable, EnumBlock.IEnumMeta {
+  public enum SearedType implements StringRepresentable, EnumBlock.IEnumMeta {
     STONE,
     COBBLE,
     PAVER,

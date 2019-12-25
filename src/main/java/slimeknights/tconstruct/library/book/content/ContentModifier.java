@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
@@ -76,7 +76,7 @@ public class ContentModifier extends TinkerPage {
     if(tool == null) {
       tool = Lists.newArrayList();
       for(String entry : demoTool) {
-        Item item = Item.REGISTRY.getObject(new ResourceLocation(entry));
+        Item item = Item.REGISTRY.getObject(new Identifier(entry));
         if(item != null) {
           tool.add(item);
         }

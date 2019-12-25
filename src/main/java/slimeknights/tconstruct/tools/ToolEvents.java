@@ -7,14 +7,14 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.loot.LootEntry;
+import net.minecraft.world.loot.LootPool;
+import net.minecraft.world.loot.UniformLootTableRange;
+import net.minecraft.world.loot.condition.KilledByPlayerLootCondition;
+import net.minecraft.world.loot.condition.RandomChanceWithLootingLootCondition;
+import net.minecraft.world.loot.entry.LootEntry;
 import net.minecraft.world.storage.loot.LootEntryItem;
-import net.minecraft.world.storage.loot.LootPool;
 import net.minecraft.world.storage.loot.LootTableList;
-import net.minecraft.world.storage.loot.RandomValueRange;
-import net.minecraft.world.storage.loot.conditions.KilledByPlayer;
 import net.minecraft.world.storage.loot.conditions.LootCondition;
-import net.minecraft.world.storage.loot.conditions.RandomChanceWithLooting;
 import net.minecraft.world.storage.loot.functions.LootFunction;
 import net.minecraft.world.storage.loot.functions.SetMetadata;
 import net.minecraftforge.event.LootTableLoadEvent;
@@ -97,16 +97,16 @@ public class ToolEvents {
       LootEntry entry = new LootEntryItem(TinkerCommons.matNecroticBone.getItem(),
                                           1,
                                           0,
-                                          new LootFunction[]{new SetMetadata(lootConditions, new RandomValueRange(TinkerCommons.matNecroticBone.getMetadata()))},
+                                          new LootFunction[]{new SetMetadata(lootConditions, new UniformLootTableRange(TinkerCommons.matNecroticBone.getMetadata()))},
                                           lootConditions,
                                           "necrotic_bone");
       event.getTable().addPool(new LootPool(new LootEntry[]{entry},
                                             new LootCondition[]{
-                                                new KilledByPlayer(false),
-                                                new RandomChanceWithLooting(0.07f, 0.05f)
+                                                new KilledByPlayerLootCondition(false),
+                                                new RandomChanceWithLootingLootCondition(0.07f, 0.05f)
                                             },
-                                            new RandomValueRange(1),
-                                            new RandomValueRange(0),
+                                            new UniformLootTableRange(1),
+                                            new UniformLootTableRange(0),
                                             "necrotic_bone"));
     }
   }
@@ -123,7 +123,7 @@ public class ToolEvents {
           // convert moss to mending moss
           player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
 
-          if(!event.getWorld().isRemote) {
+          if(!event.getWorld().isClient) {
             event.getItemStack().shrink(1);
             player.onEnchant(null, ModMendingMoss.MENDING_MOSS_LEVELS);
             ItemHandlerHelper.giveItemToPlayer(player, TinkerCommons.matMendingMoss.copy());

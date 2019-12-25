@@ -3,7 +3,7 @@ package slimeknights.tconstruct.tools.common.client;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -19,7 +19,7 @@ import slimeknights.tconstruct.tools.common.tileentity.TileCraftingStation;
 @SideOnly(Side.CLIENT)
 public class GuiCraftingStation extends GuiTinkerStation {
 
-  private static final ResourceLocation BACKGROUND = new ResourceLocation("textures/gui/container/crafting_table.png");
+  private static final Identifier BACKGROUND = new Identifier("textures/gui/container/crafting_table.png");
   protected final TileCraftingStation tile;
 
   public GuiCraftingStation(InventoryPlayer playerInv, World world, BlockPos pos, TileCraftingStation tile) {

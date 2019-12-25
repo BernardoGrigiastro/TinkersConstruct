@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.smeltery.multiblock;
 
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.world.World;
 import slimeknights.mantle.multiblock.IMasterLogic;
 import slimeknights.mantle.multiblock.MultiServantLogic;
@@ -27,7 +27,7 @@ public abstract class MultiblockDetection {
     public final BlockPos minPos; // smallest coordinate in the multiblock
     public final BlockPos maxPos; // largest coordinate in the multiblock
 
-    protected final AxisAlignedBB bb;
+    protected final BoundingBox bb;
 
     public MultiblockStructure(int xd, int yd, int zd, List<BlockPos> blocks) {
       this.xd = xd;
@@ -62,12 +62,12 @@ public abstract class MultiblockDetection {
         }
       }
 
-      bb = new AxisAlignedBB(minx, miny, minz, maxx + 1, maxy + 1, maxz + 1);
+      bb = new BoundingBox(minx, miny, minz, maxx + 1, maxy + 1, maxz + 1);
       minPos = new BlockPos(minx, miny, minz);
       maxPos = new BlockPos(maxx, maxy, maxz);
     }
 
-    public AxisAlignedBB getBoundingBox() {
+    public BoundingBox getBoundingBox() {
       return bb;
     }
   }
@@ -156,7 +156,7 @@ public abstract class MultiblockDetection {
   }
 
   public static void assignMultiBlock(World world, BlockPos master, List<BlockPos> servants) {
-    TileEntity masterBlock = world.getTileEntity(master);
+    BlockEntity masterBlock = world.getTileEntity(master);
     if(!(masterBlock instanceof IMasterLogic)) {
       throw new IllegalArgumentException("Master must be of IMasterLogic");
     }
@@ -164,7 +164,7 @@ public abstract class MultiblockDetection {
     // assign master to each servant
     for(BlockPos pos : servants) {
       if(world.isBlockLoaded(pos)) {
-        TileEntity slave = world.getTileEntity(pos);
+        BlockEntity slave = world.getTileEntity(pos);
         if(slave instanceof MultiServantLogic && slave.getWorld() != null) {
           MultiServantLogic logic = (MultiServantLogic)slave;
           BlockPos current = logic.getMasterPosition();

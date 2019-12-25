@@ -1,12 +1,12 @@
 package slimeknights.tconstruct.smeltery.block;
 
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -21,18 +21,18 @@ import slimeknights.tconstruct.smeltery.tileentity.TileSearedFurnace;
 public class BlockSearedFurnaceController extends BlockMultiblockController {
 
   public BlockSearedFurnaceController() {
-    super(Material.ROCK);
+    super(Material.STONE);
     this.setCreativeTab(TinkerRegistry.tabSmeltery);
     this.setHardness(3F);
     this.setResistance(20F);
-    this.setSoundType(SoundType.METAL);
+    this.setSoundType(BlockSoundGroup.METAL);
 
     this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(ACTIVE, false));
   }
 
   @Nonnull
   @Override
-  public TileEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
+  public BlockEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
     return new TileSearedFurnace();
   }
 
@@ -51,7 +51,7 @@ public class BlockSearedFurnaceController extends BlockMultiblockController {
    */
   @Nonnull
   @Override
-  public IBlockState withRotation(@Nonnull IBlockState state, Rotation rot) {
+  public IBlockState withRotation(@Nonnull IBlockState state, BlockRotation rot) {
     return state.withProperty(FACING, rot.rotate(state.getValue(FACING)));
   }
 
@@ -61,7 +61,7 @@ public class BlockSearedFurnaceController extends BlockMultiblockController {
    */
   @Nonnull
   @Override
-  public IBlockState withMirror(@Nonnull IBlockState state, Mirror mirrorIn) {
+  public IBlockState withMirror(@Nonnull IBlockState state, BlockMirror mirrorIn) {
     return state.withRotation(mirrorIn.toRotation(state.getValue(FACING)));
   }
 

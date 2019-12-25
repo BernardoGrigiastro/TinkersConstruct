@@ -8,8 +8,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextFormatting;
-
+import net.minecraft.text.TextFormat;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,7 +35,7 @@ public class DumpMaterialTest extends CommandBase {
   public Material baseMaterial;
 
   public DumpMaterialTest() {
-    baseMaterial = new Material("Baseline", TextFormatting.WHITE);
+    baseMaterial = new Material("Baseline", TextFormat.field_1068);
     baseMaterial.addStats(new HeadMaterialStats(500, 10, 10, 1));
   }
 

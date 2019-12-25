@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.library;
 
 import net.minecraft.block.Block;
-import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.recipe.Recipe;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.OreDictionary;
@@ -151,7 +151,7 @@ public class MaterialIntegration {
    * Called during the register recipes event to add a variant to the tool forge for this material
    * @param registry  IRecipe Registry
    */
-  public void registerToolForgeRecipe(IForgeRegistry<IRecipe> registry) {
+  public void registerToolForgeRecipe(IForgeRegistry<Recipe> registry) {
     if(toolforge && oreSuffix != null && !oreSuffix.isEmpty()) {
       TinkerTools.registerToolForgeBlock(registry, "block" + oreSuffix);
     }

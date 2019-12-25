@@ -1,12 +1,11 @@
 package slimeknights.tconstruct.library.client.texture;
 
-import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.util.Identifier;
 import slimeknights.tconstruct.library.client.RenderUtil;
 
 public class PatternTexture extends TextureColoredTexture {
 
-  public PatternTexture(ResourceLocation partTexture, ResourceLocation patternTexture, String spriteName) {
+  public PatternTexture(Identifier partTexture, Identifier patternTexture, String spriteName) {
     super(partTexture, patternTexture, spriteName);
   }
 

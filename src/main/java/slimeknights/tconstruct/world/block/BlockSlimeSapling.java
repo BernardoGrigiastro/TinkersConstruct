@@ -2,7 +2,6 @@ package slimeknights.tconstruct.world.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
-import net.minecraft.block.SoundType;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -10,9 +9,10 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.DefaultedList;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.EnumPlantType;
@@ -32,12 +32,12 @@ public class BlockSlimeSapling extends BlockSapling {
 
   public BlockSlimeSapling() {
     setCreativeTab(TinkerRegistry.tabWorld);
-    setDefaultState(this.blockState.getBaseState());
-    this.setSoundType(SoundType.PLANT);
+    setDefaultState(this.stateFactory.getBaseState());
+    this.setSoundType(BlockSoundGroup.GRASS);
   }
 
   @Override
-  public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
     for(FoliageType type : FoliageType.values()) {
       list.add(new ItemStack(this, 1, getMetaFromState(getDefaultState().withProperty(FOLIAGE, type))));
     }
@@ -95,7 +95,7 @@ public class BlockSlimeSapling extends BlockSapling {
 
   @Nonnull
   @Override
-  public ItemStack getPickBlock(@Nonnull IBlockState state, RayTraceResult target, @Nonnull World world, @Nonnull BlockPos pos, EntityPlayer player) {
+  public ItemStack getPickBlock(@Nonnull IBlockState state, HitResult target, @Nonnull World world, @Nonnull BlockPos pos, EntityPlayer player) {
     IBlockState iblockstate = world.getBlockState(pos);
     int meta = iblockstate.getBlock().getMetaFromState(iblockstate);
     return new ItemStack(Item.getItemFromBlock(this), 1, meta);

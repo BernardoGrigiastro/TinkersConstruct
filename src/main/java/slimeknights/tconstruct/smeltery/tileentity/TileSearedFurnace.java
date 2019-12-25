@@ -9,8 +9,8 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -155,7 +155,7 @@ public class TileSearedFurnace extends TileHeatingStructureFuelTank<MultiblockSe
 
   protected void interactWithEntitiesInside() {
     // find all monsters within the furnace and kill them 
-    AxisAlignedBB bb = info.getBoundingBox().contract(1, 1, 1).offset(0, 0.5, 0).expand(0, 0.5, 0);
+    BoundingBox bb = info.getBoundingBox().contract(1, 1, 1).offset(0, 0.5, 0).expand(0, 0.5, 0);
 
     List<EntityLivingBase> entities = getWorld().getEntitiesWithinAABB(EntityLivingBase.class, bb);
 

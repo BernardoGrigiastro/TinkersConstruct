@@ -4,16 +4,16 @@
 
 package slimeknights.tconstruct.library;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 
 import org.apache.logging.log4j.LogManager;
@@ -59,15 +59,15 @@ public class Util {
     return String.format("%s:%s", RESOURCE, res);
   }
 
-  public static ResourceLocation getResource(String res) {
-    return new ResourceLocation(RESOURCE, res);
+  public static Identifier getResource(String res) {
+    return new Identifier(RESOURCE, res);
   }
 
   public static ModelResourceLocation getModelResource(String res, String variant) {
     return new ModelResourceLocation(resource(res), variant);
   }
 
-  public static ResourceLocation getModifierResource(String res) {
+  public static Identifier getModifierResource(String res) {
     return getResource("models/item/modifiers/" + res);
   }
 
@@ -96,13 +96,13 @@ public class Util {
   }
 
   /** Returns a fixed size DEEP copy of the list */
-  public static NonNullList<ItemStack> deepCopyFixedNonNullList(NonNullList<ItemStack> in) {
+  public static DefaultedList<ItemStack> deepCopyFixedNonNullList(DefaultedList<ItemStack> in) {
     return RecipeMatchRegistry.copyItemStackArray(in);
   }
 
   /** @deprecated use deepCopyFixedNonNullList */
   @Deprecated
-  public static NonNullList<ItemStack> copyItemStackArray(NonNullList<ItemStack> in) {
+  public static DefaultedList<ItemStack> copyItemStackArray(DefaultedList<ItemStack> in) {
     return deepCopyFixedNonNullList(in);
   }
 
@@ -113,7 +113,7 @@ public class Util {
   public static boolean isCtrlKeyDown() {
     // prioritize CONTROL, but allow OPTION as well on Mac (note: GuiScreen's isCtrlKeyDown only checks for the OPTION key on Mac)
     boolean isCtrlKeyDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
-    if(!isCtrlKeyDown && Minecraft.IS_RUNNING_ON_MAC) {
+    if(!isCtrlKeyDown && MinecraftClient.IS_SYSTEM_MAC) {
       isCtrlKeyDown = Keyboard.isKeyDown(Keyboard.KEY_LMETA) || Keyboard.isKeyDown(Keyboard.KEY_RMETA);
     }
 
@@ -129,7 +129,7 @@ public class Util {
   /**
    * Returns the actual color value for a chatformatting
    */
-  public static int enumChatFormattingToColor(TextFormatting color) {
+  public static int enumChatFormattingToColor(TextFormat color) {
     int i = color.getColorIndex();
     int j = (i >> 3 & 1) * 85;
     int k = (i >> 2 & 1) * 170 + j;
@@ -185,7 +185,7 @@ public class Util {
    * @param hitZ  Z hit location
    * @return  True if the click was within the box
    */
-  public static boolean clickedAABB(AxisAlignedBB aabb, float hitX, float hitY, float hitZ) {
+  public static boolean clickedAABB(BoundingBox aabb, float hitX, float hitY, float hitZ) {
     return aabb.minX <= hitX && hitX <= aabb.maxX
         && aabb.minY <= hitY && hitY <= aabb.maxY
         && aabb.minZ <= hitZ && hitZ <= aabb.maxZ;

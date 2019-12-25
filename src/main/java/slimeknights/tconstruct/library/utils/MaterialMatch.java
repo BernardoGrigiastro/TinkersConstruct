@@ -4,8 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-
+import net.minecraft.util.DefaultedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +35,7 @@ public class MaterialMatch extends RecipeMatch {
   }
 
   @Override
-  public Optional<Match> matches(NonNullList<ItemStack> stacks) {
+  public Optional<Match> matches(DefaultedList<ItemStack> stacks) {
     List<ItemStack> found = Lists.newLinkedList();
     int stillNeeded = amountNeeded;
 

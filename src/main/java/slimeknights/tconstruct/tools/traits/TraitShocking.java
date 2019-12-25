@@ -3,13 +3,13 @@ package slimeknights.tconstruct.tools.traits;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.damage.EntityDamageSource;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -29,7 +29,7 @@ public class TraitShocking extends AbstractTrait {
 
   @Override
   public void onHit(ItemStack tool, EntityLivingBase player, EntityLivingBase target, float damage, boolean isCritical) {
-    if(player.getEntityWorld().isRemote) {
+    if(player.getEntityWorld().isClient) {
       return;
     }
 
@@ -50,7 +50,7 @@ public class TraitShocking extends AbstractTrait {
 
   @Override
   public void afterBlockBreak(ItemStack tool, World world, IBlockState state, BlockPos pos, EntityLivingBase player, boolean wasEffective) {
-    if(player.getEntityWorld().isRemote) {
+    if(player.getEntityWorld().isClient) {
       return;
     }
 
@@ -67,7 +67,7 @@ public class TraitShocking extends AbstractTrait {
 
   @Override
   public void onUpdate(ItemStack tool, World world, Entity entity, int itemSlot, boolean isSelected) {
-    if(!isSelected || world.isRemote || world.getTotalWorldTime() % 5 > 0) {
+    if(!isSelected || world.isClient || world.getTotalWorldTime() % 5 > 0) {
       return;
     }
     if(entity instanceof EntityPlayer) {
@@ -86,9 +86,9 @@ public class TraitShocking extends AbstractTrait {
     }
 
     // how far did we move?
-    double dx = entity.posX - data.x;
-    double dy = entity.posY - data.y;
-    double dz = entity.posZ - data.z;
+    double dx = entity.x - data.x;
+    double dy = entity.y - data.y;
+    double dz = entity.z - data.z;
 
     double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
     if(dist < 0.1f) {
@@ -100,9 +100,9 @@ public class TraitShocking extends AbstractTrait {
 
     addCharge((float)(dist * 2d), tool, entity, data);
 
-    data.x = entity.posX;
-    data.y = entity.posY;
-    data.z = entity.posZ;
+    data.x = entity.x;
+    data.y = entity.y;
+    data.z = entity.z;
     modtag.save();
   }
 

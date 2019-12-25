@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -36,7 +36,7 @@ import slimeknights.tconstruct.library.utils.RecipeUtil;
 
 public class Material extends RecipeMatchRegistry {
 
-  public static final Material UNKNOWN = new Material("unknown", TextFormatting.WHITE);
+  public static final Material UNKNOWN = new Material("unknown", TextFormat.field_1068);
   public static final String LOC_Name = "material.%s.name";
   public static final String LOC_Prefix = "material.%s.prefix";
 
@@ -124,7 +124,7 @@ public class Material extends RecipeMatchRegistry {
   /** Stat-ID -> Traits */
   protected final Map<String, List<ITrait>> traits = new LinkedHashMap<>();
 
-  public Material(String identifier, TextFormatting textColor) {
+  public Material(String identifier, TextFormat textColor) {
     this(identifier, Util.enumChatFormattingToColor(textColor));
   }
 

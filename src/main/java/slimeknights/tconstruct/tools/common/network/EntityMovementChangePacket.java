@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.tools.common.network;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -25,19 +25,19 @@ public class EntityMovementChangePacket extends AbstractPacketThreadsafe {
     this.x = entity.motionX;
     this.y = entity.motionY;
     this.z = entity.motionZ;
-    this.yaw = entity.rotationYaw;
-    this.pitch = entity.rotationPitch;
+    this.yaw = entity.yaw;
+    this.pitch = entity.pitch;
   }
 
   @Override
   public void handleClientSafe(NetHandlerPlayClient netHandler) {
-    Entity entity = Minecraft.getMinecraft().world.getEntityByID(entityID);
+    Entity entity = MinecraftClient.getMinecraft().world.getEntityByID(entityID);
     if(entity != null) {
       entity.motionX = x;
       entity.motionY = y;
       entity.motionZ = z;
-      entity.rotationYaw = yaw;
-      entity.rotationPitch = pitch;
+      entity.yaw = yaw;
+      entity.pitch = pitch;
     }
   }
 

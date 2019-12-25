@@ -15,13 +15,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.IShearable;
@@ -44,13 +44,13 @@ import slimeknights.tconstruct.tools.TinkerTools;
 
 public class Kama extends AoeToolCore {
 
-  public static final ImmutableSet<net.minecraft.block.material.Material> effective_materials =
-      ImmutableSet.of(net.minecraft.block.material.Material.WEB,
-          net.minecraft.block.material.Material.LEAVES,
-          net.minecraft.block.material.Material.PLANTS,
-          net.minecraft.block.material.Material.VINE,
-          net.minecraft.block.material.Material.GOURD,
-          net.minecraft.block.material.Material.CACTUS);
+  public static final ImmutableSet<net.minecraft.block.Material> effective_materials =
+      ImmutableSet.of(net.minecraft.block.Material.COBWEB,
+          net.minecraft.block.Material.LEAVES,
+          net.minecraft.block.Material.PLANT,
+          net.minecraft.block.Material.REPLACEABLE_PLANT,
+          net.minecraft.block.Material.PUMPKIN,
+          net.minecraft.block.Material.CACTUS);
 
 
   public Kama(PartMaterialType... requiredComponents) {
@@ -93,15 +93,15 @@ public class Kama extends AoeToolCore {
 
   @Nonnull
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+  public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
     ItemStack itemStackIn = playerIn.getHeldItem(hand);
     if(ToolHelper.isBroken(itemStackIn)) {
-      return ActionResult.newResult(EnumActionResult.FAIL, itemStackIn);
+      return TypedActionResult.newResult(EnumActionResult.FAIL, itemStackIn);
     }
 
-    RayTraceResult trace = this.rayTrace(worldIn, playerIn, true);
-    if(trace == null || trace.typeOfHit != RayTraceResult.Type.BLOCK) {
-      return ActionResult.newResult(EnumActionResult.PASS, itemStackIn);
+    HitResult trace = this.rayTrace(worldIn, playerIn, true);
+    if(trace == null || trace.typeOfHit != HitResult.Type.BLOCK) {
+      return TypedActionResult.newResult(EnumActionResult.PASS, itemStackIn);
     }
 
     int fortune = ToolHelper.getFortuneLevel(itemStackIn);
@@ -117,12 +117,12 @@ public class Kama extends AoeToolCore {
     harvestedSomething |= harvestCrop(itemStackIn, worldIn, playerIn, origin, fortune);
 
     if(harvestedSomething) {
-      playerIn.getEntityWorld().playSound(null, playerIn.posX, playerIn.posY, playerIn.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, playerIn.getSoundCategory(), 1.0F, 1.0F);
+      playerIn.getEntityWorld().playSound(null, playerIn.x, playerIn.y, playerIn.z, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, playerIn.getSoundCategory(), 1.0F, 1.0F);
       swingTool(playerIn, hand);
-      return ActionResult.newResult(EnumActionResult.SUCCESS, itemStackIn);
+      return TypedActionResult.newResult(EnumActionResult.SUCCESS, itemStackIn);
     }
 
-    return ActionResult.newResult(EnumActionResult.PASS, itemStackIn);
+    return TypedActionResult.newResult(EnumActionResult.PASS, itemStackIn);
   }
 
   protected boolean canHarvestCrop(IBlockState state) {
@@ -190,7 +190,7 @@ public class Kama extends AoeToolCore {
     }
 
     // can be harvested, always just return true clientside for the animation stuff
-    if(!world.isRemote) {
+    if(!world.isClient) {
       doHarvestCrop(stack, world, player, pos, fortune, state);
     }
 
@@ -200,7 +200,7 @@ public class Kama extends AoeToolCore {
   protected void doHarvestCrop(ItemStack stack, World world, EntityPlayer player, BlockPos pos, int fortune, IBlockState state) {
     // first, try getting a seed from the drops, if we don't have one we don't replant
     float chance = 1.0f;
-    NonNullList<ItemStack> drops = NonNullList.create();
+    DefaultedList<ItemStack> drops = DefaultedList.create();
     state.getBlock().getDrops(drops, world, pos, state, fortune);
     chance = ForgeEventFactory.fireBlockHarvesting(drops, world, pos, state, fortune, chance, false, player);
 
@@ -234,7 +234,7 @@ public class Kama extends AoeToolCore {
 
         // drop the remainder of the items
         for(ItemStack drop : drops) {
-          if(world.rand.nextFloat() <= chance) {
+          if(world.random.nextFloat() <= chance) {
             Block.spawnAsEntity(world, pos, drop);
           }
         }
@@ -255,9 +255,9 @@ public class Kama extends AoeToolCore {
 
     IShearable shearable = (IShearable) entity;
     if(shearable.isShearable(stack, world, entity.getPosition())) {
-      if(!world.isRemote) {
+      if(!world.isClient) {
         List<ItemStack> drops = shearable.onSheared(stack, world, entity.getPosition(), fortune);
-        Random rand = world.rand;
+        Random rand = world.random;
         for(ItemStack drop : drops) {
           EntityItem entityItem = entity.entityDropItem(drop, 1.0F);
           if(entityItem != null) {

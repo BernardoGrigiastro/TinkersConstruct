@@ -8,8 +8,7 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
-import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.util.Identifier;
 import java.util.LinkedHashMap;
 
 import javax.annotation.Nonnull;
@@ -38,7 +37,7 @@ public class PropertyStateMapper extends StateMapperBase {
     for(IProperty<?> ignored : ignore) {
       map.remove(ignored);
     }
-    ResourceLocation res = new ResourceLocation(Block.REGISTRY.getNameForObject(state.getBlock()).getResourceDomain(), name + state.getValue(prop).getName());
+    Identifier res = new Identifier(Block.REGISTRY.getNameForObject(state.getBlock()).getResourceDomain(), name + state.getValue(prop).getName());
 
     return new ModelResourceLocation(res, this.getPropertyString(map));
   }

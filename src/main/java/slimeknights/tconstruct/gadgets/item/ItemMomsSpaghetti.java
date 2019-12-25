@@ -1,9 +1,8 @@
 package slimeknights.tconstruct.gadgets.item;
 
 import com.google.common.collect.ImmutableList;
-
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,14 +11,14 @@ import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatList;
-import net.minecraft.util.ActionResult;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -64,7 +63,7 @@ public class ItemMomsSpaghetti extends ItemFood implements IRepairable, IModifya
   }
 
   @Override
-  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
+  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> items) {
     // no creative items, nono
   }
 
@@ -106,7 +105,7 @@ public class ItemMomsSpaghetti extends ItemFood implements IRepairable, IModifya
     if(entityLiving instanceof EntityPlayer) {
       EntityPlayer entityplayer = (EntityPlayer) entityLiving;
       entityplayer.getFoodStats().addStats(this, stack);
-      worldIn.playSound(null, entityplayer.posX, entityplayer.posY, entityplayer.posZ, SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS, 0.5F, worldIn.rand.nextFloat() * 0.1F + 0.9F);
+      worldIn.playSound(null, entityplayer.x, entityplayer.y, entityplayer.z, SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.field_15248, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
       StatBase statBase = StatList.getObjectUseStats(this);
       assert statBase != null;
       entityplayer.addStat(statBase);
@@ -134,14 +133,14 @@ public class ItemMomsSpaghetti extends ItemFood implements IRepairable, IModifya
 
   @Nonnull
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+  public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
     ItemStack itemStackIn = playerIn.getHeldItem(hand);
     if(playerIn.canEat(false) && getUses(itemStackIn) > 0) {
       playerIn.setActiveHand(hand);
-      return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+      return new TypedActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
     }
     else {
-      return new ActionResult<>(EnumActionResult.FAIL, itemStackIn);
+      return new TypedActionResult<>(EnumActionResult.FAIL, itemStackIn);
     }
   }
 
@@ -150,7 +149,7 @@ public class ItemMomsSpaghetti extends ItemFood implements IRepairable, IModifya
   }
 
   @Override
-  public ItemStack repair(ItemStack repairable, NonNullList<ItemStack> repairItems) {
+  public ItemStack repair(ItemStack repairable, DefaultedList<ItemStack> repairItems) {
     if(repairable.getItemDamage() == 0) {
       // nothing to repair, full durability
       return ItemStack.EMPTY;
@@ -185,7 +184,7 @@ public class ItemMomsSpaghetti extends ItemFood implements IRepairable, IModifya
 
   @SideOnly(Side.CLIENT)
   @Override
-  public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+  public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, TooltipContext flagIn) {
     tooltip.add(String.format("%s: %s", Util.translate(LOC_USES),
                               CustomFontColor.formatPartialAmount(getUses(stack), getMaxDamage(stack))));
     TooltipBuilder.addModifierTooltips(stack, tooltip);
@@ -204,7 +203,7 @@ public class ItemMomsSpaghetti extends ItemFood implements IRepairable, IModifya
   @Nonnull
   @SideOnly(Side.CLIENT)
   @Override
-  public FontRenderer getFontRenderer(ItemStack stack) {
+  public TextRenderer getFontRenderer(ItemStack stack) {
     return ClientProxy.fontRenderer;
   }
 
@@ -220,9 +219,9 @@ public class ItemMomsSpaghetti extends ItemFood implements IRepairable, IModifya
 
     return ImmutableList.of(
         Util.translate(LOC_DESC),
-        String.format("%s: %s", Util.translate(LOC_USES), getUses(stack)) + TextFormatting.RESET,
-        String.format("%s: %s", Util.translate(LOC_NOURISHMENT), nourishment) + TextFormatting.RESET,
-        String.format("%s: %s", Util.translate(LOC_SATURATION), Util.dfPercent.format(saturation)) + TextFormatting.RESET
+        String.format("%s: %s", Util.translate(LOC_USES), getUses(stack)) + TextFormat.RESET,
+        String.format("%s: %s", Util.translate(LOC_NOURISHMENT), nourishment) + TextFormat.RESET,
+        String.format("%s: %s", Util.translate(LOC_SATURATION), Util.dfPercent.format(saturation)) + TextFormat.RESET
     );
   }
 }

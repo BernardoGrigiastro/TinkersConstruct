@@ -1,11 +1,10 @@
 package slimeknights.tconstruct.tools.traits;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.EntityDamageSource;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSource;
-import net.minecraft.util.text.TextFormatting;
-
+import net.minecraft.text.TextFormat;
 import slimeknights.tconstruct.library.traits.AbstractTrait;
 import slimeknights.tconstruct.shared.client.ParticleEffect;
 import slimeknights.tconstruct.tools.TinkerTools;
@@ -13,7 +12,7 @@ import slimeknights.tconstruct.tools.TinkerTools;
 public class TraitPrickly extends AbstractTrait {
 
   public TraitPrickly() {
-    super("prickly", TextFormatting.DARK_GREEN);
+    super("prickly", TextFormat.field_1077);
   }
 
   @Override
@@ -26,7 +25,7 @@ public class TraitPrickly extends AbstractTrait {
   protected void causeDamage(EntityLivingBase player, EntityLivingBase target) {
     float damage = 0.5f + Math.max(-0.5f, (float) random.nextGaussian() * 0.75f);
     if(damage > 0) {
-      EntityDamageSource damageSource = new EntityDamageSource(DamageSource.CACTUS.damageType, player);
+      EntityDamageSource damageSource = new EntityDamageSource(DamageSource.CACTUS.name, player);
       damageSource.setDamageBypassesArmor();
       damageSource.setDamageIsAbsolute();
 

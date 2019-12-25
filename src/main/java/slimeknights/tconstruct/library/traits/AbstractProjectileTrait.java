@@ -3,7 +3,7 @@ package slimeknights.tconstruct.library.traits;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -12,7 +12,7 @@ import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 
 public abstract class AbstractProjectileTrait extends AbstractTrait implements IProjectileTrait {
 
-  public AbstractProjectileTrait(String identifier, TextFormatting color) {
+  public AbstractProjectileTrait(String identifier, TextFormat color) {
     super(identifier, color);
   }
 

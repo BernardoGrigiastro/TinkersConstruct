@@ -7,8 +7,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.DefaultedList;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent.Register;
@@ -88,14 +88,14 @@ public class TinkerDebug {
     for(IModifier modifier : TinkerRegistry.getAllModifiers()) {
       try {
         modifier.matches(ListUtil.getListFrom(new ItemStack(Items.STICK)));
-        modifier.matches(NonNullList.withSize(1, ItemStack.EMPTY));
+        modifier.matches(DefaultedList.withSize(1, ItemStack.EMPTY));
       } catch(Exception e) {
         log.error("Caught exception in modifier " + modifier.getIdentifier(), e);
       }
     }
 
     // check all blocks if all metadatas are supported
-    for(ResourceLocation identifier : Block.REGISTRY.getKeys()) {
+    for(Identifier identifier : Block.REGISTRY.getKeys()) {
       // only our own stuff
       if(!identifier.getResourceDomain().equals(Util.RESOURCE)) {
         continue;
@@ -113,7 +113,7 @@ public class TinkerDebug {
     }
 
     // same for items
-    for(ResourceLocation identifier : Item.REGISTRY.getKeys()) {
+    for(Identifier identifier : Item.REGISTRY.getKeys()) {
       // only our own stuff
       if(!identifier.getResourceDomain().equals(Util.RESOURCE)) {
         continue;

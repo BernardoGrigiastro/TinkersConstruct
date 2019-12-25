@@ -4,15 +4,13 @@ import com.google.common.collect.Lists;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.linked.TIntLinkedList;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.Container;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextFormatting;
-
 import java.util.List;
 import java.util.ListIterator;
 
@@ -30,7 +28,7 @@ public class GuiInfoPanel extends GuiModule {
   private static int resW = 118;
   private static int resH = 75;
 
-  private static ResourceLocation BACKGROUND = Util.getResource("textures/gui/panel.png");
+  private static Identifier BACKGROUND = Util.getResource("textures/gui/panel.png");
 
   private static GuiElement topLeft  = new GuiElement(0,0, 4, 4, 256,256);
   private static GuiElement topRight = new GuiElement(resW+4,0, 4, 4);
@@ -53,7 +51,7 @@ public class GuiInfoPanel extends GuiModule {
 
   private GuiWidgetBorder border = new GuiWidgetBorder();
 
-  private FontRenderer fontRenderer = ClientProxy.fontRenderer;
+  private TextRenderer fontRenderer = ClientProxy.fontRenderer;
   private GuiWidgetSlider slider = new GuiWidgetSlider(sliderNormal, sliderHover, sliderHover, sliderTop, sliderBot, sliderBar);
 
   protected String caption;
@@ -87,7 +85,7 @@ public class GuiInfoPanel extends GuiModule {
   }
 
   @Override
-  public void setWorldAndResolution(Minecraft mc, int width, int height) {
+  public void setWorldAndResolution(MinecraftClient mc, int width, int height) {
     super.setWorldAndResolution(mc, width, height);
     super.fontRenderer = fontRenderer;
   }
@@ -153,11 +151,11 @@ public class GuiInfoPanel extends GuiModule {
     int neededHeight = 0;
 
     if(hasCaption()) {
-      neededHeight += fontRenderer.FONT_HEIGHT;
+      neededHeight += fontRenderer.fontHeight;
       neededHeight += 3;
     }
 
-    neededHeight += (fontRenderer.FONT_HEIGHT + 0.5f) * getTotalLines().size();
+    neededHeight += (fontRenderer.fontHeight + 0.5f) * getTotalLines().size();
 
     return neededHeight;
   }
@@ -179,8 +177,8 @@ public class GuiInfoPanel extends GuiModule {
     slider.show();
     // check how many lines we can show
     int neededHeight = calcNeededHeight(); // recalc because width changed due to slider
-    int hiddenRows = (neededHeight - h) / fontRenderer.FONT_HEIGHT;
-    if((neededHeight - h) % fontRenderer.FONT_HEIGHT > 0) {
+    int hiddenRows = (neededHeight - h) / fontRenderer.fontHeight;
+    if((neededHeight - h) % fontRenderer.fontHeight > 0) {
       hiddenRows++;
     }
 
@@ -256,7 +254,7 @@ public class GuiInfoPanel extends GuiModule {
     // floating over tooltip info?
     if(hasTooltips()
        && mouseX >= guiRight() - border.w - fontRenderer.getCharWidth('?') / 2 && mouseX < guiRight()
-       && mouseY > guiTop + 5 && mouseY < guiTop + 5 + fontRenderer.FONT_HEIGHT) {
+       && mouseY > guiTop + 5 && mouseY < guiTop + 5 + fontRenderer.fontHeight) {
       int w = MathHelper.clamp(this.width - mouseX - 12, 10, 200);
       drawHoveringText(fontRenderer.listFormattedStringToWidth(Util.translate("gui.general.hover"), w), mouseX - guiLeft, mouseY - guiTop);
     }
@@ -265,10 +263,10 @@ public class GuiInfoPanel extends GuiModule {
     float y = 5 + guiTop;
 
     if(hasCaption()) {
-      y += fontRenderer.FONT_HEIGHT + 3;
+      y += fontRenderer.fontHeight + 3;
     }
 
-    float textHeight = fontRenderer.FONT_HEIGHT * textScale + 0.5f;
+    float textHeight = fontRenderer.fontHeight * textScale + 0.5f;
     float lowerBound = (guiTop + ySize - 5) / textScale;
 
     // get the index of the currently hovered line
@@ -312,7 +310,7 @@ public class GuiInfoPanel extends GuiModule {
 
     List<String> lines = fontRenderer.listFormattedStringToWidth(tooltips.get(i), w);
 
-    drawHoveringText(lines, mouseX - guiLeft, mouseY - guiTop - lines.size() * fontRenderer.FONT_HEIGHT / 2);
+    drawHoveringText(lines, mouseX - guiLeft, mouseY - guiTop - lines.size() * fontRenderer.fontHeight / 2);
   }
 
   @Override
@@ -336,9 +334,9 @@ public class GuiInfoPanel extends GuiModule {
     if(hasCaption()) {
       int x2 = xSize / 2;
       x2 -= fontRenderer.getStringWidth(caption) / 2;
-      fontRenderer.drawStringWithShadow(TextFormatting.UNDERLINE + TextFormatting
+      fontRenderer.drawStringWithShadow(TextFormat.field_1073 + TextFormat
           .getTextWithoutFormattingCodes(caption), guiLeft + x2, y, color);
-      y += fontRenderer.FONT_HEIGHT + 3;
+      y += fontRenderer.fontHeight + 3;
     }
 
 
@@ -347,7 +345,7 @@ public class GuiInfoPanel extends GuiModule {
       return;
     }
 
-    float textHeight = fontRenderer.FONT_HEIGHT * textScale + 0.5f;
+    float textHeight = fontRenderer.fontHeight * textScale + 0.5f;
     float lowerBound = (guiTop + ySize - 5) / textScale;
     GlStateManager.scale(textScale, textScale, 1.0f);
     x /= textScale;

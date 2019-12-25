@@ -1,9 +1,8 @@
 package slimeknights.tconstruct.tools.traits;
 
 import com.google.common.collect.Multimap;
-
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 
@@ -22,9 +21,9 @@ public class TraitHeavy extends AbstractTrait {
   }
 
   @Override
-  public void getAttributeModifiers(@Nonnull EntityEquipmentSlot slot, ItemStack stack, Multimap<String, AttributeModifier> attributeMap) {
+  public void getAttributeModifiers(@Nonnull EntityEquipmentSlot slot, ItemStack stack, Multimap<String, EntityAttributeModifier> attributeMap) {
     if(slot == EntityEquipmentSlot.MAINHAND || slot == EntityEquipmentSlot.OFFHAND) {
-      attributeMap.put(SharedMonsterAttributes.KNOCKBACK_RESISTANCE.getName(), new AttributeModifier(KNOCKBACK_MODIFIER, "Knockback modifier", 1, 0));
+      attributeMap.put(EntityAttributes.KNOCKBACK_RESISTANCE.getName(), new EntityAttributeModifier(KNOCKBACK_MODIFIER, "Knockback modifier", 1, 0));
     }
   }
 }

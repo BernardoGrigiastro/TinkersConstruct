@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.gadgets.block;
 
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -18,11 +18,11 @@ public class BlockBrownstone extends EnumBlock<BlockBrownstone.BrownstoneType> {
   public final static PropertyEnum<BrownstoneType> TYPE = PropertyEnum.create("type", BrownstoneType.class);
 
   public BlockBrownstone() {
-    super(Material.ROCK, TYPE, BrownstoneType.class);
+    super(Material.STONE, TYPE, BrownstoneType.class);
     this.setCreativeTab(TinkerRegistry.tabGadgets);
     this.setHardness(3F);
     this.setResistance(20F);
-    this.setSoundType(SoundType.STONE);
+    this.setSoundType(BlockSoundGroup.STONE);
   }
 
   @Override
@@ -37,7 +37,7 @@ public class BlockBrownstone extends EnumBlock<BlockBrownstone.BrownstoneType> {
     }
   }
 
-  public enum BrownstoneType implements IStringSerializable, EnumBlock.IEnumMeta {
+  public enum BrownstoneType implements StringRepresentable, EnumBlock.IEnumMeta {
     SMOOTH,
     ROUGH,
     PAVER,

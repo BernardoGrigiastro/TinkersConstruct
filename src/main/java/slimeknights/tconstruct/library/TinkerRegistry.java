@@ -19,7 +19,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -525,7 +525,7 @@ public final class TinkerRegistry {
   private static List<ICastingRecipe> basinCastRegistry = Lists.newLinkedList();
   private static List<AlloyRecipe> alloyRegistry = Lists.newLinkedList();
   private static Map<FluidStack, Integer> smelteryFuels = Maps.newHashMap();
-  private static Map<ResourceLocation, FluidStack> entityMeltingRegistry = Maps.newHashMap();
+  private static Map<Identifier, FluidStack> entityMeltingRegistry = Maps.newHashMap();
 
   /** Registers this item with all its metadatas to melt into amount of the given fluid. */
   public static void registerMelting(Item item, Fluid fluid, int amount) {
@@ -739,7 +739,7 @@ public final class TinkerRegistry {
 
   /** Register an entity to melt into the given fluidstack. The fluidstack is returned for 1 heart damage */
   public static void registerEntityMelting(Class<? extends Entity> clazz, FluidStack liquid) {
-    ResourceLocation name = EntityList.getKey(clazz);
+    Identifier name = EntityList.getKey(clazz);
 
     if(name == null) {
       error("Entity Melting: Entity %s is not registered in the EntityList", clazz.getSimpleName());
@@ -760,7 +760,7 @@ public final class TinkerRegistry {
   }
 
   public static FluidStack getMeltingForEntity(Entity entity) {
-    ResourceLocation name = EntityList.getKey(entity);
+    Identifier name = EntityList.getKey(entity);
     FluidStack fluidStack = entityMeltingRegistry.get(name);
     // check if the fluid is the correct one to use
     return Optional.ofNullable(fluidStack)

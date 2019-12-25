@@ -1,14 +1,13 @@
 package slimeknights.tconstruct.tools.common.client.module;
 
-import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.util.Identifier;
 import slimeknights.mantle.client.gui.GuiElement;
 import slimeknights.mantle.client.gui.GuiElementScalable;
 import slimeknights.tconstruct.library.Util;
 
 public final class GuiGeneric {
 
-  public static final ResourceLocation LOCATION = Util.getResource("textures/gui/generic.png");
+  public static final Identifier LOCATION = Util.getResource("textures/gui/generic.png");
 
   // first one sets default texture w/h
   public static final GuiElement cornerTopLeft = new GuiElement(0, 0, 7, 7, 64, 64);

@@ -5,8 +5,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -54,19 +54,19 @@ public class TraitMagnetic extends AbstractTraitLeveled {
     @Override
     public void performEffect(@Nonnull EntityLivingBase entity, int id) {
       // super magnetic - inspired by botanias code
-      double x = entity.posX;
-      double y = entity.posY;
-      double z = entity.posZ;
+      double x = entity.x;
+      double y = entity.y;
+      double z = entity.z;
       double range = 1.8d;
       PotionEffect activePotionEffect = entity.getActivePotionEffect(this);
       if(activePotionEffect != null) {
         range += activePotionEffect.getAmplifier() * 0.3f;
       }
 
-      List<EntityItem> items = entity.getEntityWorld().getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(x - range, y - range, z - range, x + range, y + range, z + range));
+      List<EntityItem> items = entity.getEntityWorld().getEntitiesWithinAABB(EntityItem.class, new BoundingBox(x - range, y - range, z - range, x + range, y + range, z + range));
       int pulled = 0;
       for(EntityItem item : items) {
-        if(item.getItem().isEmpty() || item.isDead) {
+        if(item.getItem().isEmpty() || item.removed) {
           continue;
         }
 
@@ -79,7 +79,7 @@ public class TraitMagnetic extends AbstractTraitLeveled {
 
         // calculate direction: item -> player
         Vector3d vec = new Vector3d(x, y, z);
-        vec.sub(new Vector3d(item.posX, item.posY, item.posZ));
+        vec.sub(new Vector3d(item.x, item.y, item.z));
 
         vec.normalize();
         vec.scale(strength);

@@ -2,15 +2,14 @@ package slimeknights.tconstruct.tools.traits;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
-
+import net.minecraft.text.TextFormat;
 import slimeknights.tconstruct.library.traits.AbstractTrait;
 
 // You're so cheap, repairing gives you a bonus
 public class TraitCheap extends AbstractTrait {
 
   public TraitCheap() {
-    super("cheap", TextFormatting.DARK_GRAY);
+    super("cheap", TextFormat.field_1063);
   }
 
   @Override

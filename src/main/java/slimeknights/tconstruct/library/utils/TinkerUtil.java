@@ -5,8 +5,7 @@ import com.google.common.collect.Lists;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.NonNullList;
-
+import net.minecraft.util.DefaultedList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -130,8 +129,8 @@ public final class TinkerUtil {
     return tagList.getCompoundTagAt(index);
   }
 
-  public static NonNullList<IModifier> getModifiers(ItemStack itemStack) {
-    NonNullList<IModifier> result = NonNullList.create();
+  public static DefaultedList<IModifier> getModifiers(ItemStack itemStack) {
+    DefaultedList<IModifier> result = DefaultedList.create();
     NBTTagList modifierList = TagUtil.getModifiersTagList(itemStack);
     for(int i = 0; i < modifierList.tagCount(); i++) {
       NBTTagCompound tag = modifierList.getCompoundTagAt(i);

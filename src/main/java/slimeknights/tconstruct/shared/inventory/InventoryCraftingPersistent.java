@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.shared.inventory;
 
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 
@@ -12,10 +12,10 @@ public class InventoryCraftingPersistent extends InventoryCrafting {
 
   private final int length;
   private final Container eventHandler;
-  private final IInventory parent;
+  private final Inventory parent;
   private boolean doNotCallUpdates;
 
-  public InventoryCraftingPersistent(Container eventHandler, IInventory parent, int width, int height) {
+  public InventoryCraftingPersistent(Container eventHandler, Inventory parent, int width, int height) {
     super(eventHandler, width, height);
     int k = width * height;
 

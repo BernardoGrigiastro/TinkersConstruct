@@ -1,7 +1,6 @@
 package slimeknights.tconstruct.library.materials;
 
-import net.minecraft.util.text.TextFormatting;
-
+import net.minecraft.text.TextFormat;
 import slimeknights.tconstruct.library.Util;
 
 public abstract class AbstractMaterialStats implements IMaterialStats {
@@ -31,7 +30,7 @@ public abstract class AbstractMaterialStats implements IMaterialStats {
                          Util.translate(loc),
                          color,
                          Util.df.format(number))
-           + TextFormatting.RESET;
+           + TextFormat.RESET;
   }
 
   public static String formatNumberPercent(String loc, String color, float number) {
@@ -39,6 +38,6 @@ public abstract class AbstractMaterialStats implements IMaterialStats {
                          Util.translate(loc),
                          color,
                          Util.dfPercent.format(number))
-           + TextFormatting.RESET;
+           + TextFormat.RESET;
   }
 }

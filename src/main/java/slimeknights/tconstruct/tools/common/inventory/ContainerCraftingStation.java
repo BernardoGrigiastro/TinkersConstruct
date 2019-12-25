@@ -1,20 +1,20 @@
 package slimeknights.tconstruct.tools.common.inventory;
 
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -48,8 +48,8 @@ public class ContainerCraftingStation extends ContainerTinkerStation<TileCraftin
   private final InventoryCraftingPersistent craftMatrix;
   private final InventoryCraftResult craftResult;
 
-  private IRecipe lastRecipe;
-  private IRecipe lastLastRecipe;
+  private Recipe lastRecipe;
+  private Recipe lastLastRecipe;
 
   @SubscribeEvent
   public static void onCraftingStationGuiOpened(PlayerContainerEvent.Open event) {
@@ -78,7 +78,7 @@ public class ContainerCraftingStation extends ContainerTinkerStation<TileCraftin
     }
 
     // detect te
-    TileEntity inventoryTE = null;
+    BlockEntity inventoryTE = null;
     EnumFacing accessDir = null;
     for(EnumFacing dir : EnumFacing.HORIZONTALS) {
       BlockPos neighbor = pos.offset(dir);
@@ -90,13 +90,13 @@ public class ContainerCraftingStation extends ContainerTinkerStation<TileCraftin
         }
       }
       if(!stationPart) {
-        TileEntity te = world.getTileEntity(neighbor);
+        BlockEntity te = world.getTileEntity(neighbor);
         if(te != null && !(te instanceof TileCraftingStation)) {
           // if blacklisted, skip checks entirely
           if(blacklisted(te.getClass())) {
             continue;
           }
-          if(te instanceof IInventory && !((IInventory) te).isUsableByPlayer(player)) {
+          if(te instanceof Inventory && !((Inventory) te).isUsableByPlayer(player)) {
             continue;
           }
 
@@ -127,13 +127,13 @@ public class ContainerCraftingStation extends ContainerTinkerStation<TileCraftin
     this.addPlayerInventory(playerInventory, 8, 84);
   }
 
-  private boolean blacklisted(Class<? extends TileEntity> clazz) {
+  private boolean blacklisted(Class<? extends BlockEntity> clazz) {
     if(Config.craftingStationBlacklist.isEmpty()) {
       return false;
     }
 
     // first, try registry name
-    ResourceLocation registryName = TileEntity.getKey(clazz);
+    Identifier registryName = BlockEntity.getKey(clazz);
     if(registryName != null && Config.craftingStationBlacklist.contains(registryName.toString())) {
       return true;
     }
@@ -160,7 +160,7 @@ public class ContainerCraftingStation extends ContainerTinkerStation<TileCraftin
   }
 
   @Override
-  public void onCraftMatrixChanged(IInventory inventoryIn) {
+  public void onCraftMatrixChanged(Inventory inventoryIn) {
     this.slotChangedCraftingGrid(this.world, this.player, this.craftMatrix, this.craftResult);
   }
 
@@ -181,7 +181,7 @@ public class ContainerCraftingStation extends ContainerTinkerStation<TileCraftin
     result.setInventorySlotContents(SLOT_RESULT, itemstack);
 
     // update recipe on server
-    if(!world.isRemote) {
+    if(!world.isClient) {
       EntityPlayerMP entityplayermp = (EntityPlayerMP) player;
 
       // we need to sync to all players currently in the inventory
@@ -207,7 +207,7 @@ public class ContainerCraftingStation extends ContainerTinkerStation<TileCraftin
     });
   }
 
-  private void syncRecipeToAllOpenWindows(final IRecipe lastRecipe, List<EntityPlayerMP> players) {
+  private void syncRecipeToAllOpenWindows(final Recipe lastRecipe, List<EntityPlayerMP> players) {
     players.forEach(otherPlayer -> {
       // safe cast since hasSameContainerOpen does class checks
       ((ContainerCraftingStation)otherPlayer.openContainer).lastRecipe = lastRecipe;
@@ -217,14 +217,14 @@ public class ContainerCraftingStation extends ContainerTinkerStation<TileCraftin
 
   // todo: move this to Mantle
   // server can be gotten from EntityPlayerMP
-  private <T extends TileEntity> List<EntityPlayerMP> getAllPlayersWithThisContainerOpen(BaseContainer<T> container, WorldServer server) {
+  private <T extends BlockEntity> List<EntityPlayerMP> getAllPlayersWithThisContainerOpen(BaseContainer<T> container, WorldServer server) {
     return server.playerEntities.stream()
         .filter(player -> hasSameContainerOpen(container, player))
         .map(player -> (EntityPlayerMP)player)
         .collect(Collectors.toList());
   }
 
-  private <T extends TileEntity> boolean hasSameContainerOpen(BaseContainer<T> container, EntityPlayer playerToCheck) {
+  private <T extends BlockEntity> boolean hasSameContainerOpen(BaseContainer<T> container, EntityPlayer playerToCheck) {
     return playerToCheck instanceof EntityPlayerMP &&
            playerToCheck.openContainer.getClass().isAssignableFrom(container.getClass()) &&
         this.sameGui((BaseContainer<T>) playerToCheck.openContainer);
@@ -235,7 +235,7 @@ public class ContainerCraftingStation extends ContainerTinkerStation<TileCraftin
     return p_94530_2_.inventory != this.craftResult && super.canMergeSlot(p_94530_1_, p_94530_2_);
   }
 
-  protected TileEntity detectInventory() {
+  protected BlockEntity detectInventory() {
     for(EnumFacing dir : EnumFacing.HORIZONTALS) {
       BlockPos neighbor = pos.offset(dir);
       boolean stationPart = false;
@@ -246,7 +246,7 @@ public class ContainerCraftingStation extends ContainerTinkerStation<TileCraftin
         }
       }
       if(!stationPart) {
-        TileEntity te = world.getTileEntity(neighbor);
+        BlockEntity te = world.getTileEntity(neighbor);
         if(te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.getOpposite())) {
           if(te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.getOpposite()) instanceof IItemHandlerModifiable) {
             return te;
@@ -269,14 +269,14 @@ public class ContainerCraftingStation extends ContainerTinkerStation<TileCraftin
     return craftMatrix;
   }
 
-  public void updateLastRecipeFromServer(IRecipe recipe) {
+  public void updateLastRecipeFromServer(Recipe recipe) {
     lastRecipe = recipe;
     // if no recipe, set to empty to prevent ghost outputs when another player grabs the result
     this.craftResult.setInventorySlotContents(SLOT_RESULT, recipe != null ? recipe.getCraftingResult(craftMatrix) : ItemStack.EMPTY);
   }
 
 
-  public NonNullList<ItemStack> getRemainingItems() {
+  public DefaultedList<ItemStack> getRemainingItems() {
     if(lastRecipe != null && lastRecipe.matches(craftMatrix, world)) {
       return lastRecipe.getRemainingItems(craftMatrix);
     }

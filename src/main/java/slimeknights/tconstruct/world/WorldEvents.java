@@ -13,8 +13,8 @@ import slimeknights.tconstruct.world.worldgen.SlimeIslandGenerator;
 public class WorldEvents {
 
   // Custom slime spawning on slime islands
-  Biome.SpawnListEntry magmaSlimeSpawn = new Biome.SpawnListEntry(EntityMagmaCube.class, 150, 4, 6);
-  Biome.SpawnListEntry blueSlimeSpawn = new Biome.SpawnListEntry(EntityBlueSlime.class, 15, 2, 4);
+  Biome.SpawnEntry magmaSlimeSpawn = new Biome.SpawnEntry(EntityMagmaCube.class, 150, 4, 6);
+  Biome.SpawnEntry blueSlimeSpawn = new Biome.SpawnEntry(EntityBlueSlime.class, 15, 2, 4);
 
   @SubscribeEvent
   public void extraSlimeSpawn(WorldEvent.PotentialSpawns event) {

@@ -2,7 +2,7 @@ package slimeknights.tconstruct.tools.traits;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
 import slimeknights.tconstruct.library.traits.AbstractTrait;
@@ -14,7 +14,7 @@ import slimeknights.tconstruct.library.traits.AbstractTrait;
 public class TraitUnnatural extends AbstractTrait {
 
   public TraitUnnatural() {
-    super("unnatural", TextFormatting.LIGHT_PURPLE);
+    super("unnatural", TextFormat.field_1076);
   }
 
   @Override

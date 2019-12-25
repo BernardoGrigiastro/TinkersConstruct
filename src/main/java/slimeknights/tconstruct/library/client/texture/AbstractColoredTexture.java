@@ -2,11 +2,9 @@ package slimeknights.tconstruct.library.client.texture;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.client.texture.Sprite;
+import net.minecraft.util.Identifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Function;
@@ -16,31 +14,31 @@ import slimeknights.tconstruct.library.client.RenderUtil;
 
 public abstract class AbstractColoredTexture extends TinkerTexture {
 
-  private ResourceLocation backupTextureLocation;
+  private Identifier backupTextureLocation;
 
-  protected AbstractColoredTexture(ResourceLocation baseTextureLocation, String spriteName) {
+  protected AbstractColoredTexture(Identifier baseTextureLocation, String spriteName) {
     super(spriteName);
 
     this.backupTextureLocation = baseTextureLocation;
   }
 
   @Override
-  public Collection<ResourceLocation> getDependencies() {
+  public Collection<Identifier> getDependencies() {
     return ImmutableList.of(backupTextureLocation);
   }
 
   @Override
-  public boolean hasCustomLoader(IResourceManager manager, ResourceLocation location) {
+  public boolean hasCustomLoader(IResourceManager manager, Identifier location) {
     return true;
   }
 
   @Override
-  public boolean load(IResourceManager manager, ResourceLocation location, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
+  public boolean load(IResourceManager manager, Identifier location, Function<Identifier, Sprite> textureGetter) {
     this.framesTextureData = Lists.newArrayList();
-    this.frameCounter = 0;
-    this.tickCounter = 0;
+    this.framePos = 0;
+    this.ticks = 0;
 
-    TextureAtlasSprite baseTexture = textureGetter.apply(backupTextureLocation);
+    Sprite baseTexture = textureGetter.apply(backupTextureLocation);
     if(baseTexture == null || baseTexture.getFrameCount() <= 0) {
       this.width = 1; // needed so we don't crash
       this.height = 1;

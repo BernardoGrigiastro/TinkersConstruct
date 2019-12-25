@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.common.config;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.TextComponentString;
@@ -42,7 +42,7 @@ public class ConfigSync {
   @SubscribeEvent
   @SideOnly(Side.CLIENT)
   public void playerJoinedWorld(TickEvent.ClientTickEvent event) {
-    EntityPlayerSP player = Minecraft.getMinecraft().player;
+    EntityPlayerSP player = MinecraftClient.getMinecraft().player;
     if(needsRestart) {
         player.sendMessage(new TextComponentString("[TConstruct] " + I18n.translateToLocal("config.synced.restart")));
       }

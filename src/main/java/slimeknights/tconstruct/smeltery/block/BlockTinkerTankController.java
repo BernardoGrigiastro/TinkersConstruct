@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.smeltery.block;
 
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.block.BlockRenderLayer;
+import net.minecraft.block.Material;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -16,16 +16,16 @@ import slimeknights.tconstruct.smeltery.tileentity.TileTinkerTank;
 public class BlockTinkerTankController extends BlockMultiblockController {
 
   public BlockTinkerTankController() {
-    super(Material.ROCK);
+    super(Material.STONE);
     this.setCreativeTab(TinkerRegistry.tabSmeltery);
     this.setHardness(3F);
     this.setResistance(20F);
-    this.setSoundType(SoundType.METAL);
+    this.setSoundType(BlockSoundGroup.METAL);
   }
 
   @Nonnull
   @Override
-  public TileEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
+  public BlockEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
     return new TileTinkerTank();
   }
 

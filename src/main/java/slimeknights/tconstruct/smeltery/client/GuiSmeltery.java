@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.smeltery.client;
 
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.fluids.FluidStack;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ import slimeknights.tconstruct.tools.common.inventory.ContainerSideInventory;
 
 public class GuiSmeltery extends GuiHeatingStructureFuelTank implements IGuiLiquidTank {
 
-  public static final ResourceLocation BACKGROUND = Util.getResource("textures/gui/smeltery.png");
+  public static final Identifier BACKGROUND = Util.getResource("textures/gui/smeltery.png");
 
   protected GuiElement scala = new GuiElement(176, 76, 52, 52, 256, 256);
 

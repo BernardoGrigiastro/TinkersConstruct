@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.tools.common.client;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.text.translation.I18n;
 
 import slimeknights.tconstruct.library.client.Icons;
@@ -15,7 +15,7 @@ public class GuiButtonRepair extends GuiButtonItem<ToolBuildGuiInfo> {
   }
 
   @Override
-  protected void drawIcon(Minecraft mc) {
+  protected void drawIcon(MinecraftClient mc) {
     mc.getTextureManager().bindTexture(Icons.ICON);
     Icons.ICON_Anvil.draw(x, y);
   }

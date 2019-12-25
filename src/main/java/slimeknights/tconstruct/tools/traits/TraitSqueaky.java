@@ -5,7 +5,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
 import slimeknights.tconstruct.common.Sounds;
 import slimeknights.tconstruct.library.modifiers.IToolMod;
 import slimeknights.tconstruct.library.traits.AbstractTrait;
@@ -15,7 +15,7 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 public class TraitSqueaky extends AbstractTrait {
 
   public TraitSqueaky() {
-    super("squeaky", TextFormatting.YELLOW);
+    super("squeaky", TextFormat.field_1054);
   }
 
   @Override

@@ -1,10 +1,9 @@
 package slimeknights.tconstruct.shared.block;
 
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.util.IStringSerializable;
-
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.StringRepresentable;
 import java.util.Locale;
 
 import slimeknights.mantle.block.EnumBlock;
@@ -15,17 +14,17 @@ public class BlockDecoGround extends EnumBlock<BlockDecoGround.DecoGroundType> {
   public final static PropertyEnum<DecoGroundType> TYPE = PropertyEnum.create("type", DecoGroundType.class);
 
   public BlockDecoGround() {
-    super(Material.GROUND, TYPE, DecoGroundType.class);
+    super(Material.EARTH, TYPE, DecoGroundType.class);
 
     this.setHardness(2.0f);
 
-    this.setSoundType(SoundType.GROUND);
+    this.setSoundType(BlockSoundGroup.GRAVEL);
 
     setHarvestLevel("shovel", -1);
     setCreativeTab(TinkerRegistry.tabGeneral);
   }
 
-  public enum DecoGroundType implements IStringSerializable, EnumBlock.IEnumMeta {
+  public enum DecoGroundType implements StringRepresentable, EnumBlock.IEnumMeta {
     MUDBRICK;
 
     public final int meta;

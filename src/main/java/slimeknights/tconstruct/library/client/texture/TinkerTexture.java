@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.library.client.texture;
 
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.texture.Sprite;
+import net.minecraft.util.Identifier;
 
-public class TinkerTexture extends TextureAtlasSprite {
+public class TinkerTexture extends Sprite {
 
-  public static TextureAtlasSprite loadManually(ResourceLocation sprite) {
+  public static Sprite loadManually(Identifier sprite) {
     return new TinkerTexture(sprite.toString());
   }
 

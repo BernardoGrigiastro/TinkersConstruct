@@ -1,13 +1,13 @@
 package slimeknights.tconstruct.shared.block;
 
-import net.minecraft.block.SoundType;
+import net.minecraft.block.BlockRenderLayer;
+import net.minecraft.block.Material;
 import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -32,7 +32,7 @@ public class BlockClearStainedGlass extends EnumBlockConnectedTexture<BlockClear
 
     this.setHardness(0.3f);
     setHarvestLevel("pickaxe", -1);
-    this.setSoundType(SoundType.GLASS);
+    this.setSoundType(BlockSoundGroup.GLASS);
 
     this.setCreativeTab(TinkerRegistry.tabGeneral);
   }
@@ -80,7 +80,7 @@ public class BlockClearStainedGlass extends EnumBlockConnectedTexture<BlockClear
   }
 
   // The default does not implement EnumBlock.IEnumMeta, and Enums cannot be extended
-  public enum EnumGlassColor implements IStringSerializable, EnumBlock.IEnumMeta {
+  public enum EnumGlassColor implements StringRepresentable, EnumBlock.IEnumMeta {
     WHITE(0xffffff, MapColor.SNOW),
     ORANGE(0xd87f33, MapColor.ADOBE),
     MAGENTA(0xb24cd8, MapColor.MAGENTA),

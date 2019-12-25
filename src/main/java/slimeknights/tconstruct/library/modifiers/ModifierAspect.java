@@ -2,7 +2,7 @@ package slimeknights.tconstruct.library.modifiers;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
 import net.minecraft.util.text.translation.I18n;
 
 import slimeknights.tconstruct.library.Util;
@@ -120,7 +120,7 @@ public abstract class ModifierAspect {
 
     private final int color;
 
-    public DataAspect(IModifier parent, TextFormatting color) {
+    public DataAspect(IModifier parent, TextFormat color) {
       this(parent, Util.enumChatFormattingToColor(color));
     }
 

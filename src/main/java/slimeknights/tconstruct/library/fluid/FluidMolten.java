@@ -1,20 +1,19 @@
 package slimeknights.tconstruct.library.fluid;
 
 import net.minecraft.item.EnumRarity;
-import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.util.Identifier;
 import slimeknights.tconstruct.library.Util;
 
 public class FluidMolten extends FluidColored {
 
-  public static ResourceLocation ICON_MetalStill = Util.getResource("blocks/fluids/molten_metal");
-  public static ResourceLocation ICON_MetalFlowing = Util.getResource("blocks/fluids/molten_metal_flow");
+  public static Identifier ICON_MetalStill = Util.getResource("blocks/fluids/molten_metal");
+  public static Identifier ICON_MetalFlowing = Util.getResource("blocks/fluids/molten_metal_flow");
 
   public FluidMolten(String fluidName, int color) {
     this(fluidName, color, ICON_MetalStill, ICON_MetalFlowing);
   }
 
-  public FluidMolten(String fluidName, int color, ResourceLocation still, ResourceLocation flow) {
+  public FluidMolten(String fluidName, int color, Identifier still, Identifier flow) {
     super(fluidName, color, still, flow);
 
     this.setDensity(2000); // thicker than a bowl of oatmeal

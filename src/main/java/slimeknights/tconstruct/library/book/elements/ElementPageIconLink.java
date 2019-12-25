@@ -1,8 +1,7 @@
 package slimeknights.tconstruct.library.book.elements;
 
 import com.google.common.collect.ImmutableList;
-
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -35,7 +34,7 @@ public class ElementPageIconLink extends SizedBookElement {
   }
 
   @Override
-  public void draw(int mouseX, int mouseY, float partialTicks, FontRenderer fontRenderer) {
+  public void draw(int mouseX, int mouseY, float partialTicks, TextRenderer fontRenderer) {
     boolean hover = isHovered(mouseX, mouseY);
     GlStateManager.color(1F, 1F, 1F, hover ? 1F : 0.5F);
     //GlStateManager.scale(scale, scale, 1f);
@@ -49,7 +48,7 @@ public class ElementPageIconLink extends SizedBookElement {
   }
 
   @Override
-  public void drawOverlay(int mouseX, int mouseY, float partialTicks, FontRenderer fontRenderer) {
+  public void drawOverlay(int mouseX, int mouseY, float partialTicks, TextRenderer fontRenderer) {
     if(name != null && !name.isEmpty() && isHovered(mouseX, mouseY)) {
       drawHoveringText(ImmutableList.of(name), mouseX, mouseY, fontRenderer);
     }

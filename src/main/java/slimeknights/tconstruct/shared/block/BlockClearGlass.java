@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.shared.block;
 
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.BlockRenderLayer;
+import net.minecraft.block.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -19,7 +19,7 @@ public class BlockClearGlass extends BlockConnectedTexture {
 
     this.setHardness(0.3f);
     setHarvestLevel("pickaxe", -1);
-    this.setSoundType(SoundType.GLASS);
+    this.setSoundType(BlockSoundGroup.GLASS);
 
     this.setCreativeTab(TinkerRegistry.tabGeneral);
   }

@@ -3,7 +3,7 @@ package slimeknights.tconstruct.tools.ranged.item;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class LongBow extends ShortBow {
   }
 
   @Override
-  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
     if(this.isInCreativeTab(tab)) {
       addDefaultSubItems(subItems, null, null, null, TinkerMaterials.string);
     }

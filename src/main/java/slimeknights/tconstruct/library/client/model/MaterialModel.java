@@ -2,13 +2,12 @@ package slimeknights.tconstruct.library.client.model;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.texture.Sprite;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ItemLayerModel;
 import net.minecraftforge.client.model.ModelStateComposition;
@@ -31,13 +30,13 @@ public class MaterialModel implements IPatternOffset, IModel {
   protected final int offsetX;
   protected final int offsetY;
 
-  private final ImmutableList<ResourceLocation> textures;
+  private final ImmutableList<Identifier> textures;
 
-  public MaterialModel(ImmutableList<ResourceLocation> textures) {
+  public MaterialModel(ImmutableList<Identifier> textures) {
     this(textures, 0, 0);
   }
 
-  public MaterialModel(ImmutableList<ResourceLocation> textures, int offsetX, int offsetY) {
+  public MaterialModel(ImmutableList<Identifier> textures, int offsetX, int offsetY) {
     this.textures = textures;
 
     this.offsetX = offsetX;
@@ -45,12 +44,12 @@ public class MaterialModel implements IPatternOffset, IModel {
   }
 
   @Override
-  public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+  public IBakedModel bake(IModelState state, VertexFormat format, Function<Identifier, Sprite> bakedTextureGetter) {
     return bakeIt(state, format, bakedTextureGetter);
   }
 
   // the only difference here is the return-type
-  public BakedMaterialModel bakeIt(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+  public BakedMaterialModel bakeIt(IModelState state, VertexFormat format, Function<Identifier, Sprite> bakedTextureGetter) {
     // take offset of texture into account
     if(offsetX != 0 || offsetY != 0) {
       state = new ModelStateComposition(state, TRSRTransformation
@@ -66,10 +65,10 @@ public class MaterialModel implements IPatternOffset, IModel {
 
     // and generate the baked model for each material-variant we have for the base texture
     String baseTexture = base.getParticleTexture().getIconName();
-    Map<String, TextureAtlasSprite> sprites = CustomTextureCreator.sprites.get(baseTexture);
+    Map<String, Sprite> sprites = CustomTextureCreator.sprites.get(baseTexture);
 
     if(sprites != null) {
-      for(Map.Entry<String, TextureAtlasSprite> entry : sprites.entrySet()) {
+      for(Map.Entry<String, Sprite> entry : sprites.entrySet()) {
         Material material = TinkerRegistry.getMaterial(entry.getKey());
 
         IModel model2 = ItemLayerModel.INSTANCE.retexture(ImmutableMap.of("layer0", entry.getValue().getIconName()));
@@ -97,12 +96,12 @@ public class MaterialModel implements IPatternOffset, IModel {
   }
 
   @Override
-  public Collection<ResourceLocation> getDependencies() {
+  public Collection<Identifier> getDependencies() {
     return ImmutableList.of();
   }
 
   @Override
-  public Collection<ResourceLocation> getTextures() {
+  public Collection<Identifier> getTextures() {
     return textures;
   }
 

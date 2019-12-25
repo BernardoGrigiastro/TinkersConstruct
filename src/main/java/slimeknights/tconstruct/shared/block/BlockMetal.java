@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.shared.block;
 
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.DefaultedList;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import slimeknights.mantle.block.EnumBlock;
@@ -20,7 +20,7 @@ public class BlockMetal extends EnumBlock<BlockMetal.MetalTypes> {
   public static final PropertyEnum<MetalTypes> TYPE = PropertyEnum.create("type", MetalTypes.class);
 
   public BlockMetal() {
-    super(Material.IRON, TYPE, MetalTypes.class);
+    super(Material.METAL, TYPE, MetalTypes.class);
 
     setHardness(5f);
     setHarvestLevel("pickaxe", -1); // we're generous. no harvest level required
@@ -28,7 +28,7 @@ public class BlockMetal extends EnumBlock<BlockMetal.MetalTypes> {
   }
 
   @Override
-  public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
     for(MetalTypes type : MetalTypes.values()) {
       if(type == MetalTypes.ALUBRASS && !TinkerIntegration.isIntegrated(TinkerFluids.alubrass)) {
         continue;
@@ -42,7 +42,7 @@ public class BlockMetal extends EnumBlock<BlockMetal.MetalTypes> {
     return true;
   }
 
-  public enum MetalTypes implements IStringSerializable, EnumBlock.IEnumMeta {
+  public enum MetalTypes implements StringRepresentable, EnumBlock.IEnumMeta {
     COBALT,
     ARDITE,
     MANYULLYN,

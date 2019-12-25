@@ -3,9 +3,10 @@ package slimeknights.tconstruct.gadgets.block;
 import com.google.common.collect.ImmutableList;
 
 import net.minecraft.block.BlockContainer;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.BlockRenderLayer;
+import net.minecraft.block.Material;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -14,20 +15,19 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.stats.StatList;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityHopper;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -51,10 +51,10 @@ import static net.minecraft.block.BlockHopper.FACING;
 @SuppressWarnings({"NullableProblems", "deprecation"})
 public class BlockWoodenHopper extends BlockContainer {
   // Quitely stolen from RWTemas Diet Hoppers
-  private static final EnumMap<EnumFacing, List<AxisAlignedBB>> bounds;
+  private static final EnumMap<EnumFacing, List<BoundingBox>> bounds;
 
   static {
-    List<AxisAlignedBB> commonBounds = ImmutableList.of(
+    List<BoundingBox> commonBounds = ImmutableList.of(
         makeAABB(0, 10, 0, 16, 16, 16),
         makeAABB(4, 4, 4, 12, 10, 12)
     );
@@ -77,19 +77,19 @@ public class BlockWoodenHopper extends BlockContainer {
     super(Material.WOOD, MapColor.STONE);
     this.setHardness(3.0F);
     this.setResistance(8.0F);
-    this.setSoundType(SoundType.WOOD);
+    this.setSoundType(BlockSoundGroup.WOOD);
     this.setCreativeTab(CreativeTabs.REDSTONE);
 
-    this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.DOWN));
+    this.setDefaultState(this.stateFactory.getBaseState().withProperty(FACING, EnumFacing.DOWN));
   }
 
-  private static AxisAlignedBB makeAABB(int fromX, int fromY, int fromZ, int toX, int toY, int toZ) {
-    return new AxisAlignedBB(fromX / 16F, fromY / 16F, fromZ / 16F, toX / 16F, toY / 16F, toZ / 16F);
+  private static BoundingBox makeAABB(int fromX, int fromY, int fromZ, int toX, int toY, int toZ) {
+    return new BoundingBox(fromX / 16F, fromY / 16F, fromZ / 16F, toX / 16F, toY / 16F, toZ / 16F);
   }
 
   @SuppressWarnings("deprecation")
   @Override
-  public RayTraceResult collisionRayTrace(IBlockState blockState, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Vec3d start, @Nonnull Vec3d end) {
+  public HitResult collisionRayTrace(IBlockState blockState, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Vec3d start, @Nonnull Vec3d end) {
     return bounds.get(blockState.getValue(FACING)).stream()
                  .map(bb -> rayTrace(pos, start, end, bb))
                  .anyMatch(Objects::nonNull)
@@ -97,7 +97,7 @@ public class BlockWoodenHopper extends BlockContainer {
   }
 
   @Override
-  public TileEntity createNewTileEntity(World worldIn, int meta) {
+  public BlockEntity createNewTileEntity(World worldIn, int meta) {
     return new TileWoodenHopper();
   }
 
@@ -146,18 +146,18 @@ public class BlockWoodenHopper extends BlockContainer {
   }
 
   // unchanged copied hopper code
-  public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
+  public BoundingBox getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
   {
     return FULL_BLOCK_AABB;
   }
 
-  protected static final AxisAlignedBB BASE_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.625D, 1.0D);
-  protected static final AxisAlignedBB SOUTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 0.125D);
-  protected static final AxisAlignedBB NORTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.875D, 1.0D, 1.0D, 1.0D);
-  protected static final AxisAlignedBB WEST_AABB = new AxisAlignedBB(0.875D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
-  protected static final AxisAlignedBB EAST_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.125D, 1.0D, 1.0D);
+  protected static final BoundingBox BASE_AABB = new BoundingBox(0.0D, 0.0D, 0.0D, 1.0D, 0.625D, 1.0D);
+  protected static final BoundingBox SOUTH_AABB = new BoundingBox(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 0.125D);
+  protected static final BoundingBox NORTH_AABB = new BoundingBox(0.0D, 0.0D, 0.875D, 1.0D, 1.0D, 1.0D);
+  protected static final BoundingBox WEST_AABB = new BoundingBox(0.875D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
+  protected static final BoundingBox EAST_AABB = new BoundingBox(0.0D, 0.0D, 0.0D, 0.125D, 1.0D, 1.0D);
 
-  public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean p_185477_7_)
+  public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, BoundingBox entityBox, List<BoundingBox> collidingBoxes, @Nullable Entity entityIn, boolean p_185477_7_)
   {
     addCollisionBoxToList(pos, entityBox, collidingBoxes, BASE_AABB);
     addCollisionBoxToList(pos, entityBox, collidingBoxes, EAST_AABB);
@@ -175,7 +175,7 @@ public class BlockWoodenHopper extends BlockContainer {
 
     if (stack.hasDisplayName())
     {
-      TileEntity tileentity = worldIn.getTileEntity(pos);
+      BlockEntity tileentity = worldIn.getTileEntity(pos);
 
       if (tileentity instanceof TileEntityHopper)
       {
@@ -197,13 +197,13 @@ public class BlockWoodenHopper extends BlockContainer {
    */
   public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
   {
-    if (worldIn.isRemote)
+    if (worldIn.isClient)
     {
       return true;
     }
     else
     {
-      TileEntity tileentity = worldIn.getTileEntity(pos);
+      BlockEntity tileentity = worldIn.getTileEntity(pos);
 
       if (tileentity instanceof TileEntityHopper)
       {
@@ -220,11 +220,11 @@ public class BlockWoodenHopper extends BlockContainer {
    */
   public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
   {
-    TileEntity tileentity = worldIn.getTileEntity(pos);
+    BlockEntity tileentity = worldIn.getTileEntity(pos);
 
     if (tileentity instanceof TileEntityHopper)
     {
-      InventoryHelper.dropInventoryItems(worldIn, pos, (TileEntityHopper)tileentity);
+      ItemScatterer.dropInventoryItems(worldIn, pos, (TileEntityHopper)tileentity);
       worldIn.updateComparatorOutputLevel(pos, this);
     }
 
@@ -277,7 +277,7 @@ public class BlockWoodenHopper extends BlockContainer {
   @SideOnly(Side.CLIENT)
   public BlockRenderLayer getBlockLayer()
   {
-    return BlockRenderLayer.CUTOUT_MIPPED;
+    return BlockRenderLayer.MIPPED_CUTOUT;
   }
 
 
@@ -285,7 +285,7 @@ public class BlockWoodenHopper extends BlockContainer {
    * Returns the blockstate with the given rotation from the passed blockstate. If inapplicable, returns the passed
    * blockstate.
    */
-  public IBlockState withRotation(IBlockState state, Rotation rot)
+  public IBlockState withRotation(IBlockState state, BlockRotation rot)
   {
     return state.withProperty(FACING, rot.rotate(state.getValue(FACING)));
   }
@@ -294,7 +294,7 @@ public class BlockWoodenHopper extends BlockContainer {
    * Returns the blockstate with the given mirror of the passed blockstate. If inapplicable, returns the passed
    * blockstate.
    */
-  public IBlockState withMirror(IBlockState state, Mirror mirrorIn)
+  public IBlockState withMirror(IBlockState state, BlockMirror mirrorIn)
   {
     return state.withRotation(mirrorIn.toRotation(state.getValue(FACING)));
   }

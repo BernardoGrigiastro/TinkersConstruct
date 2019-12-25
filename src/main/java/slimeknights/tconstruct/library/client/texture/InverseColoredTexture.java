@@ -1,12 +1,11 @@
 package slimeknights.tconstruct.library.client.texture;
 
-import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.util.Identifier;
 import slimeknights.tconstruct.library.client.RenderUtil;
 
 public class InverseColoredTexture extends SimpleColoredTexture {
 
-  public InverseColoredTexture(int colorLow, int colorMid, int colorHigh, ResourceLocation baseTexture, String spriteName) {
+  public InverseColoredTexture(int colorLow, int colorMid, int colorHigh, Identifier baseTexture, String spriteName) {
     super(colorLow, colorMid, colorHigh, baseTexture, spriteName);
   }
 

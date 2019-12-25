@@ -1,20 +1,20 @@
 package slimeknights.tconstruct.gadgets.item;
 
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemSnowball;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatList;
-import net.minecraft.util.ActionResult;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 
@@ -37,7 +37,7 @@ public class ItemThrowball extends ItemSnowball {
   }
 
   @Override
-  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
     if(this.isInCreativeTab(tab)) {
       for(ThrowballType type : ThrowballType.values()) {
         subItems.add(new ItemStack(this, 1, type.ordinal()));
@@ -47,15 +47,15 @@ public class ItemThrowball extends ItemSnowball {
 
   @Nonnull
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+  public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
     ItemStack itemStackIn = playerIn.getHeldItem(hand);
     if(!playerIn.capabilities.isCreativeMode) {
       itemStackIn.shrink(1);
     }
 
-    worldIn.playSound(null, playerIn.posX, playerIn.posY, playerIn.posZ, SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
+    worldIn.playSound(null, playerIn.x, playerIn.y, playerIn.z, SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.field_15254, 0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
 
-    if(!worldIn.isRemote) {
+    if(!worldIn.isClient) {
       ThrowballType type = ThrowballType.values()[itemStackIn.getMetadata() % ThrowballType.values().length];
       launchThrowball(worldIn, playerIn, type, hand);
     }
@@ -63,12 +63,12 @@ public class ItemThrowball extends ItemSnowball {
     StatBase statBase = StatList.getObjectUseStats(this);
     assert statBase != null;
     playerIn.addStat(statBase);
-    return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+    return new TypedActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
   }
 
   public void launchThrowball(World world, EntityPlayer player, ThrowballType type, EnumHand hand) {
     EntityThrowball entity = new EntityThrowball(world, player, type);
-    entity.setHeadingFromThrower(player, player.rotationPitch, player.rotationYaw, 0.0F, 2.1F, 0.5F);
+    entity.setHeadingFromThrower(player, player.pitch, player.yaw, 0.0F, 2.1F, 0.5F);
     world.spawnEntity(entity);
   }
 
@@ -85,9 +85,9 @@ public class ItemThrowball extends ItemSnowball {
   }
 
   @Override
-  public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+  public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, TooltipContext flagIn) {
     if(I18n.canTranslate(this.getUnlocalizedName(stack) + ".tooltip")) {
-      tooltip.add(TextFormatting.GRAY.toString() + LocUtils.translateRecursive(this.getUnlocalizedName(stack) + ".tooltip"));
+      tooltip.add(TextFormat.field_1080.toString() + LocUtils.translateRecursive(this.getUnlocalizedName(stack) + ".tooltip"));
     }
   }
 

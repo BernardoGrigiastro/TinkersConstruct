@@ -3,20 +3,20 @@ package slimeknights.tconstruct.tools.melee.item;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketEntityVelocity;
-import net.minecraft.util.ActionResult;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.TConstruct;
@@ -49,7 +49,7 @@ public class FryPan extends TinkerToolCore {
   }
 
   @Override
-  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
     if(this.isInCreativeTab(tab)) {
       addDefaultSubItems(subItems);
       ItemStack tool = getInfiTool("Bane of Pigs");
@@ -68,7 +68,7 @@ public class FryPan extends TinkerToolCore {
 
   @Override
   public void onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase player, int timeLeft) {
-    if(world.isRemote) {
+    if(world.isClient) {
       return;
     }
 
@@ -78,9 +78,9 @@ public class FryPan extends TinkerToolCore {
     float range = 3.2f;
 
     // is the player currently looking at an entity?
-    Vec3d eye = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ); // Entity.getPositionEyes
+    Vec3d eye = new Vec3d(player.x, player.y + player.getEyeHeight(), player.z); // Entity.getPositionEyes
     Vec3d look = player.getLook(1.0f);
-    RayTraceResult mop = EntityUtil.raytraceEntity(player, eye, look, range, true);
+    HitResult mop = EntityUtil.raytraceEntity(player, eye, look, range, true);
 
     // nothing hit :(
     if(mop == null) {
@@ -88,14 +88,14 @@ public class FryPan extends TinkerToolCore {
     }
 
     // we hit something. let it FLYYYYYYYYY
-    if(mop.typeOfHit == RayTraceResult.Type.ENTITY) {
+    if(mop.typeOfHit == HitResult.Type.ENTITY) {
       Entity entity = mop.entityHit;
       double x = look.x * strength;
       double y = look.y / 3f * strength + 0.1f + 0.4f * progress;
       double z = look.z * strength;
 
       // bonus damage!
-      AttributeModifier modifier = new AttributeModifier(FRYPAN_CHARGE_BONUS, "Frypan charge bonus", progress * 5f, 0);
+      EntityAttributeModifier modifier = new EntityAttributeModifier(FRYPAN_CHARGE_BONUS, "Frypan charge bonus", progress * 5f, 0);
 
       // we set the entity on fire for the hit if it was fully charged
       // this makes it so it drops cooked stuff.. and it'funny :D
@@ -103,14 +103,14 @@ public class FryPan extends TinkerToolCore {
       if(flamingStrike) {
         entity.setFire(1);
       }
-      player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(modifier);
+      player.getEntityAttribute(EntityAttributes.ATTACK_DAMAGE).applyModifier(modifier);
       ToolHelper.attackEntity(stack, this, player, entity);
-      player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(modifier);
+      player.getEntityAttribute(EntityAttributes.ATTACK_DAMAGE).removeModifier(modifier);
       if(flamingStrike) {
         entity.extinguish();
       }
 
-      world.playSound(null, player.getPosition(), Sounds.frypan_boing, SoundCategory.PLAYERS, 1.5f, 0.6f + 0.2f * TConstruct.random.nextFloat());
+      world.playSound(null, player.getPosition(), Sounds.frypan_boing, SoundCategory.field_15248, 1.5f, 0.6f + 0.2f * TConstruct.random.nextFloat());
       entity.addVelocity(x, y, z);
       TinkerTools.proxy.spawnAttackParticle(Particles.FRYPAN_ATTACK, player, 0.6d);
       if(entity instanceof EntityPlayerMP) {
@@ -122,7 +122,7 @@ public class FryPan extends TinkerToolCore {
   @Override
   public boolean dealDamage(ItemStack stack, EntityLivingBase player, Entity entity, float damage) {
     boolean hit = super.dealDamage(stack, player, entity, damage);
-    if(hit || player.getEntityWorld().isRemote) {
+    if(hit || player.getEntityWorld().isClient) {
       player.playSound(Sounds.frypan_boing, 2f, 1f);
     }
     if(hit && readyForSpecialAttack(player)) {
@@ -168,10 +168,10 @@ public class FryPan extends TinkerToolCore {
 
   @Nonnull
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+  public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
     ItemStack itemStackIn = playerIn.getHeldItem(hand);
     playerIn.setActiveHand(hand);
-    return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+    return new TypedActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
   }
 
   @Override

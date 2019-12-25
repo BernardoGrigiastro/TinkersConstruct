@@ -3,14 +3,15 @@ package slimeknights.tconstruct.library.utils;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -24,14 +25,13 @@ import net.minecraft.network.play.client.CPacketPlayerDigging;
 import net.minecraft.network.play.server.SPacketAnimation;
 import net.minecraft.network.play.server.SPacketBlockChange;
 import net.minecraft.network.play.server.SPacketEntityVelocity;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.stats.StatList;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -243,7 +243,7 @@ public final class ToolHelper {
     }
 
     // raytrace to get the side, but has to result in the same block
-    RayTraceResult mop = ((ToolCore) stack.getItem()).rayTrace(world, player, true);
+    HitResult mop = ((ToolCore) stack.getItem()).rayTrace(world, player, true);
     if(mop == null || !origin.equals(mop.getBlockPos())) {
       mop = ((ToolCore) stack.getItem()).rayTrace(world, player, false);
       if(mop == null || !origin.equals(mop.getBlockPos())) {
@@ -274,18 +274,18 @@ public final class ToolHelper {
         z = vec.getX() * width + vec.getZ() * height;
         start = start.add(-x / 2, 0, -z / 2);
         if(x % 2 == 0) {
-          if(x > 0 && mop.hitVec.x - mop.getBlockPos().getX() > 0.5d) {
+          if(x > 0 && mop.pos.x - mop.getBlockPos().getX() > 0.5d) {
             start = start.add(1, 0, 0);
           }
-          else if(x < 0 && mop.hitVec.x - mop.getBlockPos().getX() < 0.5d) {
+          else if(x < 0 && mop.pos.x - mop.getBlockPos().getX() < 0.5d) {
             start = start.add(-1, 0, 0);
           }
         }
         if(z % 2 == 0) {
-          if(z > 0 && mop.hitVec.z - mop.getBlockPos().getZ() > 0.5d) {
+          if(z > 0 && mop.pos.z - mop.getBlockPos().getZ() > 0.5d) {
             start = start.add(0, 0, 1);
           }
-          else if(z < 0 && mop.hitVec.z - mop.getBlockPos().getZ() < 0.5d) {
+          else if(z < 0 && mop.pos.z - mop.getBlockPos().getZ() < 0.5d) {
             start = start.add(0, 0, -1);
           }
         }
@@ -296,10 +296,10 @@ public final class ToolHelper {
         y = height;
         z = mop.sideHit.getAxisDirection().getOffset() * -depth;
         start = start.add(-x / 2, -y / 2, 0);
-        if(x % 2 == 0 && mop.hitVec.x - mop.getBlockPos().getX() > 0.5d) {
+        if(x % 2 == 0 && mop.pos.x - mop.getBlockPos().getX() > 0.5d) {
           start = start.add(1, 0, 0);
         }
-        if(y % 2 == 0 && mop.hitVec.y - mop.getBlockPos().getY() > 0.5d) {
+        if(y % 2 == 0 && mop.pos.y - mop.getBlockPos().getY() > 0.5d) {
           start = start.add(0, 1, 0);
         }
         break;
@@ -309,10 +309,10 @@ public final class ToolHelper {
         y = height;
         z = width;
         start = start.add(-0, -y / 2, -z / 2);
-        if(y % 2 == 0 && mop.hitVec.y - mop.getBlockPos().getY() > 0.5d) {
+        if(y % 2 == 0 && mop.pos.y - mop.getBlockPos().getY() > 0.5d) {
           start = start.add(0, 1, 0);
         }
-        if(z % 2 == 0 && mop.hitVec.z - mop.getBlockPos().getZ() > 0.5d) {
+        if(z % 2 == 0 && mop.pos.z - mop.getBlockPos().getZ() > 0.5d) {
           start = start.add(0, 0, 1);
         }
         break;
@@ -386,7 +386,7 @@ public final class ToolHelper {
       }
 
       // send update to client
-      if(!world.isRemote) {
+      if(!world.isClient) {
         TinkerNetwork.sendPacket(player, new SPacketBlockChange(world, pos));
       }
       return false;
@@ -406,7 +406,7 @@ public final class ToolHelper {
     stack.onBlockDestroyed(world, state, pos, player);
 
     // server sided handling
-    if(!world.isRemote) {
+    if(!world.isClient) {
       // send the blockbreak event
       int xp = ForgeHooks.onBlockBreakEvent(world, ((EntityPlayerMP) player).interactionManager.getGameType(), (EntityPlayerMP) player, pos);
       if(xp == -1) {
@@ -415,7 +415,7 @@ public final class ToolHelper {
 
       // serverside we reproduce ItemInWorldManager.tryHarvestBlock
 
-      TileEntity tileEntity = world.getTileEntity(pos);
+      BlockEntity tileEntity = world.getTileEntity(pos);
       // ItemInWorldManager.removeBlock
       if(block.removedByPlayer(state, world, pos, player, true)) { // boolean is if block can be harvested, checked above
         block.onBlockDestroyedByPlayer(world, pos, state);
@@ -446,10 +446,10 @@ public final class ToolHelper {
 
       // send an update to the server, so we get an update back
       //if(PHConstruct.extraBlockUpdates)
-      NetHandlerPlayClient netHandlerPlayClient = Minecraft.getMinecraft().getConnection();
+      NetHandlerPlayClient netHandlerPlayClient = MinecraftClient.getMinecraft().getConnection();
       assert netHandlerPlayClient != null;
-      netHandlerPlayClient.sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.STOP_DESTROY_BLOCK, pos, Minecraft
-          .getMinecraft().objectMouseOver.sideHit));
+      netHandlerPlayClient.sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.STOP_DESTROY_BLOCK, pos, MinecraftClient
+          .getMinecraft().hitResult.sideHit));
     }
   }
 
@@ -481,7 +481,7 @@ public final class ToolHelper {
    */
   public static boolean shearBlock(ItemStack itemstack, World world, EntityPlayer player, BlockPos pos) {
     // only serverside since it creates entities
-    if(world.isRemote) {
+    if(world.isClient) {
       return false;
     }
 
@@ -569,7 +569,7 @@ public final class ToolHelper {
     TagUtil.setToolTag(stack, tag);
 
     if(entity instanceof EntityPlayerMP) {
-      entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvents.ENTITY_ITEM_BREAK, entity.getSoundCategory(), 0.8F, 0.8F + entity.world.rand.nextFloat() * 0.4F);
+      entity.world.playSound(null, entity.x, entity.y, entity.z, SoundEvents.ENTITY_ITEM_BREAK, entity.getSoundCategory(), 0.8F, 0.8F + entity.world.random.nextFloat() * 0.4F);
       // work around MC-86252, this is needed since damaging the tool does not clear the active hand, even if the player is no longer blocking
       if(entity.isHandActive() && entity.getActiveItemStack().equals(stack)) {
         entity.resetActiveHand();
@@ -653,7 +653,7 @@ public final class ToolHelper {
     List<ITrait> traits = TinkerUtil.getTraitsOrdered(stack);
 
     // players base damage (includes tools damage stat)
-    float baseDamage = (float) attacker.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+    float baseDamage = (float) attacker.getEntityAttribute(EntityAttributes.ATTACK_DAMAGE).getAttributeValue();
 
     // missing because not supported by tcon tools: vanilla damage enchantments, we have our own modifiers
     // missing because not supported by tcon tools: vanilla knockback enchantments, we have our own modifiers
@@ -713,11 +713,11 @@ public final class ToolHelper {
 
     // deal the damage
     if(target != null) {
-      int hurtResistantTime = target.hurtResistantTime;
+      int hurtResistantTime = target.field_6008;
       for(ITrait trait : traits) {
         trait.onHit(stack, attacker, target, damage, isCritical);
         // reset hurt reristant time
-        target.hurtResistantTime = hurtResistantTime;
+        target.field_6008 = hurtResistantTime;
       }
     }
 
@@ -741,8 +741,8 @@ public final class ToolHelper {
 
       // apply knockback
       if(knockback > 0f) {
-        double velX = -MathHelper.sin(attacker.rotationYaw * (float) Math.PI / 180.0F) * knockback * 0.5F;
-        double velZ = MathHelper.cos(attacker.rotationYaw * (float) Math.PI / 180.0F) * knockback * 0.5F;
+        double velX = -MathHelper.sin(attacker.yaw * (float) Math.PI / 180.0F) * knockback * 0.5F;
+        double velZ = MathHelper.cos(attacker.yaw * (float) Math.PI / 180.0F) * knockback * 0.5F;
         targetEntity.addVelocity(velX, 0.1d, velZ);
 
         // slow down player
@@ -753,9 +753,9 @@ public final class ToolHelper {
 
       // Send movement changes caused by attacking directly to hit players.
       // I guess this is to allow better handling at the hit players side? No idea why it resets the motion though.
-      if(targetEntity instanceof EntityPlayerMP && targetEntity.velocityChanged) {
+      if(targetEntity instanceof EntityPlayerMP && targetEntity.velocityModified) {
         TinkerNetwork.sendPacket(targetEntity, new SPacketEntityVelocity(targetEntity));
-        targetEntity.velocityChanged = false;
+        targetEntity.velocityModified = false;
         targetEntity.motionX = oldVelX;
         targetEntity.motionY = oldVelY;
         targetEntity.motionZ = oldVelZ;
@@ -805,7 +805,7 @@ public final class ToolHelper {
 
         if(player.getEntityWorld() instanceof WorldServer && damageDealt > 2f) {
           int k = (int) (damageDealt * 0.5);
-          ((WorldServer) player.getEntityWorld()).spawnParticle(EnumParticleTypes.DAMAGE_INDICATOR, targetEntity.posX, targetEntity.posY + targetEntity.height * 0.5F, targetEntity.posZ, k, 0.1D, 0.0D, 0.1D, 0.2D);
+          ((WorldServer) player.getEntityWorld()).spawnParticle(EnumParticleTypes.DAMAGE_INDICATOR, targetEntity.x, targetEntity.y + targetEntity.height * 0.5F, targetEntity.z, k, 0.1D, 0.0D, 0.1D, 0.2D);
         }
 
         // cooldown for non-projectiles
@@ -821,7 +821,7 @@ public final class ToolHelper {
     }
 
     if (player != null && sound != null) {
-      player.world.playSound(null, player.posX, player.posY, player.posZ, sound, player.getSoundCategory(), 1.0F, 1.0F);
+      player.world.playSound(null, player.x, player.y, player.z, sound, player.getSoundCategory(), 1.0F, 1.0F);
     }
 
     return true;
@@ -850,9 +850,9 @@ public final class ToolHelper {
   }
 
   public static float getActualDamage(ItemStack stack, EntityLivingBase player) {
-    float damage = (float) SharedMonsterAttributes.ATTACK_DAMAGE.getDefaultValue();
+    float damage = (float) EntityAttributes.ATTACK_DAMAGE.getDefaultValue();
     if (player != null) {
-      damage = (float) player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+      damage = (float) player.getEntityAttribute(EntityAttributes.ATTACK_DAMAGE).getAttributeValue();
     }
 
     damage += ToolHelper.getActualAttack(stack);

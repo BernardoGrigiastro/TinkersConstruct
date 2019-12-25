@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.tools.common.network;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -23,7 +23,7 @@ public class ToolBreakAnimationPacket extends AbstractPacketThreadsafe {
   @Override
   public void handleClientSafe(NetHandlerPlayClient netHandler) {
     // play the animation
-    Minecraft.getMinecraft().player.renderBrokenItemStack(breakingTool);
+    MinecraftClient.getMinecraft().player.renderBrokenItemStack(breakingTool);
   }
 
   @Override

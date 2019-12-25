@@ -1,9 +1,8 @@
 package slimeknights.tconstruct.shared.block;
 
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
 import net.minecraft.block.state.IBlockState;
-
+import net.minecraft.sound.BlockSoundGroup;
 import slimeknights.mantle.block.EnumBlockSlab;
 import slimeknights.tconstruct.library.TinkerRegistry;
 import slimeknights.tconstruct.shared.TinkerCommons;
@@ -17,7 +16,7 @@ public class BlockFirewoodSlab extends EnumBlockSlab<BlockFirewood.FirewoodType>
     this.setResistance(7f);
     this.setCreativeTab(TinkerRegistry.tabGeneral);
     this.setLightLevel(0.5f);
-    this.setSoundType(SoundType.WOOD);
+    this.setSoundType(BlockSoundGroup.WOOD);
   }
 
   @Override

@@ -4,10 +4,10 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.text.TextComponent;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
@@ -94,7 +94,7 @@ public class TileTinkerTank extends TileMultiblock<MultiblockTinkerTank> impleme
 
   @Nonnull
   @Override
-  public ITextComponent getDisplayName() {
+  public TextComponent getDisplayName() {
     if(hasCustomName()) {
       return new TextComponentString(getName());
     }
@@ -104,13 +104,13 @@ public class TileTinkerTank extends TileMultiblock<MultiblockTinkerTank> impleme
 
   @Nonnull
   @Override
-  public AxisAlignedBB getRenderBoundingBox() {
+  public BoundingBox getRenderBoundingBox() {
     if(minPos == null || maxPos == null) {
       return super.getRenderBoundingBox();
     }
     // we stretch the bounding on the X and Z since the liquids show in the full structure rather than just the inside
     // we also need to include the controller's position for Y value as we render a face there (but X/Z is covered above)
-    return new AxisAlignedBB(
+    return new BoundingBox(
         minPos.getX() - 1,
         Math.min(minPos.getY(), pos.getY()),
         minPos.getZ() - 1,

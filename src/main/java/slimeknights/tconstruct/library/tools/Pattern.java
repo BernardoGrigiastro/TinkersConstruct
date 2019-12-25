@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.library.tools;
 
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.world.World;
 
 import java.util.Collection;
@@ -30,7 +30,7 @@ public class Pattern extends Item implements IPattern {
   }
 
   @Override
-  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
     if(this.isInCreativeTab(tab)) {
       subItems.add(new ItemStack(this));
 
@@ -107,7 +107,7 @@ public class Pattern extends Item implements IPattern {
   }
 
   @Override
-  public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+  public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, TooltipContext flagIn) {
     Item part = getPartFromTag(stack);
     if(part != null && part instanceof IToolPart) {
       float cost = ((IToolPart) part).getCost() / (float) Material.VALUE_Ingot;

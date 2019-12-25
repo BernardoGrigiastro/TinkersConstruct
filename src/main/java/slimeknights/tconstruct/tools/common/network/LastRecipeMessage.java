@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.tools.common.network;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.recipe.Recipe;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 import io.netty.buffer.ByteBuf;
@@ -15,18 +15,18 @@ import slimeknights.tconstruct.tools.common.inventory.ContainerCraftingStation;
 // not threadsafe!
 public class LastRecipeMessage extends AbstractPacket {
 
-  private IRecipe recipe;
+  private Recipe recipe;
 
   public LastRecipeMessage() {
   }
 
-  public LastRecipeMessage(IRecipe recipe) {
+  public LastRecipeMessage(Recipe recipe) {
     this.recipe = recipe;
   }
 
   @Override
   public IMessage handleClient(NetHandlerPlayClient netHandler) {
-    Container container = Minecraft.getMinecraft().player.openContainer;
+    Container container = MinecraftClient.getMinecraft().player.openContainer;
     if(container instanceof ContainerCraftingStation) {
       ((ContainerCraftingStation) container).updateLastRecipeFromServer(recipe);
     }

@@ -2,11 +2,11 @@ package slimeknights.tconstruct.tools.traits;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.HungerManager;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.FoodStats;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.text.TextFormat;
 import net.minecraft.world.World;
 
 import slimeknights.tconstruct.library.traits.AbstractTrait;
@@ -18,17 +18,17 @@ public class TraitTasty extends AbstractTrait {
   public static final int NOM_COST = 5;
 
   public TraitTasty() {
-    super("tasty", TextFormatting.RED);
+    super("tasty", TextFormat.field_1061);
   }
 
   @Override
   public void onUpdate(ItemStack tool, World world, Entity entity, int itemSlot, boolean isSelected) {
     // needs to be in hand to be eaten!
-    if(!isSelected || !(entity instanceof EntityPlayer) || entity.getEntityWorld().isRemote) {
+    if(!isSelected || !(entity instanceof EntityPlayer) || entity.getEntityWorld().isClient) {
       return;
     }
 
-    FoodStats foodStats = ((EntityPlayer) entity).getFoodStats();
+    HungerManager foodStats = ((EntityPlayer) entity).getFoodStats();
     float chance = 0.01f;
     // faster nomming if we're damanged
     if(((EntityPlayer) entity).getHealth() < ((EntityPlayer) entity).getMaxHealth()) {
@@ -62,7 +62,7 @@ public class TraitTasty extends AbstractTrait {
     }
 
     player.getFoodStats().addStats(1, 0);
-    player.getEntityWorld().playSound(null, player.getPosition(), SoundEvents.ENTITY_GENERIC_EAT, SoundCategory.PLAYERS, 0.8f, 1.0f);
+    player.getEntityWorld().playSound(null, player.getPosition(), SoundEvents.ENTITY_GENERIC_EAT, SoundCategory.field_15248, 0.8f, 1.0f);
     ToolHelper.damageTool(tool, NOM_COST, player);
   }
 }

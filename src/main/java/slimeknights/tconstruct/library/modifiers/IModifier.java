@@ -2,7 +2,7 @@ package slimeknights.tconstruct.library.modifiers;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.DefaultedList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -16,7 +16,7 @@ public interface IModifier extends IToolMod {
    * Called with a set of itemstacks and returns a match which contains the items that match
    * and how often the modifier can be applied with them
    */
-  Optional<RecipeMatch.Match> matches(NonNullList<ItemStack> stacks);
+  Optional<RecipeMatch.Match> matches(DefaultedList<ItemStack> stacks);
 
   /**
    * Returns true if the modifier can be applied to the given itemstack.

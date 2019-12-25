@@ -195,7 +195,7 @@ public class TinkerFluids extends TinkerPulse {
       blueslime.setTemperature(310);
       blueslime.setViscosity(1500);
       blueslime.setDensity(1500);
-      registerBlock(registry, new BlockLiquidSlime(blueslime, net.minecraft.block.material.Material.WATER), blueslime.getName());
+      registerBlock(registry, new BlockLiquidSlime(blueslime, net.minecraft.block.Material.WATER), blueslime.getName());
     }
 
     if(isWorldLoaded() || isSmelteryLoaded()) {
@@ -203,7 +203,7 @@ public class TinkerFluids extends TinkerPulse {
       purpleSlime.setTemperature(370);
       purpleSlime.setViscosity(1600);
       purpleSlime.setDensity(1600);
-      registerBlock(registry, new BlockLiquidSlime(purpleSlime, net.minecraft.block.material.Material.WATER), purpleSlime.getName());
+      registerBlock(registry, new BlockLiquidSlime(purpleSlime, net.minecraft.block.Material.WATER), purpleSlime.getName());
     }
   }
 
@@ -297,7 +297,7 @@ public class TinkerFluids extends TinkerPulse {
 
   /** Registers a non-burning water based block for the fluid */
   public static BlockFluidBase registerClassicBlock(IForgeRegistry<Block> registry, Fluid fluid) {
-    return registerBlock(registry, new BlockTinkerFluid(fluid, net.minecraft.block.material.Material.WATER), fluid.getName());
+    return registerBlock(registry, new BlockTinkerFluid(fluid, net.minecraft.block.Material.WATER), fluid.getName());
   }
 
   /** Registers a hot lava-based block for the fluid, prefix with molten_ */

@@ -1,13 +1,13 @@
 package slimeknights.tconstruct.shared.client;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.ParticleCrit;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.texture.TextureManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 import net.minecraftforge.fml.relauncher.Side;
@@ -18,8 +18,8 @@ import slimeknights.tconstruct.library.Util;
 @SideOnly(Side.CLIENT)
 public class ParticleEffect extends ParticleCrit {
 
-  public static final ResourceLocation TEXTURE = Util.getResource("textures/particle/particles.png");
-  public static final ResourceLocation VANILLA_PARTICLE_TEXTURES = new ResourceLocation("textures/particle/particles.png");
+  public static final Identifier TEXTURE = Util.getResource("textures/particle/particles.png");
+  public static final Identifier VANILLA_PARTICLE_TEXTURES = new Identifier("textures/particle/particles.png");
 
   protected TextureManager textureManager;
   protected final Type type;
@@ -35,41 +35,41 @@ public class ParticleEffect extends ParticleCrit {
 
     this.type = Type.values()[typeId];
 
-    this.particleMaxAge = 20;
+    this.maxAge = 20;
     this.particleTextureIndexX = type.x / 8;
     this.particleTextureIndexY = type.y / 8;
 
-    this.motionY += 0.1f;
-    this.motionX += -0.25f + rand.nextFloat() * 0.5f;
-    this.motionZ += -0.25f + rand.nextFloat() * 0.5f;
+    this.velocityY += 0.1f;
+    this.velocityX += -0.25f + random.nextFloat() * 0.5f;
+    this.velocityZ += -0.25f + random.nextFloat() * 0.5f;
 
-    particleRed = particleBlue = particleGreen = 1f;
+    colorRed = colorBlue = colorGreen = 1f;
 
-    this.textureManager = Minecraft.getMinecraft().getTextureManager();
+    this.textureManager = MinecraftClient.getMinecraft().getTextureManager();
 
     // has to be set after constructor because parent class accesses layer-0-only functions
     this.layer = 3;
   }
 
-  protected ResourceLocation getTexture() {
+  protected Identifier getTexture() {
     return TEXTURE;
   }
 
   @Override
   public void onUpdate() {
-    float r = this.particleRed;
-    float g = this.particleGreen;
-    float b = this.particleBlue;
+    float r = this.colorRed;
+    float g = this.colorGreen;
+    float b = this.colorBlue;
     super.onUpdate();
 
-    this.particleRed = r * 0.975f;
-    this.particleGreen = g * 0.975f;
-    this.particleBlue = b * 0.975f;
+    this.colorRed = r * 0.975f;
+    this.colorGreen = g * 0.975f;
+    this.colorBlue = b * 0.975f;
   }
 
   @Override
   public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
-    buffer.begin(7, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
+    buffer.begin(7, VertexFormats.POSITION_UV_COLOR_LMAP);
     textureManager.bindTexture(getTexture());
     super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
     Tessellator.getInstance().draw();

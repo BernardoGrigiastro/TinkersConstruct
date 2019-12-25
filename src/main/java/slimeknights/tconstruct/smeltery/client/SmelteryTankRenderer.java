@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.smeltery.client;
 
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
 
@@ -13,7 +13,7 @@ import slimeknights.tconstruct.library.client.RenderUtil;
 import slimeknights.tconstruct.library.smeltery.ISmelteryTankHandler;
 import slimeknights.tconstruct.library.smeltery.SmelteryTank;
 
-public class SmelteryTankRenderer<T extends TileEntity & ISmelteryTankHandler> extends TileEntitySpecialRenderer<T> {
+public class SmelteryTankRenderer<T extends BlockEntity & ISmelteryTankHandler> extends TileEntitySpecialRenderer<T> {
 
   public void renderFluids(SmelteryTank tank, @Nonnull BlockPos pos, @Nonnull BlockPos tankMinPos, @Nonnull BlockPos tankMaxPos, double x, double y, double z) {
     // minpos as lightingPos instead of smeltery.pos because we want to use the lighting inside the smeltery

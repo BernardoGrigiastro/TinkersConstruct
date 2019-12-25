@@ -2,9 +2,9 @@ package slimeknights.tconstruct.tools.ranged.item;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -44,20 +44,20 @@ public class Shuriken extends ProjectileCore {
 
   @Nonnull
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+  public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
     ItemStack itemStackIn = playerIn.getHeldItem(hand);
     if(ToolHelper.isBroken(itemStackIn)) {
-      return ActionResult.newResult(EnumActionResult.FAIL, itemStackIn);
+      return TypedActionResult.newResult(EnumActionResult.FAIL, itemStackIn);
     }
     playerIn.getCooldownTracker().setCooldown(itemStackIn.getItem(), 4);
 
-    if(!worldIn.isRemote) {
+    if(!worldIn.isClient) {
       boolean usedAmmo = useAmmo(itemStackIn, playerIn);
       EntityProjectileBase projectile = getProjectile(itemStackIn, itemStackIn, worldIn, playerIn, 2.1f, 0f, 1f, usedAmmo);
       worldIn.spawnEntity(projectile);
     }
 
-    return ActionResult.newResult(EnumActionResult.SUCCESS, itemStackIn);
+    return TypedActionResult.newResult(EnumActionResult.SUCCESS, itemStackIn);
   }
 
   @Override

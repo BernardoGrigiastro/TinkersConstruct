@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.gadgets.item;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.ItemMultiTexture;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -21,7 +21,7 @@ public class ItemBlockRack extends ItemMultiTexture {
   }
 
   @Override
-  public void addInformation(@Nonnull ItemStack stack, @Nullable World worldIn, @Nonnull List<String> tooltip, ITooltipFlag flagIn) {
+  public void addInformation(@Nonnull ItemStack stack, @Nullable World worldIn, @Nonnull List<String> tooltip, TooltipContext flagIn) {
     if(stack.hasTagCompound()) {
       ItemStack legs = ItemBlockTable.getLegStack(stack);
       if(!legs.isEmpty()) {

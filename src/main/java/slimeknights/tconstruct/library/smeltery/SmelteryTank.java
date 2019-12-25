@@ -3,7 +3,7 @@ package slimeknights.tconstruct.library.smeltery;
 import com.google.common.collect.Lists;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.StringUtils;
+import net.minecraft.util.ChatUtil;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
@@ -98,7 +98,7 @@ public class SmelteryTank implements IFluidTank, IFluidHandler {
   public int fill(FluidStack resource, boolean doFill) {
     // Safeety check, it seems sometimes it can happen that something creates an invalid fluidstack?
     // does some mod register a fluid with an empty string as name..?
-    if(StringUtils.isNullOrEmpty(FluidRegistry.getFluidName(resource.getFluid()))) {
+    if(ChatUtil.isNullOrEmpty(FluidRegistry.getFluidName(resource.getFluid()))) {
       return 0;
     }
 

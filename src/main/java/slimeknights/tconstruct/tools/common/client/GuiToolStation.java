@@ -4,17 +4,17 @@ import com.google.common.collect.Lists;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -57,7 +57,7 @@ import slimeknights.tconstruct.tools.common.tileentity.TileToolStation;
 @SideOnly(Side.CLIENT)
 public class GuiToolStation extends GuiTinkerStation {
 
-  private static final ResourceLocation BACKGROUND = Util.getResource("textures/gui/toolstation.png");
+  private static final Identifier BACKGROUND = Util.getResource("textures/gui/toolstation.png");
 
   private static final GuiElement TextFieldActive = new GuiElement(0, 210, 102, 12, 256, 256);
   private static final GuiElement ItemCover = new GuiElement(176, 18, 80, 64);
@@ -263,7 +263,7 @@ public class GuiToolStation extends GuiTinkerStation {
       toolInfo.setText();
 
       traitInfo.setCaption(null);
-      String c = TextFormatting.DARK_GRAY.toString();
+      String c = TextFormat.field_1063.toString();
       String[] art = new String[]{
           c + "",
           c + "",
@@ -290,7 +290,7 @@ public class GuiToolStation extends GuiTinkerStation {
 
         ItemStack slotStack = container.getSlot(i).getStack();
         if(!pmt.isValid(slotStack)) {
-          sb.append(TextFormatting.RED);
+          sb.append(TextFormat.field_1061);
 
           // is an item in the slot?
           if(slotStack.getItem() instanceof IToolPart) {
@@ -403,7 +403,7 @@ public class GuiToolStation extends GuiTinkerStation {
     // reset state after item drawing
     GlStateManager.enableBlend();
     GlStateManager.enableAlpha();
-    RenderHelper.disableStandardItemLighting();
+    GuiLighting.disableStandardItemLighting();
     GlStateManager.disableDepth();
 
     // draw the halftransparent "cover" over the item

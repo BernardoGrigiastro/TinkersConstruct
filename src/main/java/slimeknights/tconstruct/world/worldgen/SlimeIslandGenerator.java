@@ -6,10 +6,10 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
+import net.minecraft.world.level.LevelGeneratorType;
 import net.minecraftforge.fml.common.IWorldGenerator;
 import slimeknights.tconstruct.common.config.Config;
 import slimeknights.tconstruct.shared.TinkerCommons;
@@ -89,7 +89,7 @@ public class SlimeIslandGenerator implements IWorldGenerator {
   }
 
   protected SlimeIslandData getIslandData(World world) {
-    int dimensionId = world.provider.getDimension();
+    int dimensionId = world.dimension.getDimension();
     if(!islandData.containsKey(dimensionId)) {
       SlimeIslandData data = (SlimeIslandData) world.getPerWorldStorage().getOrLoadData(SlimeIslandData.class, getDataName());
       if(data == null) {
@@ -117,14 +117,14 @@ public class SlimeIslandGenerator implements IWorldGenerator {
       return;
     }
     // do we generate in superflat?
-    if(world.getWorldType() == WorldType.FLAT && !Config.genIslandsInSuperflat) {
+    if(world.getWorldType() == LevelGeneratorType.FLAT && !Config.genIslandsInSuperflat) {
       return;
     }
-    if(!Config.slimeIslandsOnlyGenerateInSurfaceWorlds && !world.provider.isSurfaceWorld()) {
+    if(!Config.slimeIslandsOnlyGenerateInSurfaceWorlds && !world.dimension.isSurfaceWorld()) {
       return;
     }
     // should generate in this dimension?
-    if(!shouldGenerateInDimension(world.provider.getDimension())) {
+    if(!shouldGenerateInDimension(world.dimension.getDimension())) {
       return;
     }
 

@@ -5,7 +5,7 @@ import com.google.common.collect.Multimap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -174,7 +174,7 @@ public interface ITrait extends IToolMod {
    * @param stack        Item.getAttributeModifiers
    * @param attributeMap The map you usually return. Fill in your stuff, if needed
    */
-  default void getAttributeModifiers(@Nonnull EntityEquipmentSlot slot, ItemStack stack, Multimap<String, AttributeModifier> attributeMap) {}
+  default void getAttributeModifiers(@Nonnull EntityEquipmentSlot slot, ItemStack stack, Multimap<String, EntityAttributeModifier> attributeMap) {}
 
   /**
    * Determines the order in which traits/modifiers are processed. Higher priority gets processed first.

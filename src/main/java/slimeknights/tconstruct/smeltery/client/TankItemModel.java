@@ -10,14 +10,13 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemOverride;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.BakedModelWrapper;
 import net.minecraftforge.client.model.IModel;
@@ -46,11 +45,11 @@ public class TankItemModel extends BakedModelWrapper<IBakedModel> {
     return overrides;
   }
 
-  private static IBakedModel getTexturedModel(IBakedModel original, ResourceLocation location, Fluid fluid) {
+  private static IBakedModel getTexturedModel(IBakedModel original, Identifier location, Fluid fluid) {
     try {
       IModel model = ModelLoaderRegistry.getModel(location);
       IModel retextured = model.retexture(ImmutableMap.of("fluid", fluid.getStill().toString()));
-      return retextured.bake(retextured.getDefaultState(), DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
+      return retextured.bake(retextured.getDefaultState(), VertexFormats.POSITION_COLOR_UV_NORMAL, ModelLoader.defaultTextureGetter());
     }
     catch(Exception e) {
       e.printStackTrace();
@@ -69,7 +68,7 @@ public class TankItemModel extends BakedModelWrapper<IBakedModel> {
 
     @Override
     @Deprecated
-    public ResourceLocation applyOverride(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
+    public Identifier applyOverride(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
       return parent.applyOverride(stack, worldIn, entityIn);
     }
 
@@ -85,7 +84,7 @@ public class TankItemModel extends BakedModelWrapper<IBakedModel> {
       }
 
       @SuppressWarnings("deprecation")
-      ResourceLocation location = parent.applyOverride(stack, world, entity);
+      Identifier location = parent.applyOverride(stack, world, entity);
       if (location == null) {
         return original;
       }
@@ -106,9 +105,9 @@ public class TankItemModel extends BakedModelWrapper<IBakedModel> {
   }
 
   private static class TankCacheKey {
-    private ResourceLocation location;
+    private Identifier location;
     private Fluid fluid;
-    private TankCacheKey(@Nonnull ResourceLocation location, @Nonnull Fluid fluid) {
+    private TankCacheKey(@Nonnull Identifier location, @Nonnull Fluid fluid) {
       this.location = location;
       this.fluid = fluid;
     }

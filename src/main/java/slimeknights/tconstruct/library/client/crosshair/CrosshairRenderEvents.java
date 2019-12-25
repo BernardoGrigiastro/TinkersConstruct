@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.library.client.crosshair;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -19,7 +19,7 @@ public final class CrosshairRenderEvents {
 
   public static final CrosshairRenderEvents INSTANCE = new CrosshairRenderEvents();
 
-  private static final Minecraft mc = Minecraft.getMinecraft();
+  private static final MinecraftClient mc = MinecraftClient.getMinecraft();
 
   private CrosshairRenderEvents() {}
 
@@ -55,7 +55,7 @@ public final class CrosshairRenderEvents {
 
 
     // damage cooldown indicator
-    if(mc.gameSettings.attackIndicator == 1) {
+    if(mc.options.attackIndicator == 1) {
       int resW = event.getResolution().getScaledWidth();
       int resH = event.getResolution().getScaledHeight();
 
@@ -68,8 +68,8 @@ public final class CrosshairRenderEvents {
         int i = resH / 2 - 7 + 16;
         int j = resW / 2 - 7;
         int k = (int) (f * 17.0F);
-        mc.ingameGUI.drawTexturedModalRect(j, i, 36, 94, 16, 4);
-        mc.ingameGUI.drawTexturedModalRect(j, i, 52, 94, k, 4);
+        mc.inGameHud.drawTexturedModalRect(j, i, 36, 94, 16, 4);
+        mc.inGameHud.drawTexturedModalRect(j, i, 52, 94, k, 4);
       }
     }
 

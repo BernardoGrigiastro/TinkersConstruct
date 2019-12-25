@@ -4,8 +4,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.LoaderState;
@@ -60,9 +60,9 @@ public class CommonProxy {
   public void spawnAttackParticle(Particles particleType, Entity entity, double height) {
     float distance = 0.017453292f;
 
-    double xd = -MathHelper.sin(entity.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(entity.rotationPitch / 180.0F * (float) Math.PI);
-    double zd = +MathHelper.cos(entity.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(entity.rotationPitch / 180.0F * (float) Math.PI);
-    double yd = -MathHelper.sin(entity.rotationPitch / 180.0F * (float) Math.PI);
+    double xd = -MathHelper.sin(entity.yaw / 180.0F * (float) Math.PI) * MathHelper.cos(entity.pitch / 180.0F * (float) Math.PI);
+    double zd = +MathHelper.cos(entity.yaw / 180.0F * (float) Math.PI) * MathHelper.cos(entity.pitch / 180.0F * (float) Math.PI);
+    double yd = -MathHelper.sin(entity.pitch / 180.0F * (float) Math.PI);
 
     distance = 1f;
     xd *= distance;
@@ -75,14 +75,14 @@ public class CommonProxy {
 
     spawnParticle(particleType,
                   entity.getEntityWorld(),
-                  entity.posX + xd,
-                  entity.posY + entity.height * height,
-                  entity.posZ + zd,
+                  entity.x + xd,
+                  entity.y + entity.height * height,
+                  entity.z + zd,
                   xd, yd, zd);
   }
 
   public void spawnEffectParticle(ParticleEffect.Type type, Entity entity, int count) {
-    spawnParticle(Particles.EFFECT, entity.getEntityWorld(), entity.posX, entity.posY + entity.height * 0.5f, entity.posZ, 0d, 1d, 0d, count, type.ordinal());
+    spawnParticle(Particles.EFFECT, entity.getEntityWorld(), entity.x, entity.y + entity.height * 0.5f, entity.z, 0d, 1d, 0d, count, type.ordinal());
   }
 
   public void spawnEffectParticle(ParticleEffect.Type type, World world, double x, double y, double z, int count) {
@@ -95,7 +95,7 @@ public class CommonProxy {
 
   public void spawnParticle(Particles particleType, World world, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, int... data) {
     // 32*32 = 1024 = vanilla particle range
-    NetworkRegistry.TargetPoint point = new NetworkRegistry.TargetPoint(world.provider.getDimension(), x, y, z, 32);
+    NetworkRegistry.TargetPoint point = new NetworkRegistry.TargetPoint(world.dimension.getDimension(), x, y, z, 32);
     AbstractPacket packet = new SpawnParticlePacket(particleType, x, y, z, xSpeed, ySpeed, zSpeed, data);
     TinkerNetwork.sendToAllAround(packet, point);
   }

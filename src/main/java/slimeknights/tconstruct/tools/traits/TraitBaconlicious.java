@@ -25,12 +25,12 @@ public class TraitBaconlicious extends AbstractTrait {
   public void afterHit(ItemStack tool, EntityLivingBase player, EntityLivingBase target, float damageDealt, boolean wasCritical, boolean wasHit) {
     // did the target die?
     if(!target.isEntityAlive() && wasHit) {
-      dropBacon(target.getEntityWorld(), target.posX, target.posY, target.posZ, 0.05f);
+      dropBacon(target.getEntityWorld(), target.x, target.y, target.z, 0.05f);
     }
   }
 
   protected void dropBacon(World world, double x, double y, double z, float chance) {
-    if(!world.isRemote && random.nextFloat() < chance) {
+    if(!world.isClient && random.nextFloat() < chance) {
       EntityItem entity = new EntityItem(world, x, y, z, TinkerCommons.bacon.copy());
       world.spawnEntity(entity);
     }

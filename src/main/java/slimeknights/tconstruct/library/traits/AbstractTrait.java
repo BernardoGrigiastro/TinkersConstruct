@@ -8,8 +8,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
+import net.minecraft.text.TextFormat;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -30,7 +30,7 @@ public abstract class AbstractTrait extends Modifier implements ITrait {
   //private final String identifier;
   protected final int color;
 
-  public AbstractTrait(String identifier, TextFormatting color) {
+  public AbstractTrait(String identifier, TextFormat color) {
     this(identifier, Util.enumChatFormattingToColor(color));
   }
 

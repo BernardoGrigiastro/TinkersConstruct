@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.gadgets.item;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
@@ -12,9 +12,9 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketSetPassengers;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -35,7 +35,7 @@ import slimeknights.tconstruct.library.capability.piggyback.ITinkerPiggyback;
 import slimeknights.tconstruct.library.capability.piggyback.TinkerPiggybackSerializer;
 import slimeknights.tconstruct.library.client.Icons;
 import slimeknights.tconstruct.library.potion.TinkerPotion;
-
+import ArmorMaterial;
 import javax.annotation.Nonnull;
 
 public class ItemPiggybackPack extends ItemArmorTooltip {
@@ -54,9 +54,9 @@ public class ItemPiggybackPack extends ItemArmorTooltip {
 
   @Nonnull
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+  public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
     ItemStack itemStackIn = playerIn.getHeldItem(hand);
-    return new ActionResult<>(EnumActionResult.PASS, itemStackIn);
+    return new TypedActionResult<>(EnumActionResult.PASS, itemStackIn);
   }
 
   @Override
@@ -93,7 +93,7 @@ public class ItemPiggybackPack extends ItemArmorTooltip {
   }
 
   public boolean pickupEntity(EntityPlayer player, Entity target) {
-    if(player.getEntityWorld().isRemote) {
+    if(player.getEntityWorld().isClient) {
       return false;
     }
 
@@ -184,7 +184,7 @@ public class ItemPiggybackPack extends ItemArmorTooltip {
     protected CarryPotionEffect() {
       super(Util.getResource("carry"), false, true);
 
-      this.registerPotionAttributeModifier(SharedMonsterAttributes.MOVEMENT_SPEED, UUID, -0.05D, 2);
+      this.registerPotionAttributeModifier(EntityAttributes.MOVEMENT_SPEED, UUID, -0.05D, 2);
     }
 
     @Override
@@ -200,7 +200,7 @@ public class ItemPiggybackPack extends ItemArmorTooltip {
       }
       else {
         TinkerGadgets.piggybackPack.matchCarriedEntitiesToCount(entityLivingBaseIn, chestArmor.getCount());
-        if(!entityLivingBaseIn.getEntityWorld().isRemote) {
+        if(!entityLivingBaseIn.getEntityWorld().isClient) {
           if(entityLivingBaseIn.hasCapability(CapabilityTinkerPiggyback.PIGGYBACK, null)) {
             ITinkerPiggyback piggyback = entityLivingBaseIn.getCapability(CapabilityTinkerPiggyback.PIGGYBACK, null);
             piggyback.updatePassengers();
@@ -211,13 +211,13 @@ public class ItemPiggybackPack extends ItemArmorTooltip {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
+    public void renderInventoryEffect(int x, int y, PotionEffect effect, MinecraftClient mc) {
       renderHUDEffect(x, y, effect, mc, 1f);
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void renderHUDEffect(int x, int y, PotionEffect effect, Minecraft mc, float alpha) {
+    public void renderHUDEffect(int x, int y, PotionEffect effect, MinecraftClient mc, float alpha) {
       mc.getTextureManager().bindTexture(Icons.ICON);
       GuiElement element;
       switch(effect.getAmplifier()) {

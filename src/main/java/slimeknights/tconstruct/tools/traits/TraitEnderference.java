@@ -4,7 +4,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.EnderTeleportEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -18,7 +18,7 @@ public class TraitEnderference extends AbstractTrait {
   public static TinkerPotion Enderference = new TinkerPotion(Util.getResource("enderference"), true, false, 0x21985f);
 
   public TraitEnderference() {
-    super("enderference", TextFormatting.DARK_AQUA);
+    super("enderference", TextFormat.field_1062);
 
     MinecraftForge.EVENT_BUS.register(this);
   }

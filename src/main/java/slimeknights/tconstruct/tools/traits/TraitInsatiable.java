@@ -2,8 +2,7 @@ package slimeknights.tconstruct.tools.traits;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
-
+import net.minecraft.text.TextFormat;
 import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.potion.TinkerPotion;
 import slimeknights.tconstruct.library.traits.AbstractTrait;
@@ -13,7 +12,7 @@ public class TraitInsatiable extends AbstractTrait {
   public static TinkerPotion Insatiable = new TinkerPotion(Util.getResource("insatiable"), true, false);
 
   public TraitInsatiable() {
-    super("insatiable", TextFormatting.DARK_PURPLE);
+    super("insatiable", TextFormat.field_1064);
   }
 
   @Override

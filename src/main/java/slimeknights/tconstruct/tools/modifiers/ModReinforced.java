@@ -40,7 +40,7 @@ public class ModReinforced extends ModifierTrait {
 
   @Override
   public int onToolDamage(ItemStack tool, int damage, int newDamage, EntityLivingBase entity) {
-    if(entity.getEntityWorld().isRemote) {
+    if(entity.getEntityWorld().isClient) {
       return 0;
     }
 

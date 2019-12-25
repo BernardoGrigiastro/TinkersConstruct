@@ -3,7 +3,7 @@ package slimeknights.tconstruct.tools.common.client.module;
 import com.google.common.collect.Lists;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
@@ -74,7 +74,7 @@ public class GuiTinkerTabs extends GuiModule {
     // highlighted tooltip
     if(tabs.highlighted > -1) {
       BlockPos pos = tabData.get(tabs.highlighted);
-      IBlockState state = Minecraft.getMinecraft().player.getEntityWorld().getBlockState(pos);
+      IBlockState state = MinecraftClient.getMinecraft().player.getEntityWorld().getBlockState(pos);
       ItemStack stack = new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state));
       String name = stack.getDisplayName();
 

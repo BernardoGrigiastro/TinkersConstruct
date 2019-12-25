@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.smeltery.tileentity;
 
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
+import net.minecraft.network.ClientConnection;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import slimeknights.mantle.multiblock.MultiServantLogic;
 import slimeknights.tconstruct.library.smeltery.ISmelteryTankHandler;
 
@@ -20,7 +20,7 @@ public class TileSmelteryComponent extends MultiServantLogic {
   }
 
   @Override
-  public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+  public void onDataPacket(ClientConnection net, SPacketUpdateTileEntity pkt) {
     super.onDataPacket(net, pkt);
     readFromNBT(pkt.getNbtCompound());
   }
@@ -43,7 +43,7 @@ public class TileSmelteryComponent extends MultiServantLogic {
    */
   protected ISmelteryTankHandler getSmelteryTankHandler() {
     if(getHasMaster()) {
-      TileEntity te = getWorld().getTileEntity(getMasterPosition());
+      BlockEntity te = getWorld().getTileEntity(getMasterPosition());
       if(te instanceof ISmelteryTankHandler) {
         return (ISmelteryTankHandler)te;
       }

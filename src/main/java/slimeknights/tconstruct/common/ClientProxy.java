@@ -1,10 +1,9 @@
 package slimeknights.tconstruct.common;
 
 import com.google.common.collect.ImmutableList;
-
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -12,11 +11,11 @@ import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChatUtil;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StringUtils;
-import net.minecraft.world.Explosion;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -64,9 +63,9 @@ public abstract class ClientProxy extends CommonProxy {
   public static Material RenderMaterials[];
   public static Material RenderMaterialString;
 
-  public static final ResourceLocation BOOK_MODIFY = Util.getResource("textures/gui/book/modify.png");
+  public static final Identifier BOOK_MODIFY = Util.getResource("textures/gui/book/modify.png");
 
-  private static final Minecraft mc = Minecraft.getMinecraft();
+  private static final MinecraftClient mc = MinecraftClient.getMinecraft();
   public static CustomFontRenderer fontRenderer;
 
   protected static final ToolModelLoader loader = new ToolModelLoader();
@@ -124,22 +123,22 @@ public abstract class ClientProxy extends CommonProxy {
     resourceManager.registerReloadListener(CustomTextureCreator.INSTANCE);
 
     // Font renderer for tooltips and GUIs
-    fontRenderer = new CustomFontRenderer(mc.gameSettings,
-                                          new ResourceLocation("textures/font/ascii.png"),
-                                          mc.renderEngine);
-    if(mc.gameSettings.language != null) {
-      fontRenderer.setUnicodeFlag(mc.getLanguageManager().isCurrentLocaleUnicode() || mc.gameSettings.forceUnicodeFont);
+    fontRenderer = new CustomFontRenderer(mc.options,
+                                          new Identifier("textures/font/ascii.png"),
+                                          mc.textureManager);
+    if(mc.options.language != null) {
+      fontRenderer.setUnicodeFlag(mc.getLanguageManager().isCurrentLocaleUnicode() || mc.options.forceUnicodeFont);
       fontRenderer.setBidiFlag(mc.getLanguageManager().isCurrentLanguageBidirectional());
     }
     resourceManager.registerReloadListener(fontRenderer);
 
 
     // Font Renderer for the tinker books
-    FontRenderer bookRenderer = new CustomFontRenderer(mc.gameSettings,
-                                                       new ResourceLocation("textures/font/ascii.png"),
-                                                       mc.renderEngine);
+    TextRenderer bookRenderer = new CustomFontRenderer(mc.options,
+                                                       new Identifier("textures/font/ascii.png"),
+                                                       mc.textureManager);
     bookRenderer.setUnicodeFlag(true);
-    if(mc.gameSettings.language != null) {
+    if(mc.options.language != null) {
       fontRenderer.setBidiFlag(mc.getLanguageManager().isCurrentLanguageBidirectional());
     }
     TinkerBook.INSTANCE.fontRenderer = bookRenderer;
@@ -149,7 +148,7 @@ public abstract class ClientProxy extends CommonProxy {
 
   /** Register with name only, defaults to TiC domain */
   protected void registerItemModelTiC(ItemStack item, String name) {
-    if(item != null && !StringUtils.isNullOrEmpty(name)) {
+    if(item != null && !ChatUtil.isNullOrEmpty(name)) {
       ModelRegisterUtil.registerItemModel(item, Util.getResource(name));
     }
   }
@@ -165,19 +164,19 @@ public abstract class ClientProxy extends CommonProxy {
       world = mc.world;
     }
     Particle effect = createParticle(particleType, world, x, y, z, xSpeed, ySpeed, zSpeed, data);
-    mc.effectRenderer.addEffect(effect);
+    mc.particleManager.addEffect(effect);
 
     if(particleType == Particles.EFFECT && data[0] > 1) {
       for(int i = 0; i < data[0] - 1; i++) {
         effect = createParticle(particleType, world, x, y, z, xSpeed, ySpeed, zSpeed, data);
-        mc.effectRenderer.addEffect(effect);
+        mc.particleManager.addEffect(effect);
       }
     }
   }
 
   @Override
   public void spawnSlimeParticle(World world, double x, double y, double z) {
-    mc.effectRenderer.addEffect(new EntitySlimeFx(world, x, y, z, TinkerCommons.matSlimeBallBlue.getItem(), TinkerCommons.matSlimeBallBlue.getItemDamage()));
+    mc.particleManager.addEffect(new EntitySlimeFx(world, x, y, z, TinkerCommons.matSlimeBallBlue.getItem(), TinkerCommons.matSlimeBallBlue.getItemDamage()));
   }
 
   public static Particle createParticle(Particles type, World world, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, int... data) {
@@ -218,8 +217,8 @@ public abstract class ClientProxy extends CommonProxy {
       ItemStack usingItem = playerSP.getActiveItemStack();
       if(!usingItem.isEmpty() && usingItem.getItem() == item) {
         // no slowdown from charging it up
-        playerSP.movementInput.moveForward *= originalSpeed * 5.0F;
-        playerSP.movementInput.moveStrafe *= originalSpeed * 5.0F;
+        playerSP.movementInput.movementForward *= originalSpeed * 5.0F;
+        playerSP.movementInput.movementSideways *= originalSpeed * 5.0F;
       }
     }
   }
@@ -233,9 +232,9 @@ public abstract class ClientProxy extends CommonProxy {
 
   public static class PatternMeshDefinition implements ItemMeshDefinition {
 
-    private final ResourceLocation baseLocation;
+    private final Identifier baseLocation;
 
-    public PatternMeshDefinition(ResourceLocation baseLocation) {
+    public PatternMeshDefinition(Identifier baseLocation) {
       this.baseLocation = baseLocation;
     }
 
@@ -248,7 +247,7 @@ public abstract class ClientProxy extends CommonProxy {
         suffix = Pattern.getTextureIdentifier(item);
       }
 
-      return new ModelResourceLocation(new ResourceLocation(baseLocation.getResourceDomain(),
+      return new ModelResourceLocation(new Identifier(baseLocation.getResourceDomain(),
                                                             baseLocation.getResourcePath() + suffix),
                                        "inventory");
     }

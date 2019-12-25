@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.gadgets.tileentity;
 
-import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
 import slimeknights.tconstruct.library.TinkerRegistry;
 import slimeknights.tconstruct.library.tileentity.IProgress;
 
-public class TileDryingRack extends TileItemRack implements ITickable, ISidedInventory, IProgress {
+public class TileDryingRack extends TileItemRack implements ITickable, SidedInventory, IProgress {
 
   private static final String TAG_TIME = "Time";
   private static final String TAG_MAXTIME = "MaxTime";
@@ -97,8 +97,8 @@ public class TileDryingRack extends TileItemRack implements ITickable, ISidedInv
   @Nonnull
   @Override
   @SideOnly(Side.CLIENT)
-  public AxisAlignedBB getRenderBoundingBox() {
-    return new AxisAlignedBB(pos.getX(), pos.getY() - 1, pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
+  public BoundingBox getRenderBoundingBox() {
+    return new BoundingBox(pos.getX(), pos.getY() - 1, pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
   }
 
   @Nonnull

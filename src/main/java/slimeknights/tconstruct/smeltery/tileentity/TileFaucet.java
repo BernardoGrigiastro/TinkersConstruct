@@ -1,14 +1,14 @@
 package slimeknights.tconstruct.smeltery.tileentity;
 
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
+import net.minecraft.network.ClientConnection;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
@@ -22,7 +22,7 @@ import slimeknights.tconstruct.smeltery.network.FaucetActivationPacket;
 
 import javax.annotation.Nonnull;
 
-public class TileFaucet extends TileEntity implements ITickable {
+public class TileFaucet extends BlockEntity implements ITickable {
 
   public static final int LIQUID_TRANSFER = 6; // how much liquid is transferred per operation
   public static final int TRANSACTION_AMOUNT = Material.VALUE_Ingot;
@@ -68,7 +68,7 @@ public class TileFaucet extends TileEntity implements ITickable {
 
   @Override
   public void update() {
-    if(getWorld().isRemote) {
+    if(getWorld().isClient) {
       return;
     }
     // nothing to do if not pouring
@@ -115,7 +115,7 @@ public class TileFaucet extends TileEntity implements ITickable {
           pour();
 
           // sync to clients
-          if(!getWorld().isRemote && getWorld() instanceof WorldServer) {
+          if(!getWorld().isClient && getWorld() instanceof WorldServer) {
             TinkerNetwork.sendToClients((WorldServer) getWorld(), pos, new FaucetActivationPacket(pos, drained));
           }
 
@@ -161,13 +161,13 @@ public class TileFaucet extends TileEntity implements ITickable {
     lastRedstoneState = false;
 
     // sync to clients
-    if(getWorld() != null && !getWorld().isRemote && getWorld() instanceof WorldServer) {
+    if(getWorld() != null && !getWorld().isClient && getWorld() instanceof WorldServer) {
       TinkerNetwork.sendToClients((WorldServer) getWorld(), pos, new FaucetActivationPacket(pos, null));
     }
   }
 
   protected IFluidHandler getFluidHandler(BlockPos pos, EnumFacing direction) {
-    TileEntity te = getWorld().getTileEntity(pos);
+    BlockEntity te = getWorld().getTileEntity(pos);
     if(te != null && te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction)) {
       return te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction);
     }
@@ -177,8 +177,8 @@ public class TileFaucet extends TileEntity implements ITickable {
   // faucet flow may be in the block below, so still render if looking at that
   @Override
   @SideOnly(Side.CLIENT)
-  public AxisAlignedBB getRenderBoundingBox() {
-    return new AxisAlignedBB(pos.getX(), pos.getY() - 1, pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
+  public BoundingBox getRenderBoundingBox() {
+    return new BoundingBox(pos.getX(), pos.getY() - 1, pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
   }
 
   /* Load & Save */
@@ -231,7 +231,7 @@ public class TileFaucet extends TileEntity implements ITickable {
   }
 
   @Override
-  public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+  public void onDataPacket(ClientConnection net, SPacketUpdateTileEntity pkt) {
     super.onDataPacket(net, pkt);
     readFromNBT(pkt.getNbtCompound());
   }

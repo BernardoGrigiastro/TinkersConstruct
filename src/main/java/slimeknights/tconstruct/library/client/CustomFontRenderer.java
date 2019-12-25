@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.library.client;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.settings.GameSettings;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.texture.TextureManager;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
  * Uses code from CoFHCore. Credit goes to the CoFH team, KingLemming and RWTema.
  */
 @SideOnly(Side.CLIENT)
-public class CustomFontRenderer extends FontRenderer {
+public class CustomFontRenderer extends TextRenderer {
 
   private boolean dropShadow;
   private int state = 0;
@@ -28,7 +28,7 @@ public class CustomFontRenderer extends FontRenderer {
   private int green;
   private int blue;
 
-  public CustomFontRenderer(GameSettings gameSettingsIn, ResourceLocation location, TextureManager textureManagerIn) {
+  public CustomFontRenderer(GameSettings gameSettingsIn, Identifier location, TextureManager textureManagerIn) {
     super(gameSettingsIn, location, textureManagerIn, true);
   }
 
@@ -142,7 +142,7 @@ public class CustomFontRenderer extends FontRenderer {
   @Override
   public void onResourceManagerReload(IResourceManager resourceManager) {
     super.onResourceManagerReload(resourceManager);
-    setUnicodeFlag(Minecraft.getMinecraft().getLanguageManager().isCurrentLocaleUnicode() || Minecraft.getMinecraft().gameSettings.forceUnicodeFont);
-    setBidiFlag(Minecraft.getMinecraft().getLanguageManager().isCurrentLanguageBidirectional());
+    setUnicodeFlag(MinecraftClient.getMinecraft().getLanguageManager().isCurrentLocaleUnicode() || MinecraftClient.getMinecraft().options.forceUnicodeFont);
+    setBidiFlag(MinecraftClient.getMinecraft().getLanguageManager().isCurrentLanguageBidirectional());
   }
 }

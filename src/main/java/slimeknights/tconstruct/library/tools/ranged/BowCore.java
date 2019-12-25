@@ -3,25 +3,25 @@ package slimeknights.tconstruct.library.tools.ranged;
 import com.google.common.collect.Multimap;
 
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumAction;
-import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArrow;
 import net.minecraft.item.ItemBow;
+import net.minecraft.item.ItemPropertyGetter;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatList;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.relauncher.Side;
@@ -52,18 +52,18 @@ public abstract class BowCore extends ProjectileLauncherCore implements IAmmoUse
   protected static final UUID LAUNCHER_BONUS_DAMAGE = UUID.fromString("066b8892-d2ac-4bae-ac22-26f9f91a02ee");
   protected static final UUID LAUNCHER_DAMAGE_MODIFIER = UUID.fromString("4f76565a-3845-4a09-ba8f-92a37937a7c3");
 
-  protected static final ResourceLocation PROPERTY_PULL_PROGRESS = new ResourceLocation("pull");
-  protected static final ResourceLocation PROPERTY_IS_PULLING = new ResourceLocation("pulling");
+  protected static final Identifier PROPERTY_PULL_PROGRESS = new Identifier("pull");
+  protected static final Identifier PROPERTY_IS_PULLING = new Identifier("pulling");
 
-  protected final IItemPropertyGetter pullProgressPropertyGetter;
-  protected final IItemPropertyGetter isPullingPropertyGetter;
+  protected final ItemPropertyGetter pullProgressPropertyGetter;
+  protected final ItemPropertyGetter isPullingPropertyGetter;
 
   public BowCore(PartMaterialType... requiredComponents) {
     super(requiredComponents);
 
     addCategory(Category.LAUNCHER);
 
-    pullProgressPropertyGetter = new IItemPropertyGetter() {
+    pullProgressPropertyGetter = new ItemPropertyGetter() {
       @Override
       @SideOnly(Side.CLIENT)
       public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
@@ -129,23 +129,23 @@ public abstract class BowCore extends ProjectileLauncherCore implements IAmmoUse
 
   @Nonnull
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+  public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
     ItemStack itemStackIn = playerIn.getHeldItem(hand);
     if(!ToolHelper.isBroken(itemStackIn)) {
       boolean hasAmmo = !findAmmo(itemStackIn, playerIn).isEmpty();
 
-      ActionResult<ItemStack> ret = net.minecraftforge.event.ForgeEventFactory.onArrowNock(itemStackIn, worldIn, playerIn, hand, hasAmmo);
+      TypedActionResult<ItemStack> ret = net.minecraftforge.event.ForgeEventFactory.onArrowNock(itemStackIn, worldIn, playerIn, hand, hasAmmo);
       if(ret != null) {
         return ret;
       }
 
       if(playerIn.capabilities.isCreativeMode || hasAmmo) {
         playerIn.setActiveHand(hand);
-        return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+        return new TypedActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
       }
     }
 
-    return new ActionResult<>(EnumActionResult.FAIL, itemStackIn);
+    return new TypedActionResult<>(EnumActionResult.FAIL, itemStackIn);
   }
 
   @Override
@@ -189,7 +189,7 @@ public abstract class BowCore extends ProjectileLauncherCore implements IAmmoUse
     float power = ItemBow.getArrowVelocity((int)(progress * 20f)) * progress * baseProjectileSpeed();
     power *= ProjectileLauncherNBT.from(bow).range;
 
-    if(!worldIn.isRemote) {
+    if(!worldIn.isClient) {
       TinkerToolEvent.OnBowShoot event = TinkerToolEvent.OnBowShoot.fireEvent(bow, ammoIn, player, useTime, baseInaccuracy());
 
       // copied because consumeAmmo can delete vanilla stacks
@@ -227,7 +227,7 @@ public abstract class BowCore extends ProjectileLauncherCore implements IAmmoUse
     }
     else if(ammo.getItem() instanceof ItemArrow) {
       EntityArrow projectile = ((ItemArrow) ammo.getItem()).createArrow(world, ammo, player);
-      projectile.setAim(player, player.rotationPitch, player.rotationYaw, 0.0F, power, inaccuracy);
+      projectile.setAim(player, player.pitch, player.yaw, 0.0F, power, inaccuracy);
       if(player.capabilities.isCreativeMode) {
         projectile.pickupStatus = EntityArrow.PickupStatus.CREATIVE_ONLY;
       }
@@ -265,7 +265,7 @@ public abstract class BowCore extends ProjectileLauncherCore implements IAmmoUse
   }
 
   public void playShootSound(float power, World world, EntityPlayer entityPlayer) {
-    world.playSound(null, entityPlayer.posX, entityPlayer.posY, entityPlayer.posZ, SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.NEUTRAL, 1.0F, 1.0F / (itemRand.nextFloat() * 0.4F + 1.2F) + power * 0.5F);
+    world.playSound(null, entityPlayer.x, entityPlayer.y, entityPlayer.z, SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.field_15254, 1.0F, 1.0F / (random.nextFloat() * 0.4F + 1.2F) + power * 0.5F);
   }
 
   @Override
@@ -286,14 +286,14 @@ public abstract class BowCore extends ProjectileLauncherCore implements IAmmoUse
   public abstract float projectileDamageModifier();
 
   @Override
-  public void modifyProjectileAttributes(Multimap<String, AttributeModifier> projectileAttributes, @Nullable ItemStack launcher, ItemStack projectile, float power) {
+  public void modifyProjectileAttributes(Multimap<String, EntityAttributeModifier> projectileAttributes, @Nullable ItemStack launcher, ItemStack projectile, float power) {
     double dmg = baseProjectileDamage() * power;
     dmg += ProjectileLauncherNBT.from(launcher).bonusDamage;
     if(dmg != 0) {
-      projectileAttributes.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(LAUNCHER_BONUS_DAMAGE, "Launcher bonus damage", dmg, 0));
+      projectileAttributes.put(EntityAttributes.ATTACK_DAMAGE.getName(), new EntityAttributeModifier(LAUNCHER_BONUS_DAMAGE, "Launcher bonus damage", dmg, 0));
     }
     if(projectileDamageModifier() != 0f) {
-      projectileAttributes.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(LAUNCHER_DAMAGE_MODIFIER, "Launcher damage modifier", projectileDamageModifier() - 1f, 1));
+      projectileAttributes.put(EntityAttributes.ATTACK_DAMAGE.getName(), new EntityAttributeModifier(LAUNCHER_DAMAGE_MODIFIER, "Launcher damage modifier", projectileDamageModifier() - 1f, 1));
     }
   }
 

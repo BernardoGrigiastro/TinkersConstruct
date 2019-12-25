@@ -1,10 +1,6 @@
 package slimeknights.tconstruct.plugin.jei.drying;
 
 import com.google.common.collect.ImmutableList;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
-
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -17,13 +13,15 @@ import mezz.jei.api.gui.IGuiItemStackGroup;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.IRecipeCategory;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.Identifier;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.Util;
 
 public class DryingRecipeCategory implements IRecipeCategory<DryingRecipeWrapper> {
 
   public static String CATEGORY = Util.prefix("dryingrack");
-  public static ResourceLocation background_loc = Util.getResource("textures/gui/jei/dryingrack.png");
+  public static Identifier background_loc = Util.getResource("textures/gui/jei/dryingrack.png");
 
   private final IDrawable background;
   private final IDrawableAnimated arrow;
@@ -54,7 +52,7 @@ public class DryingRecipeCategory implements IRecipeCategory<DryingRecipeWrapper
   }
 
   @Override
-  public void drawExtras(@Nonnull Minecraft minecraft) {
+  public void drawExtras(@Nonnull MinecraftClient minecraft) {
     arrow.draw(minecraft, 67, 18);
   }
 

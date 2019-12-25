@@ -1,10 +1,9 @@
 package slimeknights.tconstruct.shared.block;
 
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.util.IStringSerializable;
-
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.StringRepresentable;
 import java.util.Locale;
 
 import slimeknights.mantle.block.EnumBlock;
@@ -21,12 +20,12 @@ public class BlockFirewood extends EnumBlock<BlockFirewood.FirewoodType> {
     this.setResistance(7f);
     this.setCreativeTab(TinkerRegistry.tabGeneral);
     this.setLightLevel(0.5f);
-    this.setSoundType(SoundType.WOOD);
+    this.setSoundType(BlockSoundGroup.WOOD);
 
     this.setHarvestLevel("axe", -1);
   }
 
-  public enum FirewoodType implements IStringSerializable, EnumBlock.IEnumMeta {
+  public enum FirewoodType implements StringRepresentable, EnumBlock.IEnumMeta {
     LAVAWOOD,
     FIREWOOD;
 

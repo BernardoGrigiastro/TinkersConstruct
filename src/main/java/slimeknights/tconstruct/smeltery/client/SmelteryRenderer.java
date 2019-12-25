@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.smeltery.client;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.GuiLighting;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -45,7 +45,7 @@ public class SmelteryRenderer extends SmelteryTankRenderer<TileSmeltery> {
     int zd = 1 + maxPos.getZ() - minPos.getZ();
     int layer = xd * zd;
     //Tessellator tessellator = Tessellator.getInstance();
-    Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+    MinecraftClient.getMinecraft().textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
     RenderUtil.pre(x, y, z);
     GlStateManager.disableCull();
     GlStateManager.translate(x1, y1, z1);
@@ -53,7 +53,7 @@ public class SmelteryRenderer extends SmelteryTankRenderer<TileSmeltery> {
 
     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-    RenderHelper.enableStandardItemLighting();
+    GuiLighting.enableStandardItemLighting();
 
     for(int i = 0; i < smeltery.getSizeInventory(); i++) {
       if(smeltery.isStackInSlot(i)) {
@@ -74,10 +74,10 @@ public class SmelteryRenderer extends SmelteryTankRenderer<TileSmeltery> {
         if(isItem) {
           GlStateManager.rotate(-90, 1, 0, 0);
         }
-        IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(stack, smeltery.getWorld(), null);
+        IBakedModel model = MinecraftClient.getMinecraft().getRenderItem().getItemModelWithOverrides(stack, smeltery.getWorld(), null);
         model = ForgeHooksClient.handleCameraTransforms(model, ItemCameraTransforms.TransformType.NONE, false);
         //Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModel(smeltery.getWorld(), model, Blocks.bedrock.getDefaultState(), pos, renderer, false);
-        Minecraft.getMinecraft().getRenderItem().renderItem(stack, model);
+        MinecraftClient.getMinecraft().getRenderItem().renderItem(stack, model);
         if(isItem) {
           GlStateManager.rotate(90, 1, 0, 0);
         }
@@ -85,7 +85,7 @@ public class SmelteryRenderer extends SmelteryTankRenderer<TileSmeltery> {
         //GlStateManager.popMatrix();
       }
     }
-    RenderHelper.enableStandardItemLighting();
+    GuiLighting.enableStandardItemLighting();
     GlStateManager.enableCull();
     //tessellator.draw();
     RenderUtil.post();

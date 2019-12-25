@@ -6,8 +6,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemPickaxe;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-
+import net.minecraft.util.DefaultedList;
 import java.util.List;
 
 import slimeknights.tconstruct.library.materials.Material;
@@ -19,14 +18,14 @@ import slimeknights.tconstruct.tools.TinkerTools;
 
 public class Pickaxe extends AoeToolCore {
 
-  public static final ImmutableSet<net.minecraft.block.material.Material> effective_materials =
-      ImmutableSet.of(net.minecraft.block.material.Material.IRON,
-                      net.minecraft.block.material.Material.ANVIL,
-                      net.minecraft.block.material.Material.ROCK,
-                      net.minecraft.block.material.Material.ICE,
-                      net.minecraft.block.material.Material.GLASS,
-                      net.minecraft.block.material.Material.PACKED_ICE,
-                      net.minecraft.block.material.Material.PISTON);
+  public static final ImmutableSet<net.minecraft.block.Material> effective_materials =
+      ImmutableSet.of(net.minecraft.block.Material.METAL,
+                      net.minecraft.block.Material.ANVIL,
+                      net.minecraft.block.Material.STONE,
+                      net.minecraft.block.Material.ICE,
+                      net.minecraft.block.Material.GLASS,
+                      net.minecraft.block.Material.PACKED_ICE,
+                      net.minecraft.block.Material.PISTON);
 
   // Pick-head, binding, tool-rod
   public Pickaxe() {
@@ -45,7 +44,7 @@ public class Pickaxe extends AoeToolCore {
   }
 
   @Override
-  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
     if(this.isInCreativeTab(tab)) {
       addDefaultSubItems(subItems);
       addInfiTool(subItems, "InfiHarvester");

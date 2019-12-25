@@ -1,16 +1,16 @@
 package slimeknights.tconstruct.tools.common.inventory;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -35,7 +35,7 @@ import slimeknights.tconstruct.tools.common.tileentity.TilePatternChest;
 
 public class ContainerPartBuilder extends ContainerTinkerStation<TilePartBuilder> implements IContainerCraftingCustom {
 
-  public IInventory craftResult;
+  public Inventory craftResult;
   //public IInventory craftResultSecondary;
 
   private final Slot patternSlot;
@@ -45,7 +45,7 @@ public class ContainerPartBuilder extends ContainerTinkerStation<TilePartBuilder
 
   private final boolean partCrafter;
   private final EntityPlayer player;
-  public final IInventory patternChest;
+  public final Inventory patternChest;
 
   public ContainerPartBuilder(InventoryPlayer playerInventory, TilePartBuilder tile) {
     super(tile);
@@ -113,7 +113,7 @@ public class ContainerPartBuilder extends ContainerTinkerStation<TilePartBuilder
   }
 
   @Override
-  public void onCraftMatrixChanged(IInventory inventoryIn) {
+  public void onCraftMatrixChanged(Inventory inventoryIn) {
     updateResult();
   }
 
@@ -126,7 +126,7 @@ public class ContainerPartBuilder extends ContainerTinkerStation<TilePartBuilder
     }
     else {
       Throwable throwable = null;
-      NonNullList<ItemStack> toolPart;
+      DefaultedList<ItemStack> toolPart;
       try {
         toolPart = ToolBuilder.tryBuildToolPart(patternSlot.getStack(), ListUtil.getListFrom(input1.getStack(), input2.getStack()), false);
         if(toolPart != null && !toolPart.get(0).isEmpty()) {
@@ -177,8 +177,8 @@ public class ContainerPartBuilder extends ContainerTinkerStation<TilePartBuilder
   }
 
   @Override
-  public void onCrafting(EntityPlayer player, ItemStack output, IInventory craftMatrix) {
-    NonNullList<ItemStack> toolPart = NonNullList.create();
+  public void onCrafting(EntityPlayer player, ItemStack output, Inventory craftMatrix) {
+    DefaultedList<ItemStack> toolPart = DefaultedList.create();
     try {
       toolPart = ToolBuilder.tryBuildToolPart(patternSlot.getStack(), ListUtil.getListFrom(input1.getStack(), input2.getStack()), true);
     } catch(TinkerGuiException e) {
@@ -230,7 +230,7 @@ public class ContainerPartBuilder extends ContainerTinkerStation<TilePartBuilder
     super.putStackInSlot(p_75141_1_, p_75141_2_);
 
     // this is called solely to update the gui buttons
-    Minecraft mc = Minecraft.getMinecraft();
+    MinecraftClient mc = MinecraftClient.getMinecraft();
     if(mc.currentScreen instanceof GuiPartBuilder) {
       ((GuiPartBuilder) mc.currentScreen).updateButtons();
     }
@@ -241,7 +241,7 @@ public class ContainerPartBuilder extends ContainerTinkerStation<TilePartBuilder
   public ItemStack slotClick(int slotId, int dragType, ClickType type, EntityPlayer player) {
     ItemStack ret = super.slotClick(slotId, dragType, type, player);
     // this is called solely to update the gui buttons
-    Minecraft mc = Minecraft.getMinecraft();
+    MinecraftClient mc = MinecraftClient.getMinecraft();
     if(mc.currentScreen instanceof GuiPartBuilder) {
       ((GuiPartBuilder) mc.currentScreen).updateButtons();
     }

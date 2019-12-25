@@ -3,17 +3,17 @@ package slimeknights.tconstruct.library.potion;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 
 public class TinkerPotion extends Potion {
 
   private final boolean show;
 
-  public TinkerPotion(ResourceLocation location, boolean badEffect, boolean showInInventory) {
+  public TinkerPotion(Identifier location, boolean badEffect, boolean showInInventory) {
     this(location, badEffect, showInInventory, 0xffffff);
   }
 
-  public TinkerPotion(ResourceLocation location, boolean badEffect, boolean showInInventory, int color) {
+  public TinkerPotion(Identifier location, boolean badEffect, boolean showInInventory, int color) {
     super(badEffect, color);
     setPotionName("potion." + location.getResourcePath());
 

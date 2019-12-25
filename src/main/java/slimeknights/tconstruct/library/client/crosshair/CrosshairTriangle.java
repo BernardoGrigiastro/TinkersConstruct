@@ -1,19 +1,18 @@
 package slimeknights.tconstruct.library.client.crosshair;
 
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL11;
 
 public class CrosshairTriangle extends Crosshair {
 
-  public CrosshairTriangle(ResourceLocation texture) {
+  public CrosshairTriangle(Identifier texture) {
     this(texture, 16);
   }
 
-  public CrosshairTriangle(ResourceLocation texture, int size) {
+  public CrosshairTriangle(Identifier texture, int size) {
     super(texture, size);
   }
 
@@ -31,7 +30,7 @@ public class CrosshairTriangle extends Crosshair {
 
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder vb = tessellator.getBuffer();
-    vb.begin(GL11.GL_TRIANGLES, DefaultVertexFormats.POSITION_TEX); // 4
+    vb.begin(GL11.GL_TRIANGLES, VertexFormats.POSITION_UV); // 4
     // top part
     if(part == 0) {
       vb.pos(x - s, y - s, z).tex(0, 0).endVertex();

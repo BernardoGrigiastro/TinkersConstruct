@@ -6,7 +6,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 
@@ -30,16 +30,16 @@ public class TraitAlien extends TraitProgressiveStats {
   protected static float ATTACK_STEP = 0.005f;
 
   public TraitAlien() {
-    super("alien", TextFormatting.YELLOW);
+    super("alien", TextFormat.field_1054);
   }
 
   @Override
   public void onUpdate(ItemStack tool, World world, Entity entity, int itemSlot, boolean isSelected) {
-    if(entity instanceof FakePlayer || entity.getEntityWorld().isRemote) {
+    if(entity instanceof FakePlayer || entity.getEntityWorld().isClient) {
       return;
     }
     // every 3.6 seconds we distribute one stat. This means 1h = 1000 applications
-    if(entity.ticksExisted % TICK_PER_STAT > 0) {
+    if(entity.age % TICK_PER_STAT > 0) {
       return;
     }
 
@@ -54,14 +54,14 @@ public class TraitAlien extends TraitProgressiveStats {
     ToolNBT data = TagUtil.getToolStats(tool);
 
     // attack
-    if(entity.ticksExisted % (TICK_PER_STAT * 3) == 0) {
+    if(entity.age % (TICK_PER_STAT * 3) == 0) {
       if(distributed.attack < pool.attack) {
         data.attack += ATTACK_STEP;
         distributed.attack += ATTACK_STEP;
       }
     }
     // speed
-    else if(entity.ticksExisted % (TICK_PER_STAT * 2) == 0) {
+    else if(entity.age % (TICK_PER_STAT * 2) == 0) {
       if(distributed.speed < pool.speed) {
         data.speed += SPEED_STEP;
         distributed.speed += SPEED_STEP;

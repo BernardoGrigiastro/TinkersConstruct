@@ -3,16 +3,14 @@ package slimeknights.tconstruct.tools;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
@@ -35,7 +33,7 @@ import slimeknights.tconstruct.tools.common.block.BlockToolTable;
 @SideOnly(Side.CLIENT)
 public class ToolClientEvents {
 
-  public static Function<ResourceLocation, TextureAtlasSprite> textureGetter = location -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());
+  public static Function<Identifier, Sprite> textureGetter = location -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());
 
   // tool tables
   private static final String LOCATION_ToolTable = Util.resource("tooltables");
@@ -52,8 +50,8 @@ public class ToolClientEvents {
   public static final ModelResourceLocation locPartChest = getTableLoc(BlockToolTable.TableTypes.PartChest);
 
   // Blank Pattern
-  private static final ResourceLocation MODEL_BlankPattern = Util.getResource("item/pattern");
-  public static final ResourceLocation locBlankPattern = Util.getResource("pattern");
+  private static final Identifier MODEL_BlankPattern = Util.getResource("item/pattern");
+  public static final Identifier locBlankPattern = Util.getResource("pattern");
 
   private static ModelResourceLocation getTableLoc(BlockToolTable.TableTypes type) {
     return new ModelResourceLocation(LOCATION_ToolTable, String.format("%s=%s",
@@ -86,7 +84,7 @@ public class ToolClientEvents {
     try {
       IModel model = ModelLoaderRegistry.getModel(location);
       IBakedModel standard = event.getModelRegistry().getObject(location);
-      IBakedModel finalModel = new BakedTableModel(standard, model, DefaultVertexFormats.BLOCK);
+      IBakedModel finalModel = new BakedTableModel(standard, model, VertexFormats.POSITION_COLOR_UV_LMAP);
       event.getModelRegistry().putObject(location, finalModel);
     } catch(Exception e) {
       e.printStackTrace();
@@ -103,11 +101,11 @@ public class ToolClientEvents {
     }
   }
 
-  public static void replacePatternModel(ResourceLocation locPattern, ResourceLocation modelLocation, ModelBakeEvent event, String baseString, Iterable<Item> items) {
+  public static void replacePatternModel(Identifier locPattern, Identifier modelLocation, ModelBakeEvent event, String baseString, Iterable<Item> items) {
     replacePatternModel(locPattern, modelLocation, event, baseString, items, -1);
   }
 
-  public static void replacePatternModel(ResourceLocation locPattern, ResourceLocation modelLocation, ModelBakeEvent event, String baseString, Iterable<Item> items, int color) {
+  public static void replacePatternModel(Identifier locPattern, Identifier modelLocation, ModelBakeEvent event, String baseString, Iterable<Item> items, int color) {
     try {
       IModel model = ModelLoaderRegistry.getModel(modelLocation);
       if(model instanceof IModel) {
@@ -117,7 +115,7 @@ public class ToolClientEvents {
           String partPatternLocation = locPattern.toString() + suffix;
           String partPatternTexture = baseString + suffix;
           IModel partPatternModel = model.retexture(ImmutableMap.of("layer0", partPatternTexture));
-          IBakedModel baked = partPatternModel.bake(partPatternModel.getDefaultState(), DefaultVertexFormats.ITEM, textureGetter);
+          IBakedModel baked = partPatternModel.bake(partPatternModel.getDefaultState(), VertexFormats.POSITION_COLOR_UV_NORMAL, textureGetter);
           if(color > -1) {
             ImmutableList.Builder<BakedQuad> quads = ImmutableList.builder();
             // ItemLayerModel.BakedModel only uses general quads
@@ -139,7 +137,7 @@ public class ToolClientEvents {
     // check if the item belongs to a material
     for(Material material : TinkerRegistry.getAllMaterials()) {
       if(material.matches(event.getItemStack()).isPresent()) {
-        event.getToolTip().add(TextFormatting.DARK_GRAY + material.getLocalizedName());
+        event.getToolTip().add(TextFormat.field_1063 + material.getLocalizedName());
       }
     }
   }

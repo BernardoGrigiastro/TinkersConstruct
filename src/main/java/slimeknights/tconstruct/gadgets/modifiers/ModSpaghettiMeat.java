@@ -5,13 +5,13 @@ import com.google.common.collect.Lists;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-
+import net.minecraft.util.DefaultedList;
 import java.util.List;
 import java.util.Optional;
 
 import slimeknights.mantle.util.RecipeMatch;
 import slimeknights.tconstruct.gadgets.item.ItemMomsSpaghetti;
+import slimeknights.tconstruct.gadgets.modifiers.ModSpaghettiMeat.MeatMixRecipeMatch;
 import slimeknights.tconstruct.library.modifiers.TinkerGuiException;
 
 public class ModSpaghettiMeat extends ModSpaghettiMod {
@@ -42,7 +42,7 @@ public class ModSpaghettiMeat extends ModSpaghettiMod {
     }
 
     @Override
-    public Optional<Match> matches(NonNullList<ItemStack> stacks) {
+    public Optional<Match> matches(DefaultedList<ItemStack> stacks) {
       List<ItemStack> matches = Lists.newArrayList();
 
       Optional<Match> match = super.matches(stacks);

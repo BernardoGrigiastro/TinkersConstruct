@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.smeltery.multiblock;
 
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -20,7 +20,7 @@ public abstract class MultiblockTinker extends MultiblockCuboid {
     if(!world.isBlockLoaded(pos)) {
       return false;
     }
-    TileEntity te = world.getTileEntity(pos);
+    BlockEntity te = world.getTileEntity(pos);
 
     // slave-blocks are only allowed if they already belong to this smeltery
     if(te instanceof MultiServantLogic) {

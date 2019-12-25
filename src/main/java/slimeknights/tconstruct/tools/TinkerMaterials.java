@@ -8,7 +8,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
 import net.minecraftforge.event.RegistryEvent.Register;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -181,7 +181,7 @@ public final class TinkerMaterials {
   }
 
   static {
-    xu = new Material("unstable", TextFormatting.WHITE);
+    xu = new Material("unstable", TextFormat.field_1068);
   }
 
   @SubscribeEvent

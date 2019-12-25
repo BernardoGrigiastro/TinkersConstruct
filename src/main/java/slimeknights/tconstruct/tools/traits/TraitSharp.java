@@ -1,10 +1,9 @@
 package slimeknights.tconstruct.tools.traits;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.EntityDamageSource;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSource;
-
 import javax.annotation.Nonnull;
 
 import slimeknights.tconstruct.library.Util;
@@ -39,10 +38,10 @@ public class TraitSharp extends AbstractTrait {
       source = new DamageSource("bleed");
     }
 
-    int hurtResistantTime = target.hurtResistantTime;
+    int hurtResistantTime = target.field_6008;
     attackEntitySecondary(source, (level + 1f) / 3f, target, true, true);
     TinkerTools.proxy.spawnEffectParticle(ParticleEffect.Type.HEART_BLOOD, target, 1);
-    target.hurtResistantTime = hurtResistantTime;
+    target.field_6008 = hurtResistantTime;
   }
 
   public static class DoT extends TinkerPotion {

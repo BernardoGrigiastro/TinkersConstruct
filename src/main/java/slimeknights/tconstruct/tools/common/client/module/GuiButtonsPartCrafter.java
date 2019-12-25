@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -24,9 +24,9 @@ import slimeknights.tconstruct.tools.common.network.PartCrafterSelectionPacket;
 
 public class GuiButtonsPartCrafter extends GuiSideButtons {
 
-  private final IInventory patternChest;
+  private final Inventory patternChest;
 
-  public GuiButtonsPartCrafter(GuiPartBuilder parent, Container container, IInventory patternChest) {
+  public GuiButtonsPartCrafter(GuiPartBuilder parent, Container container, Inventory patternChest) {
     super(parent, container, GuiPartBuilder.Column_Count, false);
 
     this.patternChest = patternChest;

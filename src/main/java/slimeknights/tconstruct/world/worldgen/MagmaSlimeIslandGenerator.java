@@ -5,10 +5,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderHell;
-import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.IChunkGenerator;
-
+import net.minecraft.world.level.LevelGeneratorType;
 import java.util.Random;
 
 import slimeknights.tconstruct.common.config.Config;
@@ -53,12 +52,12 @@ public class MagmaSlimeIslandGenerator extends SlimeIslandGenerator {
       return;
     }
     // do we generate in superflat?
-    if(world.getWorldType() == WorldType.FLAT && !Config.genIslandsInSuperflat) {
+    if(world.getWorldType() == LevelGeneratorType.FLAT && !Config.genIslandsInSuperflat) {
       return;
     }
 
     // we only generate in hell
-    if(!(world.provider instanceof WorldProviderHell)) {
+    if(!(world.dimension instanceof WorldProviderHell)) {
       return;
     }
 

@@ -5,9 +5,9 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.client.particle.Particles;
@@ -61,14 +61,14 @@ public class LongSword extends SwordCore {
 
   @Nonnull
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+  public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
     ItemStack itemStackIn = playerIn.getHeldItem(hand);
     // don't allow free flight when using an elytra, should use fireworks
     if(playerIn.isElytraFlying()) {
-      return ActionResult.newResult(EnumActionResult.PASS, itemStackIn);
+      return TypedActionResult.newResult(EnumActionResult.PASS, itemStackIn);
     }
     playerIn.setActiveHand(hand);
-    return ActionResult.newResult(EnumActionResult.SUCCESS, itemStackIn);
+    return TypedActionResult.newResult(EnumActionResult.SUCCESS, itemStackIn);
   }
 
   @Override
@@ -112,9 +112,9 @@ public class LongSword extends SwordCore {
       if(speed > 0.925f) {
         speed = 0.925f;
       }
-      player.motionX = (double) (-MathHelper.sin(player.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(player.rotationPitch / 180.0F * (float) Math.PI) * speed);
-      player.motionZ = (double) (MathHelper.cos(player.rotationYaw / 180.0F * (float) Math.PI) * MathHelper
-          .cos(player.rotationPitch / 180.0F * (float) Math.PI) * speed);
+      player.motionX = (double) (-MathHelper.sin(player.yaw / 180.0F * (float) Math.PI) * MathHelper.cos(player.pitch / 180.0F * (float) Math.PI) * speed);
+      player.motionZ = (double) (MathHelper.cos(player.yaw / 180.0F * (float) Math.PI) * MathHelper
+          .cos(player.pitch / 180.0F * (float) Math.PI) * speed);
     }
 
     super.onPlayerStoppedUsing(stack, world, player, timeLeft);

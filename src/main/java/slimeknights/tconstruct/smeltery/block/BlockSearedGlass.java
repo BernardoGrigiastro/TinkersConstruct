@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.smeltery.block;
 
+import net.minecraft.block.BlockRenderLayer;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.relauncher.Side;
@@ -80,7 +80,7 @@ public class BlockSearedGlass extends BlockEnumSmeltery<BlockSearedGlass.GlassTy
   }
 
   // only one type, but we are forced to use an enum to extend BlockEnumSmeltery (which has all the smeltery multiblock logic)
-  public enum GlassType implements IStringSerializable, EnumBlock.IEnumMeta {
+  public enum GlassType implements StringRepresentable, EnumBlock.IEnumMeta {
     GLASS;
 
     public final int meta;

@@ -7,7 +7,7 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -28,7 +28,7 @@ public class CustomStateMap extends StateMapperBase {
   @Override
   protected ModelResourceLocation getModelResourceLocation(@Nonnull IBlockState state) {
     LinkedHashMap<IProperty<?>, Comparable<?>> linkedhashmap = Maps.newLinkedHashMap(state.getProperties());
-    ResourceLocation res = new ResourceLocation(Block.REGISTRY.getNameForObject(state.getBlock()).getResourceDomain(), customName);
+    Identifier res = new Identifier(Block.REGISTRY.getNameForObject(state.getBlock()).getResourceDomain(), customName);
 
     return new ModelResourceLocation(res, this.getPropertyString(linkedhashmap));
   }

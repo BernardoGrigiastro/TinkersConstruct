@@ -1,8 +1,7 @@
 package slimeknights.tconstruct.plugin.jei.smelting;
 
 import com.google.common.collect.ImmutableList;
-
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
@@ -47,9 +46,9 @@ public class SmeltingRecipeWrapper implements IRecipeWrapper {
   }
 
   @Override
-  public void drawInfo(@Nonnull Minecraft minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
+  public void drawInfo(@Nonnull MinecraftClient minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
     String tmpStr = Util.temperatureString(temperature);
-    int x = 80 - minecraft.fontRenderer.getStringWidth(tmpStr) / 2;
-    minecraft.fontRenderer.drawString(tmpStr, x, 10, Color.gray.getRGB());
+    int x = 80 - minecraft.textRenderer.getStringWidth(tmpStr) / 2;
+    minecraft.textRenderer.drawString(tmpStr, x, 10, Color.gray.getRGB());
   }
 }

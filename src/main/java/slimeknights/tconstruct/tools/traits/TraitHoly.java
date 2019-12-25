@@ -33,7 +33,7 @@ public class TraitHoly extends AbstractTrait {
 
   @Override
   public void afterHit(ItemStack tool, EntityLivingBase player, EntityLivingBase target, float damageDealt, boolean wasCritical, boolean wasHit) {
-    if(wasHit && !target.isDead && target.getCreatureAttribute() == EnumCreatureAttribute.UNDEAD) {
+    if(wasHit && !target.removed && target.getCreatureAttribute() == EnumCreatureAttribute.UNDEAD) {
       target.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 50, 0, false, true));
     }
   }

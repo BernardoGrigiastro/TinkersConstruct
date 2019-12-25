@@ -11,12 +11,12 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ActionResult;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -51,7 +51,7 @@ public class CrossBow extends BowCore implements ICustomCrosshairUser {
 
   private static final String TAG_Loaded = "Loaded";
 
-  protected static final ResourceLocation PROPERTY_IS_LOADED = new ResourceLocation("loaded");
+  protected static final Identifier PROPERTY_IS_LOADED = new Identifier("loaded");
 
   public CrossBow() {
     super(PartMaterialType.crossbow(TinkerTools.toughToolRod),
@@ -70,7 +70,7 @@ public class CrossBow extends BowCore implements ICustomCrosshairUser {
   }
 
   @Override
-  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
     if(this.isInCreativeTab(tab)) {
       addDefaultSubItems(subItems, null, null, null, TinkerMaterials.string);
     }
@@ -132,7 +132,7 @@ public class CrossBow extends BowCore implements ICustomCrosshairUser {
 
   @Nonnull
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+  public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
     ItemStack itemStackIn = playerIn.getHeldItem(hand);
     if(isLoaded(itemStackIn) && !ToolHelper.isBroken(itemStackIn)) {
       super.onPlayerStoppedUsing(itemStackIn, worldIn, playerIn, 0);
@@ -141,7 +141,7 @@ public class CrossBow extends BowCore implements ICustomCrosshairUser {
     else {
       return super.onItemRightClick(worldIn, playerIn, hand);
     }
-    return ActionResult.newResult(EnumActionResult.SUCCESS, itemStackIn);
+    return TypedActionResult.newResult(EnumActionResult.SUCCESS, itemStackIn);
   }
 
   @Override
@@ -149,7 +149,7 @@ public class CrossBow extends BowCore implements ICustomCrosshairUser {
     if(!ToolHelper.isBroken(stack) && (entityLiving instanceof EntityPlayer)) {
       int useTime = this.getMaxItemUseDuration(stack) - timeLeft;
       if(getDrawbackProgress(stack, useTime) >= 1f) {
-        Sounds.PlaySoundForPlayer(entityLiving, Sounds.crossbow_reload, 1.5f, 0.9f + itemRand.nextFloat() * 0.1f);
+        Sounds.PlaySoundForPlayer(entityLiving, Sounds.crossbow_reload, 1.5f, 0.9f + random.nextFloat() * 0.1f);
         setLoaded(stack, true);
       }
     }
@@ -157,7 +157,7 @@ public class CrossBow extends BowCore implements ICustomCrosshairUser {
 
   @Override
   public void playShootSound(float power, World world, EntityPlayer entityPlayer) {
-    world.playSound(null, entityPlayer.posX, entityPlayer.posY, entityPlayer.posZ, SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.NEUTRAL, 1.0F, 0.5f + itemRand.nextFloat() * 0.1f);
+    world.playSound(null, entityPlayer.x, entityPlayer.y, entityPlayer.z, SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.field_15254, 1.0F, 0.5f + random.nextFloat() * 0.1f);
   }
 
   @Override

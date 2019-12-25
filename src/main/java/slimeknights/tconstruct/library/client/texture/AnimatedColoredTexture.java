@@ -1,9 +1,8 @@
 package slimeknights.tconstruct.library.client.texture;
 
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.client.texture.Sprite;
+import net.minecraft.util.Identifier;
 import java.util.function.Function;
 
 /**
@@ -13,14 +12,14 @@ import java.util.function.Function;
  */
 public class AnimatedColoredTexture extends TextureColoredTexture {
 
-  private TextureAtlasSprite actualTexture;
+  private Sprite actualTexture;
 
-  public AnimatedColoredTexture(ResourceLocation addTexture, ResourceLocation baseTexture, String spriteName) {
+  public AnimatedColoredTexture(Identifier addTexture, Identifier baseTexture, String spriteName) {
     super(addTexture, baseTexture, spriteName);
   }
 
   @Override
-  public boolean load(IResourceManager manager, ResourceLocation location, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
+  public boolean load(IResourceManager manager, Identifier location, Function<Identifier, Sprite> textureGetter) {
     if(addTexture.getFrameCount() > 0) {
       actualTexture = addTexture;
     }

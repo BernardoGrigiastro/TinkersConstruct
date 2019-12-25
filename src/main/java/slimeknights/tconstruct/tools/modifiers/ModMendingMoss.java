@@ -43,7 +43,7 @@ public class ModMendingMoss extends ModifierTrait {
   @Override
   public void onUpdate(ItemStack tool, World world, Entity entity, int itemSlot, boolean isSelected) {
     // only in the hotbar of a player
-    if(!world.isRemote && entity instanceof EntityLivingBase) {
+    if(!world.isClient && entity instanceof EntityLivingBase) {
       // must be in hotbar or offhand for players
       if(entity instanceof EntityPlayer
          && !InventoryPlayer.isHotbar(itemSlot)

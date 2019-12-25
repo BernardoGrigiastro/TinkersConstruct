@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.shared;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.block.BlockColorMap;
+import net.minecraft.client.render.block.BlockColorMapper;
+import net.minecraft.client.render.item.ItemColorMapper;
 import net.minecraft.client.renderer.block.statemap.StateMap;
-import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -42,15 +42,15 @@ import static slimeknights.tconstruct.shared.TinkerCommons.stairsMudBrick;
 
 public class CommonsClientProxy extends ClientProxy {
 
-  public static Minecraft minecraft = Minecraft.getMinecraft();
+  public static MinecraftClient minecraft = MinecraftClient.getMinecraft();
 
   @Override
   public void init() {
-    final BlockColors blockColors = minecraft.getBlockColors();
+    final BlockColorMap blockColors = minecraft.getBlockColors();
 
     // stained glass
     blockColors.registerBlockColorHandler(
-        new IBlockColor() {
+        new BlockColorMapper() {
           @Override
           public int colorMultiplier(@Nonnull IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) {
             EnumGlassColor type = state.getValue(BlockClearStainedGlass.COLOR);
@@ -60,7 +60,7 @@ public class CommonsClientProxy extends ClientProxy {
         blockClearStainedGlass);
 
     minecraft.getItemColors().registerItemColorHandler(
-        new IItemColor() {
+        new ItemColorMapper() {
           @SuppressWarnings("deprecation")
           @Override
           public int getColorFromItemstack(@Nonnull ItemStack stack, int tintIndex) {

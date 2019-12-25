@@ -1,13 +1,13 @@
 package slimeknights.tconstruct.smeltery;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.item.ItemColorMap;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMap;
-import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.FluidStack;
@@ -108,13 +108,13 @@ public class SmelteryClientProxy extends ClientProxy {
     ClientRegistry.bindTileEntitySpecialRenderer(TileCastingBasin.class, new CastingRenderer.Basin());
 
     // Items
-    final ResourceLocation castLoc = SmelteryClientEvents.locBlankCast;
-    CustomTextureCreator.castModelLocation = new ResourceLocation(castLoc.getResourceDomain(), "item/" + castLoc.getResourcePath());
+    final Identifier castLoc = SmelteryClientEvents.locBlankCast;
+    CustomTextureCreator.castModelLocation = new Identifier(castLoc.getResourceDomain(), "item/" + castLoc.getResourcePath());
     ModelLoader.setCustomMeshDefinition(TinkerSmeltery.cast, new PatternMeshDefinition(castLoc));
 
     if(Config.claycasts) {
-      final ResourceLocation clayCastLoc = SmelteryClientEvents.locClayCast;
-      CustomTextureCreator.castModelLocation = new ResourceLocation(clayCastLoc.getResourceDomain(),
+      final Identifier clayCastLoc = SmelteryClientEvents.locClayCast;
+      CustomTextureCreator.castModelLocation = new Identifier(clayCastLoc.getResourceDomain(),
                                                                     "item/" + clayCastLoc.getResourcePath());
       ModelLoader.setCustomMeshDefinition(TinkerSmeltery.clayCast, new PatternMeshDefinition(clayCastLoc));
     }
@@ -124,10 +124,10 @@ public class SmelteryClientProxy extends ClientProxy {
 
   @Override
   public void init() {
-    Minecraft minecraft = Minecraft.getMinecraft();
+    MinecraftClient minecraft = MinecraftClient.getMinecraft();
 
     // slime channels
-    ItemColors colors = minecraft.getItemColors();
+    ItemColorMap colors = minecraft.getItemColors();
     colors.registerItemColorHandler(
         (@Nonnull ItemStack stack, int tintIndex) -> {
           if(!stack.hasTagCompound()) {

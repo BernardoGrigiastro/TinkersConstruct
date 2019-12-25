@@ -14,8 +14,8 @@ import mezz.jei.api.gui.IGuiFluidStackGroup;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.IRecipeCategory;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.Util;
@@ -23,7 +23,7 @@ import slimeknights.tconstruct.library.Util;
 public class AlloyRecipeCategory implements IRecipeCategory<AlloyRecipeWrapper> {
 
   public static String CATEGORY = Util.prefix("alloy");
-  public static ResourceLocation background_loc = Util.getResource("textures/gui/jei/smeltery.png");
+  public static Identifier background_loc = Util.getResource("textures/gui/jei/smeltery.png");
 
   protected final IDrawable background;
   protected final IDrawableAnimated arrow;
@@ -54,7 +54,7 @@ public class AlloyRecipeCategory implements IRecipeCategory<AlloyRecipeWrapper> 
   }
 
   @Override
-  public void drawExtras(@Nonnull Minecraft minecraft) {
+  public void drawExtras(@Nonnull MinecraftClient minecraft) {
     arrow.draw(minecraft, 76, 22);
   }
 

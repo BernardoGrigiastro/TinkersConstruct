@@ -1,8 +1,7 @@
 package slimeknights.tconstruct.common.config;
 
 import com.google.common.collect.Lists;
-
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.fml.client.IModGuiFactory;
@@ -36,7 +35,7 @@ public class ConfigGui extends GuiConfig {
   public static class ConfigGuiFactory implements IModGuiFactory {
 
     @Override
-    public void initialize(Minecraft minecraftInstance) {
+    public void initialize(MinecraftClient minecraftInstance) {
 
     }
 

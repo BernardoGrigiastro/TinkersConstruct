@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.library.client;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.Sprite;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -20,7 +20,7 @@ import slimeknights.tconstruct.library.client.texture.TinkerTexture;
 @SideOnly(Side.CLIENT)
 public interface MaterialRenderInfo {
 
-  TextureAtlasSprite getTexture(ResourceLocation baseTexture, String location);
+  Sprite getTexture(Identifier baseTexture, String location);
 
   boolean isStitched();
 
@@ -77,7 +77,7 @@ public interface MaterialRenderInfo {
     }
 
     @Override
-    public TextureAtlasSprite getTexture(ResourceLocation baseTexture, String location) {
+    public Sprite getTexture(Identifier baseTexture, String location) {
       return TinkerTexture.loadManually(baseTexture);
     }
 
@@ -112,7 +112,7 @@ public interface MaterialRenderInfo {
     }
 
     @Override
-    public TextureAtlasSprite getTexture(ResourceLocation baseTexture, String location) {
+    public Sprite getTexture(Identifier baseTexture, String location) {
       return new SimpleColoredTexture(low, mid, high, baseTexture, location);
     }
   }
@@ -124,7 +124,7 @@ public interface MaterialRenderInfo {
     }
 
     @Override
-    public TextureAtlasSprite getTexture(ResourceLocation baseTexture, String location) {
+    public Sprite getTexture(Identifier baseTexture, String location) {
       return new InverseColoredTexture(low, mid, high, baseTexture, location);
     }
   }
@@ -149,22 +149,22 @@ public interface MaterialRenderInfo {
 
 
     @Override
-    public TextureAtlasSprite getTexture(ResourceLocation baseTexture, String location) {
+    public Sprite getTexture(Identifier baseTexture, String location) {
       return new MetalColoredTexture(baseTexture, location, color, shinyness, brightness, hueshift);
     }
   }
 
   class MetalTextured extends Metal {
 
-    protected ResourceLocation extraTexture;
+    protected Identifier extraTexture;
 
-    public MetalTextured(ResourceLocation extraTexture, int color, float shinyness, float brightness, float hueshift) {
+    public MetalTextured(Identifier extraTexture, int color, float shinyness, float brightness, float hueshift) {
       super(color, shinyness, brightness, hueshift);
       this.extraTexture = extraTexture;
     }
 
     @Override
-    public TextureAtlasSprite getTexture(ResourceLocation baseTexture, String location) {
+    public Sprite getTexture(Identifier baseTexture, String location) {
       return new MetalTextureTexture(extraTexture, baseTexture, location, color, shinyness, brightness, hueshift);
     }
   }
@@ -174,21 +174,21 @@ public interface MaterialRenderInfo {
    */
   class BlockTexture extends AbstractMaterialRenderInfo {
 
-    protected ResourceLocation texturePath;
+    protected Identifier texturePath;
 
-    public BlockTexture(ResourceLocation texturePath) {
+    public BlockTexture(Identifier texturePath) {
       this.texturePath = texturePath;
     }
 
     @Override
-    public TextureAtlasSprite getTexture(ResourceLocation baseTexture, String location) {
-      TextureAtlasSprite blockTexture = Minecraft.getMinecraft().getTextureMapBlocks().getTextureExtry(texturePath.toString());
+    public Sprite getTexture(Identifier baseTexture, String location) {
+      Sprite blockTexture = MinecraftClient.getMinecraft().getTextureMapBlocks().getTextureExtry(texturePath.toString());
 
       if(blockTexture == null) {
         blockTexture = TinkerTexture.loadManually(texturePath);
       }
 
-      TextureColoredTexture sprite = new TextureColoredTexture(new ResourceLocation(blockTexture.getIconName()), baseTexture, location);
+      TextureColoredTexture sprite = new TextureColoredTexture(new Identifier(blockTexture.getIconName()), baseTexture, location);
       sprite.stencil = false;
       return sprite;
     }
@@ -208,14 +208,14 @@ public interface MaterialRenderInfo {
     }
 
     @Override
-    public TextureAtlasSprite getTexture(ResourceLocation baseTexture, String location) {
-      TextureAtlasSprite blockTexture = Minecraft.getMinecraft().getTextureMapBlocks().getTextureExtry(texturePath);
+    public Sprite getTexture(Identifier baseTexture, String location) {
+      Sprite blockTexture = MinecraftClient.getMinecraft().getTextureMapBlocks().getTextureExtry(texturePath);
 
       if(blockTexture == null) {
-        blockTexture = Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite();
+        blockTexture = MinecraftClient.getMinecraft().getTextureMapBlocks().getMissingSprite();
       }
 
-      TextureColoredTexture sprite = new AnimatedColoredTexture(new ResourceLocation(blockTexture.getIconName()), baseTexture, location);
+      TextureColoredTexture sprite = new AnimatedColoredTexture(new Identifier(blockTexture.getIconName()), baseTexture, location);
       return sprite;
     }
   }

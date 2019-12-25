@@ -1,10 +1,9 @@
 package slimeknights.tconstruct.plugin.jei.casting;
 
 import com.google.common.collect.ImmutableList;
-
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.fluids.FluidStack;
 
 import java.util.List;
@@ -28,7 +27,7 @@ import slimeknights.tconstruct.library.materials.Material;
 public class CastingRecipeCategory implements IRecipeCategory<CastingRecipeWrapper> {
 
   public static String CATEGORY = Util.prefix("casting_table");
-  public static ResourceLocation background_loc = Util.getResource("textures/gui/jei/casting.png");
+  public static Identifier background_loc = Util.getResource("textures/gui/jei/casting.png");
 
   protected final IDrawable background;
   protected final IDrawableAnimated arrow;
@@ -65,7 +64,7 @@ public class CastingRecipeCategory implements IRecipeCategory<CastingRecipeWrapp
   }
 
   @Override
-  public void drawExtras(@Nonnull Minecraft minecraft) {
+  public void drawExtras(@Nonnull MinecraftClient minecraft) {
     arrow.draw(minecraft, 79, 25);
   }
 

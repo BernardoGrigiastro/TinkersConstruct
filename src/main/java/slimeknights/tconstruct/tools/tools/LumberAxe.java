@@ -14,8 +14,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemAxe;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -43,10 +43,10 @@ import slimeknights.tconstruct.tools.TinkerTools;
 
 public class LumberAxe extends AoeToolCore {
 
-  public static final ImmutableSet<net.minecraft.block.material.Material> effective_materials =
-      ImmutableSet.of(net.minecraft.block.material.Material.WOOD,
-                      net.minecraft.block.material.Material.GOURD,
-                      net.minecraft.block.material.Material.CACTUS);
+  public static final ImmutableSet<net.minecraft.block.Material> effective_materials =
+      ImmutableSet.of(net.minecraft.block.Material.WOOD,
+                      net.minecraft.block.Material.PUMPKIN,
+                      net.minecraft.block.Material.CACTUS);
   public static final float DURABILITY_MODIFIER = 2f;
 
   public LumberAxe() {
@@ -62,7 +62,7 @@ public class LumberAxe extends AoeToolCore {
   }
 
   @Override
-  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
     if(this.isInCreativeTab(tab)) {
       addDefaultSubItems(subItems);
       addInfiTool(subItems, "InfiChopper");
@@ -204,7 +204,7 @@ public class LumberAxe extends AoeToolCore {
   }
 
   public static boolean fellTree(ItemStack itemstack, BlockPos start, EntityPlayer player) {
-    if(player.getEntityWorld().isRemote) {
+    if(player.getEntityWorld().isClient) {
       return true;
     }
     TinkerToolEvent.ExtraBlockBreak event = TinkerToolEvent.ExtraBlockBreak.fireEvent(itemstack, player, player.getEntityWorld().getBlockState(start), 3, 3, 3, -1);
@@ -243,7 +243,7 @@ public class LumberAxe extends AoeToolCore {
         return;
       }
       // only if same dimension
-      if(event.world.provider.getDimension() != world.provider.getDimension()) {
+      if(event.world.dimension.getDimension() != world.dimension.getDimension()) {
         return;
       }
 

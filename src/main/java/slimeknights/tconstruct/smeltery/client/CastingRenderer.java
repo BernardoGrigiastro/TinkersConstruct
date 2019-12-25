@@ -2,7 +2,7 @@ package slimeknights.tconstruct.smeltery.client;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPane;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -120,8 +120,8 @@ public class CastingRenderer<T extends TileCasting> extends TileEntitySpecialRen
       //GL14.glBlendColor(1f, 1f, 1f, 1f); // debug
 
       GL11.glDepthMask(false);
-      IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(stack, te.getWorld(), null);
-      Minecraft.getMinecraft().getRenderItem().renderItem(stack, model);
+      IBakedModel model = MinecraftClient.getMinecraft().getRenderItem().getItemModelWithOverrides(stack, te.getWorld(), null);
+      MinecraftClient.getMinecraft().getRenderItem().renderItem(stack, model);
       GL11.glDepthMask(true);
       GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
       RenderUtil.post();

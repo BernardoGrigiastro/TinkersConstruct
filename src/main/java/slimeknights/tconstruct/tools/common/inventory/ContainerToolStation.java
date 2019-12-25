@@ -1,15 +1,15 @@
 package slimeknights.tconstruct.tools.common.inventory;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.StringUtils;
+import net.minecraft.util.ChatUtil;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.world.WorldServer;
 
 import java.util.List;
@@ -130,7 +130,7 @@ public class ContainerToolStation extends ContainerTinkerStation<TileToolStation
     this.toolName = name;
 
     if(world.isRemote) {
-      GuiScreen screen = Minecraft.getMinecraft().currentScreen;
+      GuiScreen screen = MinecraftClient.getMinecraft().currentScreen;
       if(screen instanceof GuiToolStation) {
         ((GuiToolStation) screen).textField.setText(name);
       }
@@ -149,7 +149,7 @@ public class ContainerToolStation extends ContainerTinkerStation<TileToolStation
 
   // update crafting - called whenever the content of an input slot changes
   @Override
-  public void onCraftMatrixChanged(IInventory inventoryIn) {
+  public void onCraftMatrixChanged(Inventory inventoryIn) {
     // reset gui state
     updateGUI();
     try {
@@ -255,7 +255,7 @@ public class ContainerToolStation extends ContainerTinkerStation<TileToolStation
       return ItemStack.EMPTY;
     }
 
-    NonNullList<ItemStack> inputs = getInputs();
+    DefaultedList<ItemStack> inputs = getInputs();
     ItemStack result = ToolBuilder.tryReplaceToolParts(tool, inputs, remove);
     if(!result.isEmpty()) {
       TinkerCraftingEvent.ToolPartReplaceEvent.fireEvent(result, player, inputs);
@@ -284,7 +284,7 @@ public class ContainerToolStation extends ContainerTinkerStation<TileToolStation
     // modifying possible?
     if(tool.isEmpty() ||
        !(tool.getItem() instanceof TinkersItem) ||
-       StringUtils.isNullOrEmpty(toolName) ||
+       ChatUtil.isNullOrEmpty(toolName) ||
        tool.getDisplayName().equals(toolName)) {
       return ItemStack.EMPTY;
     }
@@ -300,7 +300,7 @@ public class ContainerToolStation extends ContainerTinkerStation<TileToolStation
   }
 
   private ItemStack buildTool() throws TinkerGuiException {
-    NonNullList<ItemStack> input = ItemStackList.withSize(tile.getSizeInventory());
+    DefaultedList<ItemStack> input = ItemStackList.withSize(tile.getSizeInventory());
     for(int i = 0; i < input.size(); i++) {
       input.set(i, tile.getStackInSlot(i));
     }
@@ -333,8 +333,8 @@ public class ContainerToolStation extends ContainerTinkerStation<TileToolStation
     }
   }
 
-  private NonNullList<ItemStack> getInputs() {
-    NonNullList<ItemStack> input = NonNullList.withSize(tile.getSizeInventory() - 1, ItemStack.EMPTY);
+  private DefaultedList<ItemStack> getInputs() {
+    DefaultedList<ItemStack> input = DefaultedList.withSize(tile.getSizeInventory() - 1, ItemStack.EMPTY);
     for(int i = 1; i < tile.getSizeInventory(); i++) {
       input.set(i - 1, tile.getStackInSlot(i));
     }

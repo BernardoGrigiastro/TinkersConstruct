@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.library.client;
 
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.IItemPropertyGetter;
+import net.minecraft.item.ItemPropertyGetter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -9,7 +9,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
-public abstract class BooleanItemPropertyGetter implements IItemPropertyGetter {
+public abstract class BooleanItemPropertyGetter implements ItemPropertyGetter {
 
   @Override
   @SideOnly(Side.CLIENT)

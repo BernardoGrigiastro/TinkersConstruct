@@ -3,7 +3,7 @@ package slimeknights.tconstruct.tools.common.client.module;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -39,7 +39,7 @@ public class GuiSideInventory extends GuiModule {
   protected GuiElementScalable sliderBackground = GuiGeneric.sliderBackground;
 
   // we use the chest gui as a preset for our parts
-  protected static final ResourceLocation
+  protected static final Identifier
       GUI_INVENTORY =
       Util.getResource("textures/gui/generic.png");
 

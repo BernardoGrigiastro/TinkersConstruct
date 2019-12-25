@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.gadgets.block;
 
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -21,11 +21,11 @@ public class BlockBrownstoneSlab2 extends EnumBlockSlab<BlockBrownstoneSlab2.Bro
   public final static PropertyEnum<BrownstoneType> TYPE = PropertyEnum.create("type", BrownstoneType.class);
 
   public BlockBrownstoneSlab2() {
-    super(Material.ROCK, TYPE, BrownstoneType.class);
+    super(Material.STONE, TYPE, BrownstoneType.class);
     this.setCreativeTab(TinkerRegistry.tabGadgets);
     this.setHardness(3F);
     this.setResistance(20F);
-    this.setSoundType(SoundType.STONE);
+    this.setSoundType(BlockSoundGroup.STONE);
   }
 
   @Override
@@ -48,7 +48,7 @@ public class BlockBrownstoneSlab2 extends EnumBlockSlab<BlockBrownstoneSlab2.Bro
     return TinkerGadgets.brownstone.getDefaultState().withProperty(BlockBrownstone.TYPE, state.getValue(TYPE).asBrownstone());
   }
 
-  public enum BrownstoneType implements IStringSerializable, EnumBlock.IEnumMeta {
+  public enum BrownstoneType implements StringRepresentable, EnumBlock.IEnumMeta {
     CREEPER,
     BRICK_TRIANGLE,
     BRICK_SMALL,

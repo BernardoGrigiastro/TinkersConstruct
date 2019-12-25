@@ -6,9 +6,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.Recipe;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.CraftingHelper;
@@ -380,7 +380,7 @@ public class TinkerCommons extends TinkerPulse {
   }
 
   @SubscribeEvent
-  public void registerRecipes(Register<IRecipe> event) {
+  public void registerRecipes(Register<Recipe> event) {
     // replace the vanilla slimeblock recipe with one that does not conflict with our slimeblocks
     CraftingHelper.ShapedPrimer primer = CraftingHelper.parseShaped("###", "###", "###", '#', "slimeball");
     Ingredient[] ignore = new Ingredient[] {

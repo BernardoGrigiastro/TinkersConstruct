@@ -32,14 +32,14 @@ public class TraitHovering extends AbstractProjectileTrait {
 
     projectile.motionY += projectile.getGravity()*95d/100d;
 
-    if(world.isRemote && random.nextInt(2) == 0) {
+    if(world.isClient && random.nextInt(2) == 0) {
       float vx = (random.nextFloat()-0.5f)/15f;
       float vy = (random.nextFloat())/15f;
       float vz = (random.nextFloat()-0.5f)/15f;
       world.spawnParticle(EnumParticleTypes.FLAME,
-                          projectile.posX,
-                          projectile.posY,
-                          projectile.posZ,
+                          projectile.x,
+                          projectile.y,
+                          projectile.z,
                           vx, vy, vz);
     }
   }

@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.item.ItemStack;
@@ -40,7 +40,7 @@ public class BakedColoredItemModel extends BakedWrapper {
     boolean didColorQuads = false;
 
     for(int i = 0; i < MAX_SUPPORTED_TINT_INDEX; i++) {
-      int color = Minecraft.getMinecraft().getItemColors().getColorFromItemstack(itemStack, i);
+      int color = MinecraftClient.getMinecraft().getItemColors().getColorFromItemstack(itemStack, i);
       if(color == -1) {
         continue;
       }

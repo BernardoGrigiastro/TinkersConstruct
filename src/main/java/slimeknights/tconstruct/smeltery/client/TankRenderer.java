@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.smeltery.client;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraftforge.fluids.FluidStack;
 
@@ -12,7 +12,7 @@ import slimeknights.tconstruct.smeltery.tileentity.TileTank;
 
 public class TankRenderer extends TileEntitySpecialRenderer<TileTank> {
 
-  protected static Minecraft mc = Minecraft.getMinecraft();
+  protected static MinecraftClient mc = MinecraftClient.getMinecraft();
 
   @Override
   public void render(@Nonnull TileTank tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {

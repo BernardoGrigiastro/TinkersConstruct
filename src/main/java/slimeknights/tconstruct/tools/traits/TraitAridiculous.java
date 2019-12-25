@@ -2,8 +2,8 @@ package slimeknights.tconstruct.tools.traits;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.TextFormat;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -16,7 +16,7 @@ import slimeknights.tconstruct.library.traits.AbstractTrait;
 public class TraitAridiculous extends AbstractTrait {
 
   public TraitAridiculous() {
-    super("aridiculous", TextFormatting.DARK_RED);
+    super("aridiculous", TextFormat.field_1079);
   }
 
   @Override

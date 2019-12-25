@@ -2,12 +2,12 @@ package slimeknights.tconstruct.world.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockVine;
-import net.minecraft.block.SoundType;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -25,7 +25,7 @@ public class BlockSlimeVine extends BlockVine {
 
   public BlockSlimeVine(FoliageType foliage, BlockSlimeVine nextStage) {
     this.setCreativeTab(TinkerRegistry.tabWorld);
-    this.setSoundType(SoundType.PLANT);
+    this.setSoundType(BlockSoundGroup.GRASS);
 
     this.foliage = foliage;
     this.nextStage = nextStage;
@@ -60,7 +60,7 @@ public class BlockSlimeVine extends BlockVine {
 
   @Override
   public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
-    if(world.isRemote) {
+    if(world.isClient) {
       return;
     }
 
@@ -97,7 +97,7 @@ public class BlockSlimeVine extends BlockVine {
 
   @Override
   public void updateTick(World worldIn, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull Random rand) {
-    if(!worldIn.isRemote) {
+    if(!worldIn.isClient) {
       if(rand.nextInt(4) == 0) {
         grow(worldIn, rand, pos, state);
       }

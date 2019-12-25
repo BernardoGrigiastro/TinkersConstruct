@@ -10,10 +10,10 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonUtils;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.IRecipeFactory;
 import net.minecraftforge.common.crafting.JsonContext;
@@ -24,7 +24,7 @@ import slimeknights.tconstruct.shared.block.BlockTable;
 
 public class TableRecipeFactory implements IRecipeFactory {
   @Override
-  public IRecipe parse(JsonContext context, JsonObject json) {
+  public Recipe parse(JsonContext context, JsonObject json) {
     ShapedOreRecipe recipe = ShapedOreRecipe.factory(context, json);
 
     ShapedPrimer primer = new ShapedPrimer();
@@ -35,7 +35,7 @@ public class TableRecipeFactory implements IRecipeFactory {
 
     JsonElement elem = getElement(json, "variants");
 
-    return new TableRecipe(recipe.getGroup().isEmpty() ? null : new ResourceLocation(recipe.getGroup()), CraftingHelper.getIngredient(elem, context), recipe.getRecipeOutput(), primer);
+    return new TableRecipe(recipe.getGroup().isEmpty() ? null : new Identifier(recipe.getGroup()), CraftingHelper.getIngredient(elem, context), recipe.getRecipeOutput(), primer);
   }
 
   public static JsonElement getElement(JsonObject json, String memberName) {
@@ -50,7 +50,7 @@ public class TableRecipeFactory implements IRecipeFactory {
   public static class TableRecipe extends ShapedOreRecipe {
     public final Ingredient ingredients; // first one found of these determines the output block used
 
-    public TableRecipe(ResourceLocation group, Ingredient ingredientIn, ItemStack result, ShapedPrimer primer) {
+    public TableRecipe(Identifier group, Ingredient ingredientIn, ItemStack result, ShapedPrimer primer) {
       super(group, result, primer);
 
       this.ingredients = ingredientIn;

@@ -3,13 +3,13 @@ package slimeknights.tconstruct.library.tools;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -48,7 +48,7 @@ public class ToolPart extends MaterialItem implements IToolPart {
   }
 
   @Override
-  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
     if(this.isInCreativeTab(tab)) {
       for(Material mat : TinkerRegistry.getAllMaterials()) {
         // check if the material makes sense for this item (is it usable to build stuff?)
@@ -77,7 +77,7 @@ public class ToolPart extends MaterialItem implements IToolPart {
 
   @SideOnly(Side.CLIENT)
   @Override
-  public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+  public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, TooltipContext flagIn) {
     Material material = getMaterial(stack);
 
     // Material traits/info
@@ -137,10 +137,10 @@ public class ToolPart extends MaterialItem implements IToolPart {
       // add the traits in "Stattype: Trait1, Trait2,..." style
       StringBuilder sb = new StringBuilder();
       if(withType) {
-        sb.append(TextFormatting.ITALIC.toString());
+        sb.append(TextFormat.field_1056.toString());
         sb.append(entry.getKey());
         sb.append(": ");
-        sb.append(TextFormatting.RESET.toString());
+        sb.append(TextFormat.RESET.toString());
       }
       sb.append(material.getTextColor());
       List<ITrait> traits = entry.getValue();
@@ -167,7 +167,7 @@ public class ToolPart extends MaterialItem implements IToolPart {
         List<String> text = stat.getLocalizedInfo();
         if(!text.isEmpty()) {
           builder.add("");
-          builder.add(TextFormatting.WHITE.toString() + TextFormatting.UNDERLINE + stat.getLocalizedName());
+          builder.add(TextFormat.field_1068.toString() + TextFormat.field_1073 + stat.getLocalizedName());
           builder.addAll(stat.getLocalizedInfo());
         }
       }
@@ -206,7 +206,7 @@ public class ToolPart extends MaterialItem implements IToolPart {
   @Nonnull
   @SideOnly(Side.CLIENT)
   @Override
-  public FontRenderer getFontRenderer(ItemStack stack) {
+  public TextRenderer getFontRenderer(ItemStack stack) {
     return ClientProxy.fontRenderer;
   }
 

@@ -9,15 +9,15 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.NonNullList;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.IForgeRegistryEntry.Impl;
 import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.tinkering.TinkersItem;
 import slimeknights.tconstruct.tools.TinkerTools;
 
-public class RepairRecipe extends Impl<IRecipe> implements IRecipe {
+public class RepairRecipe extends Impl<Recipe> implements Recipe {
 
   public RepairRecipe() {
     this.setRegistryName(Util.getResource("repair"));
@@ -40,7 +40,7 @@ public class RepairRecipe extends Impl<IRecipe> implements IRecipe {
   private ItemStack getRepairedTool(@Nonnull InventoryCrafting inv, boolean simulate) {
 
     ItemStack tool = null;
-    NonNullList<ItemStack> input = NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+    DefaultedList<ItemStack> input = DefaultedList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
 
     for(int i = 0; i < inv.getSizeInventory(); i++) {
       ItemStack slot = inv.getStackInSlot(i);
@@ -91,8 +91,8 @@ public class RepairRecipe extends Impl<IRecipe> implements IRecipe {
   }
 
   @Override
-  public NonNullList<ItemStack> getRemainingItems(@Nonnull InventoryCrafting inv) {
-    return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+  public DefaultedList<ItemStack> getRemainingItems(@Nonnull InventoryCrafting inv) {
+    return DefaultedList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
   }
 
   @Override

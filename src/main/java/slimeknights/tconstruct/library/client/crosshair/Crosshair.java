@@ -1,13 +1,13 @@
 package slimeknights.tconstruct.library.client.crosshair;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -18,21 +18,21 @@ import slimeknights.tconstruct.library.Util;
 @SideOnly(Side.CLIENT)
 public class Crosshair implements ICrosshair {
 
-  private final ResourceLocation texture;
+  private final Identifier texture;
   private final int size;
 
-  public Crosshair(ResourceLocation texture) {
+  public Crosshair(Identifier texture) {
     this(texture, 16);
   }
 
-  public Crosshair(ResourceLocation texture, int size) {
+  public Crosshair(Identifier texture, int size) {
     this.texture = texture;
     this.size = size;
   }
 
   @Override
   public void render(float charge, float width, float height, float partialTicks) {
-    Minecraft mc = Minecraft.getMinecraft();
+    MinecraftClient mc = MinecraftClient.getMinecraft();
 
     mc.getTextureManager().bindTexture(texture);
     GlStateManager.enableBlend();
@@ -87,7 +87,7 @@ public class Crosshair implements ICrosshair {
 
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder vb = tessellator.getBuffer();
-    vb.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+    vb.begin(GL11.GL_QUADS, VertexFormats.POSITION_UV);
     vb.pos(x - s, y - s, z).tex(u1, v1).endVertex();
     vb.pos(x - s, y + s, z).tex(u1, v2).endVertex();
     vb.pos(x + s, y + s, z).tex(u2, v2).endVertex();

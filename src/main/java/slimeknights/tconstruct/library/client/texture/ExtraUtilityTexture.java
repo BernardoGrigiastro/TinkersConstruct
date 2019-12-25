@@ -1,8 +1,7 @@
 package slimeknights.tconstruct.library.client.texture;
 
-import net.minecraft.util.ResourceLocation;
-
 import java.awt.image.DirectColorModel;
+import net.minecraft.util.Identifier;
 
 /**
  * All Logic by RWTema
@@ -13,7 +12,7 @@ public class ExtraUtilityTexture extends AbstractColoredTexture {
   boolean[] trans;
   boolean[] edge;
 
-  public ExtraUtilityTexture(ResourceLocation baseTexture,
+  public ExtraUtilityTexture(Identifier baseTexture,
                              String spriteName) {
     super(baseTexture, spriteName);
   }

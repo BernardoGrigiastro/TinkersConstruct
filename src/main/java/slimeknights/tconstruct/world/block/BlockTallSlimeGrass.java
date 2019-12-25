@@ -3,7 +3,6 @@ package slimeknights.tconstruct.world.block;
 import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
-import net.minecraft.block.SoundType;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -11,10 +10,11 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.DefaultedList;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.EnumPlantType;
@@ -38,11 +38,11 @@ public class BlockTallSlimeGrass extends BlockBush implements IShearable {
 
   public BlockTallSlimeGrass() {
     setCreativeTab(TinkerRegistry.tabWorld);
-    this.setSoundType(SoundType.PLANT);
+    this.setSoundType(BlockSoundGroup.GRASS);
   }
 
   @Override
-  public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
     for(SlimePlantType type : SlimePlantType.values()) {
       for(FoliageType foliage : FoliageType.values()) {
         list.add(new ItemStack(this, 1, getMetaFromState(getDefaultState().withProperty(TYPE, type).withProperty(FOLIAGE, foliage))));
@@ -93,7 +93,7 @@ public class BlockTallSlimeGrass extends BlockBush implements IShearable {
 
   @Nonnull
   @Override
-  public ItemStack getPickBlock(@Nonnull IBlockState state, RayTraceResult target, @Nonnull World world, @Nonnull BlockPos pos, EntityPlayer player) {
+  public ItemStack getPickBlock(@Nonnull IBlockState state, HitResult target, @Nonnull World world, @Nonnull BlockPos pos, EntityPlayer player) {
     int meta = this.getMetaFromState(state);
     return new ItemStack(Item.getItemFromBlock(this), 1, meta);
   }
@@ -141,7 +141,7 @@ public class BlockTallSlimeGrass extends BlockBush implements IShearable {
     return Lists.newArrayList(stack);
   }
 
-  public enum SlimePlantType implements IStringSerializable, EnumBlock.IEnumMeta {
+  public enum SlimePlantType implements StringRepresentable, EnumBlock.IEnumMeta {
     TALL_GRASS,
     FERN;
 

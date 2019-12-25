@@ -1,7 +1,9 @@
 package slimeknights.tconstruct.smeltery.block;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.BlockRenderLayer;
+import net.minecraft.block.Material;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
@@ -10,15 +12,13 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -44,14 +44,14 @@ public class BlockCasting extends BlockInventory implements IFaucetDepth {
   public static final PropertyEnum<CastingType> TYPE = PropertyEnum.create("type", CastingType.class);
 
   public BlockCasting() {
-    super(Material.ROCK);
+    super(Material.STONE);
     setHardness(3F);
     setResistance(20F);
     setCreativeTab(TinkerRegistry.tabSmeltery);
   }
 
   @Override
-  public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
     for(CastingType type : CastingType.values()) {
       list.add(new ItemStack(this, 1, type.getMeta()));
     }
@@ -84,7 +84,7 @@ public class BlockCasting extends BlockInventory implements IFaucetDepth {
 
   @Nonnull
   @Override
-  public TileEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
+  public BlockEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
     switch(getStateFromMeta(meta).getValue(TYPE)) {
       case TABLE:
         return new TileCastingTable();
@@ -99,7 +99,7 @@ public class BlockCasting extends BlockInventory implements IFaucetDepth {
     if(playerIn.isSneaking()) {
       return false;
     }
-    TileEntity te = worldIn.getTileEntity(pos);
+    BlockEntity te = worldIn.getTileEntity(pos);
     if(te instanceof TileCasting) {
       ((TileCasting) te).interact(playerIn);
       return true;
@@ -112,7 +112,7 @@ public class BlockCasting extends BlockInventory implements IFaucetDepth {
     super.onBlockPlacedBy(world, pos, state, placer, stack);
 
     // we have rotation for the stuff too so the items inside rotate according to placement!
-    TileEntity te = world.getTileEntity(pos);
+    BlockEntity te = world.getTileEntity(pos);
     if(te != null && te instanceof TileCasting) {
       ((TileCasting) te).setFacing(placer.getHorizontalFacing().getOpposite());
     }
@@ -124,7 +124,7 @@ public class BlockCasting extends BlockInventory implements IFaucetDepth {
   public IBlockState getExtendedState(@Nonnull IBlockState state, IBlockAccess world, BlockPos pos) {
     IExtendedBlockState extendedState = (IExtendedBlockState) state;
 
-    TileEntity te = world.getTileEntity(pos);
+    BlockEntity te = world.getTileEntity(pos);
     if(te != null && te instanceof TileCasting) {
       TileCasting tile = (TileCasting) te;
       return tile.writeExtendedBlockState(extendedState);
@@ -143,23 +143,23 @@ public class BlockCasting extends BlockInventory implements IFaucetDepth {
   }
 
   /* Bounds */
-  private static ImmutableList<AxisAlignedBB> BOUNDS_Table = ImmutableList.of(
-      new AxisAlignedBB(0, 0.625, 0, 1, 1, 1),
-      new AxisAlignedBB(0,    0, 0,    0.25, 0.625, 0.25),
-      new AxisAlignedBB(0.75, 0, 0,    1,    0.625, 0.25),
-      new AxisAlignedBB(0.75, 0, 0.75, 1,    0.625, 1),
-      new AxisAlignedBB(0,    0, 0.75, 0.25, 0.625, 1)
+  private static ImmutableList<BoundingBox> BOUNDS_Table = ImmutableList.of(
+      new BoundingBox(0, 0.625, 0, 1, 1, 1),
+      new BoundingBox(0,    0, 0,    0.25, 0.625, 0.25),
+      new BoundingBox(0.75, 0, 0,    1,    0.625, 0.25),
+      new BoundingBox(0.75, 0, 0.75, 1,    0.625, 1),
+      new BoundingBox(0,    0, 0.75, 0.25, 0.625, 1)
   );
-  private static ImmutableList<AxisAlignedBB> BOUNDS_Basin = ImmutableList.of(
-      new AxisAlignedBB(0, 0.25, 0, 1, 1, 1),
-      new AxisAlignedBB(0,      0, 0,      0.3125, 0.25, 0.3125),
-      new AxisAlignedBB(0.6875, 0, 0,      1,      0.25, 0.3125),
-      new AxisAlignedBB(0.6875, 0, 0.6875, 1,      0.25, 1),
-      new AxisAlignedBB(0,      0, 0.6875, 0.3125, 0.25, 1)
+  private static ImmutableList<BoundingBox> BOUNDS_Basin = ImmutableList.of(
+      new BoundingBox(0, 0.25, 0, 1, 1, 1),
+      new BoundingBox(0,      0, 0,      0.3125, 0.25, 0.3125),
+      new BoundingBox(0.6875, 0, 0,      1,      0.25, 0.3125),
+      new BoundingBox(0.6875, 0, 0.6875, 1,      0.25, 1),
+      new BoundingBox(0,      0, 0.6875, 0.3125, 0.25, 1)
   );
 
   @Override
-  public RayTraceResult collisionRayTrace(IBlockState blockState, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Vec3d start, @Nonnull Vec3d end) {
+  public HitResult collisionRayTrace(IBlockState blockState, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Vec3d start, @Nonnull Vec3d end) {
     if(blockState.getValue(TYPE) == CastingType.BASIN) {
       return BlockTable.raytraceMultiAABB(BOUNDS_Basin, pos, start, end);
     }
@@ -196,7 +196,7 @@ public class BlockCasting extends BlockInventory implements IFaucetDepth {
 
   @Override
   public int getComparatorInputOverride(IBlockState blockState, World world, BlockPos pos) {
-    TileEntity te = world.getTileEntity(pos);
+    BlockEntity te = world.getTileEntity(pos);
     if(!(te instanceof TileCasting)) {
       return 0;
     }
@@ -219,7 +219,7 @@ public class BlockCasting extends BlockInventory implements IFaucetDepth {
     }
   }
 
-  public enum CastingType implements IStringSerializable, EnumBlock.IEnumMeta {
+  public enum CastingType implements StringRepresentable, EnumBlock.IEnumMeta {
     TABLE,
     BASIN;
 

@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.library.client.texture;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 import java.awt.*;
@@ -14,7 +14,7 @@ public class MetalColoredTexture extends AbstractColoredTexture {
   protected float brightness;
   protected float hueshift;
 
-  public MetalColoredTexture(ResourceLocation baseTexture, String spriteName, int baseColor, float shinyness, float brightness, float hueshift) {
+  public MetalColoredTexture(Identifier baseTexture, String spriteName, int baseColor, float shinyness, float brightness, float hueshift) {
     super(baseTexture, spriteName);
     this.baseColor = baseColor;
     this.shinyness = shinyness;

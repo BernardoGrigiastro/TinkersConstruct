@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.smeltery.network;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -33,7 +33,7 @@ public class HeatingStructureFuelUpdatePacket extends AbstractPacketThreadsafe {
 
   @Override
   public void handleClientSafe(NetHandlerPlayClient netHandler) {
-    TileEntity te = Minecraft.getMinecraft().world.getTileEntity(pos);
+    BlockEntity te = MinecraftClient.getMinecraft().world.getTileEntity(pos);
     if(te instanceof TileHeatingStructureFuelTank) {
       TileHeatingStructureFuelTank structure = (TileHeatingStructureFuelTank) te;
       structure.currentFuel = fuel;

@@ -70,7 +70,7 @@ public class TraitAutosmelt extends AbstractTrait {
 
   @Override
   public void afterBlockBreak(ItemStack tool, World world, IBlockState state, BlockPos pos, EntityLivingBase player, boolean wasEffective) {
-    if(world.isRemote && wasEffective) {
+    if(world.isClient && wasEffective) {
       for(int i = 0; i < 3; i++) {
         world.spawnParticle(EnumParticleTypes.FLAME,
                             pos.getX() + random.nextDouble(),

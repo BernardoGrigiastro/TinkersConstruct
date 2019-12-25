@@ -5,8 +5,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.text.TextFormat;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 
@@ -35,7 +35,7 @@ public class ToolGrowth extends TraitProgressiveStats {
   protected static float ATTACK_STEP = 0.01f;
 
   public ToolGrowth() {
-    super("toolgrowth", TextFormatting.WHITE);
+    super("toolgrowth", TextFormat.field_1068);
 
     this.addAspects(new ModifierAspect.SingleAspect(this));
   }
@@ -50,7 +50,7 @@ public class ToolGrowth extends TraitProgressiveStats {
   // Distributing stats from the pool
   @Override
   public void onUpdate(ItemStack tool, World world, Entity entity, int itemSlot, boolean isSelected) {
-    if(entity instanceof FakePlayer || world.isRemote) {
+    if(entity instanceof FakePlayer || world.isClient) {
       return;
     }
     // we only distribute every minute or so
@@ -134,7 +134,7 @@ public class ToolGrowth extends TraitProgressiveStats {
   // Filling the pool with speed
   @Override
   public void afterBlockBreak(ItemStack tool, World world, IBlockState state, BlockPos pos, EntityLivingBase player, boolean wasEffective) {
-    if(player instanceof FakePlayer || world.isRemote) {
+    if(player instanceof FakePlayer || world.isClient) {
       return;
     }
     // 10% chance to gain stats on effective blockbreak
@@ -159,7 +159,7 @@ public class ToolGrowth extends TraitProgressiveStats {
   // Filling the pool with damage
   @Override
   public void afterHit(ItemStack tool, EntityLivingBase player, EntityLivingBase target, float damageDealt, boolean wasCritical, boolean wasHit) {
-    if(player instanceof FakePlayer || player.getEntityWorld().isRemote) {
+    if(player instanceof FakePlayer || player.getEntityWorld().isClient) {
       return;
     }
     // 10% chance on hit to gain stats

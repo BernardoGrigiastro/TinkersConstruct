@@ -11,8 +11,8 @@ import net.minecraft.init.Enchantments;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IShearable;
 
@@ -114,7 +114,7 @@ public class Scythe extends Kama {
     }
 
     // AOE attack!
-    player.getEntityWorld().playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, player.getSoundCategory(), 1.0F, 1.0F);
+    player.getEntityWorld().playSound(null, player.x, player.y, player.z, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, player.getSoundCategory(), 1.0F, 1.0F);
     player.spawnSweepParticles();
 
     int distance = event.distance;
@@ -137,7 +137,7 @@ public class Scythe extends Kama {
   private List<Entity> getAoeEntities(EntityPlayer player, Entity target, TinkerToolEvent.ExtraBlockBreak event) {
     int width = (event.width - 1) / 2;
     int height = (event.width - 1) / 2;
-    AxisAlignedBB box = new AxisAlignedBB(target.posX, target.posY, target.posZ, target.posX + 1.0D, target.posY + 1.0D, target.posZ + 1.0D).expand(width, height, width);
+    BoundingBox box = new BoundingBox(target.x, target.y, target.z, target.x + 1.0D, target.y + 1.0D, target.z + 1.0D).expand(width, height, width);
 
     return player.getEntityWorld().getEntitiesWithinAABBExcludingEntity(player, box);
   }

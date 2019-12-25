@@ -1,6 +1,7 @@
 package slimeknights.tconstruct.smeltery.block;
 
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
@@ -8,7 +9,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -50,7 +50,7 @@ public abstract class BlockMultiblockController extends BlockInventoryTinkers {
   }
 
   protected TileMultiblock<?> getTile(IBlockAccess world, BlockPos pos) {
-    TileEntity te = world.getTileEntity(pos);
+    BlockEntity te = world.getTileEntity(pos);
     if(te instanceof TileMultiblock) {
       return ((TileMultiblock<?>) te);
     }

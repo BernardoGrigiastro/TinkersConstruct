@@ -2,14 +2,14 @@ package slimeknights.tconstruct.smeltery.client;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -59,11 +59,11 @@ public class FaucetRenderer extends TileEntitySpecialRenderer<TileFaucet> {
 
       Tessellator tessellator = Tessellator.getInstance();
       BufferBuilder renderer = tessellator.getBuffer();
-      renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-      Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+      renderer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR_UV_LMAP);
+      MinecraftClient.getMinecraft().textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
       int color = te.drained.getFluid().getColor(te.drained);
       int brightness = te.getWorld().getCombinedLight(te.getPos(), te.drained.getFluid().getLuminosity());
-      TextureAtlasSprite flowing = Minecraft.getMinecraft().getTextureMapBlocks().getTextureExtry(te.drained.getFluid().getFlowing(te.drained).toString());
+      Sprite flowing = MinecraftClient.getMinecraft().getTextureMapBlocks().getTextureExtry(te.drained.getFluid().getFlowing(te.drained).toString());
 
       GlStateManager.translate(o, 0, o);
       GlStateManager.rotate(r, 0, 1, 0);

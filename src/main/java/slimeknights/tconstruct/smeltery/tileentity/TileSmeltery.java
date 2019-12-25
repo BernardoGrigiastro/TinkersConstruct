@@ -4,15 +4,15 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fluids.FluidStack;
@@ -213,7 +213,7 @@ public class TileSmeltery extends TileHeatingStructureFuelTank<MultiblockSmelter
   protected void interactWithEntitiesInside() {
     // find all entities inside the smeltery
 
-    AxisAlignedBB bb = info.getBoundingBox().contract(-2, -1, -2).offset(-1, 0, -1);
+    BoundingBox bb = info.getBoundingBox().contract(-2, -1, -2).offset(-1, 0, -1);
 
     List<Entity> entities = getWorld().getEntitiesWithinAABB(Entity.class, bb);
     for(Entity entity : entities) {
@@ -244,7 +244,7 @@ public class TileSmeltery extends TileHeatingStructureFuelTank<MultiblockSmelter
         FluidStack fluid = TinkerRegistry.getMeltingForEntity(entity);
         // no custom melting but a living entity that's alive?
         if(fluid == null && entity instanceof EntityLivingBase) {
-          if(entity.isEntityAlive() && !entity.isDead) {
+          if(entity.isEntityAlive() && !entity.removed) {
             fluid = new FluidStack(TinkerFluids.blood, 20);
           }
         }
@@ -340,11 +340,11 @@ public class TileSmeltery extends TileHeatingStructureFuelTank<MultiblockSmelter
 
   @Nonnull
   @Override
-  public AxisAlignedBB getRenderBoundingBox() {
+  public BoundingBox getRenderBoundingBox() {
     if(minPos == null || maxPos == null) {
       return super.getRenderBoundingBox();
     }
-    return new AxisAlignedBB(minPos.getX(), minPos.getY(), minPos.getZ(), maxPos.getX() + 1, maxPos.getY() + 1, maxPos.getZ() + 1);
+    return new BoundingBox(minPos.getX(), minPos.getY(), minPos.getZ(), maxPos.getX() + 1, maxPos.getY() + 1, maxPos.getZ() + 1);
   }
 
   /* Network & Saving */

@@ -4,15 +4,15 @@ import com.google.common.collect.ImmutableList;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EnumCreatureAttribute;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
@@ -229,9 +229,9 @@ public class CompareVanilla extends CommandBase {
   }
 
   protected String testToolAttack(ItemStack tinker, ItemStack vanilla) {
-    float attack1 = ToolHelper.getActualDamage(tinker, Minecraft.getMinecraft().player);
+    float attack1 = ToolHelper.getActualDamage(tinker, MinecraftClient.getMinecraft().player);
     float attack2 = 1f;
-    for(AttributeModifier mod : vanilla.getItem().getAttributeModifiers(EntityEquipmentSlot.MAINHAND, vanilla).get(SharedMonsterAttributes.ATTACK_DAMAGE.getName())) {
+    for(EntityAttributeModifier mod : vanilla.getItem().getAttributeModifiers(EntityEquipmentSlot.MAINHAND, vanilla).get(EntityAttributes.ATTACK_DAMAGE.getName())) {
       attack2 += mod.getAmount();
     }
 

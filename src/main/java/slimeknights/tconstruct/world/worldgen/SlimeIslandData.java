@@ -4,10 +4,9 @@ import com.google.common.collect.Lists;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.PersistentState;
+import net.minecraft.world.chunk.ChunkPos;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
-import net.minecraft.world.storage.WorldSavedData;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nonnull;
 
-public class SlimeIslandData extends WorldSavedData {
+public class SlimeIslandData extends PersistentState {
 
   private final List<StructureBoundingBox> islands = Lists.newArrayList();
   // I honestly don't know if we need a concurrent hashset, but can't be too sure for compatibility

@@ -19,8 +19,8 @@ public class RenderShuriken extends RenderProjectileBase<EntityShuriken> {
     GL11.glScalef(0.6F, 0.6F, 0.6F);
 
     // rotate it into the direction we threw it
-    GL11.glRotatef(entity.rotationYaw, 0f, 1f, 0f);
-    GL11.glRotatef(-entity.rotationPitch, 1f, 0f, 0f);
+    GL11.glRotatef(entity.yaw, 0f, 1f, 0f);
+    GL11.glRotatef(-entity.pitch, 1f, 0f, 0f);
 
     // add some diversity
     GL11.glRotatef(entity.rollAngle, 0f, 0f, 1f);

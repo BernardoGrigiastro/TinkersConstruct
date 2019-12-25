@@ -1,11 +1,9 @@
 package slimeknights.tconstruct.library.client.texture;
 
 import com.google.common.collect.ImmutableList;
-
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.client.texture.Sprite;
+import net.minecraft.util.Identifier;
 import java.util.Collection;
 import java.util.function.Function;
 
@@ -13,8 +11,8 @@ import slimeknights.tconstruct.library.client.RenderUtil;
 
 public class TextureColoredTexture extends AbstractColoredTexture {
 
-  protected final ResourceLocation addTextureLocation;
-  protected TextureAtlasSprite addTexture;
+  protected final Identifier addTextureLocation;
+  protected Sprite addTexture;
   protected int[] textureData;
   protected int addTextureWidth;
   protected int addTextureHeight;
@@ -24,21 +22,21 @@ public class TextureColoredTexture extends AbstractColoredTexture {
 
   public boolean stencil = false;
 
-  public TextureColoredTexture(ResourceLocation addTextureLocation, ResourceLocation baseTexture, String spriteName) {
+  public TextureColoredTexture(Identifier addTextureLocation, Identifier baseTexture, String spriteName) {
     super(baseTexture, spriteName);
     this.addTextureLocation = addTextureLocation;
   }
 
   @Override
-  public Collection<ResourceLocation> getDependencies() {
-    return ImmutableList.<ResourceLocation>builder()
+  public Collection<Identifier> getDependencies() {
+    return ImmutableList.<Identifier>builder()
         .addAll(super.getDependencies())
         .add(addTextureLocation)
         .build();
   }
 
   @Override
-  public boolean load(IResourceManager manager, ResourceLocation location, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
+  public boolean load(IResourceManager manager, Identifier location, Function<Identifier, Sprite> textureGetter) {
     addTexture = textureGetter.apply(addTextureLocation);
 
     super.load(manager, location, textureGetter);

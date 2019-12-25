@@ -2,14 +2,14 @@ package slimeknights.tconstruct.shared.tileentity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPane;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
+import net.minecraft.network.ClientConnection;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
@@ -129,7 +129,7 @@ public class TileTable extends TileInventory {
   }
 
   @Override
-  public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+  public void onDataPacket(ClientConnection net, SPacketUpdateTileEntity pkt) {
     NBTTagCompound tag = pkt.getNbtCompound();
     NBTBase feet = tag.getTag(FEET_TAG);
     if(feet != null) {
@@ -179,7 +179,7 @@ public class TileTable extends TileInventory {
     super.setInventorySlotContents(slot, itemstack);
 
     if(getWorld() != null && getWorld().isRemote && Config.renderTableItems) {
-      Minecraft.getMinecraft().renderGlobal.notifyBlockUpdate(null, pos, null, null, 0);
+      MinecraftClient.getMinecraft().worldRenderer.notifyBlockUpdate(null, pos, null, null, 0);
     }
   }
 }

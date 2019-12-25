@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools.common.client;
 
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -17,7 +17,7 @@ import slimeknights.tconstruct.tools.common.tileentity.TilePatternChest;
 @SideOnly(Side.CLIENT)
 public class GuiPatternChest extends GuiTinkerStation {
 
-  private static final ResourceLocation BACKGROUND = Util.getResource("textures/gui/blank.png");
+  private static final Identifier BACKGROUND = Util.getResource("textures/gui/blank.png");
 
   protected static final GuiElementScalable background = GuiGeneric.slotEmpty;
 

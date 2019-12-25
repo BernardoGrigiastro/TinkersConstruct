@@ -3,7 +3,7 @@ package slimeknights.tconstruct;
 import com.google.common.eventbus.Subscribe;
 
 import net.minecraft.block.Block;
-import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.recipe.Recipe;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent.Register;
 import net.minecraftforge.fluids.Fluid;
@@ -115,8 +115,8 @@ public class TinkerIntegration extends TinkerPulse {
   }
 
   @SubscribeEvent
-  public void registerRecipes(Register<IRecipe> event) {
-    IForgeRegistry<IRecipe> registry = event.getRegistry();
+  public void registerRecipes(Register<Recipe> event) {
+    IForgeRegistry<Recipe> registry = event.getRegistry();
 
     // call this here so we can get tool forge recipes, anywhere else is too late
     IMCIntegration.integrateSmeltery();

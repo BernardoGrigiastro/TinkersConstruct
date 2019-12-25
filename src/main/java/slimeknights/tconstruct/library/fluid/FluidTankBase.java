@@ -38,7 +38,7 @@ public class FluidTankBase<T extends MantleTileEntity> extends FluidTank {
   protected void sendUpdate(int amount) {
     if(amount != 0) {
       World world = parent.getWorld();
-      if(!world.isRemote) {
+      if(!world.isClient) {
         TinkerNetwork.sendToClients((WorldServer) world, parent.getPos(), new FluidUpdatePacket(parent.getPos(), this.getFluid()));
       }
     }

@@ -5,7 +5,6 @@ import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

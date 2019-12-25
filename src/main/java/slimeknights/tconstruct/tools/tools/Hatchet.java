@@ -21,12 +21,12 @@ import java.util.List;
 
 public class Hatchet extends AoeToolCore {
 
-  public static final ImmutableSet<net.minecraft.block.material.Material> effective_materials =
-      ImmutableSet.of(net.minecraft.block.material.Material.WOOD,
-                      net.minecraft.block.material.Material.VINE,
-                      net.minecraft.block.material.Material.PLANTS,
-                      net.minecraft.block.material.Material.GOURD,
-                      net.minecraft.block.material.Material.CACTUS);
+  public static final ImmutableSet<net.minecraft.block.Material> effective_materials =
+      ImmutableSet.of(net.minecraft.block.Material.WOOD,
+                      net.minecraft.block.Material.REPLACEABLE_PLANT,
+                      net.minecraft.block.Material.PLANT,
+                      net.minecraft.block.Material.PUMPKIN,
+                      net.minecraft.block.Material.CACTUS);
 
   public Hatchet() {
     this(PartMaterialType.handle(TinkerTools.toolRod),
@@ -66,7 +66,7 @@ public class Hatchet extends AoeToolCore {
   // hatches 1 : leaves 0
   @Override
   public float getStrVsBlock(ItemStack stack, IBlockState state) {
-    if(state.getBlock().getMaterial(state) == net.minecraft.block.material.Material.LEAVES) {
+    if(state.getBlock().getMaterial(state) == net.minecraft.block.Material.LEAVES) {
       return ToolHelper.calcDigSpeed(stack, state);
     }
     return super.getStrVsBlock(stack, state);

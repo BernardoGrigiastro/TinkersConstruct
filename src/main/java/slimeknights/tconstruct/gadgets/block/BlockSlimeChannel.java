@@ -3,9 +3,10 @@ package slimeknights.tconstruct.gadgets.block;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockRenderLayer;
+import net.minecraft.block.Material;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.properties.PropertyEnum;
@@ -17,14 +18,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -43,7 +43,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 
-public class BlockSlimeChannel extends EnumBlock<SlimeType> implements ITileEntityProvider {
+public class BlockSlimeChannel extends EnumBlock<SlimeType> implements BlockEntityProvider {
 
   public static final PropertyDirection SIDE = PropertyDirection.create("side");
   public static final PropertyEnum<ChannelDirection> DIRECTION = PropertyEnum.create("direction", ChannelDirection.class);
@@ -60,7 +60,7 @@ public class BlockSlimeChannel extends EnumBlock<SlimeType> implements ITileEnti
                                                             .withProperty(CONNECTED, ChannelConnected.NONE));
     //this.side = side;
     this.setHardness(0f);
-    this.setSoundType(SoundType.SLIME);
+    this.setSoundType(BlockSoundGroup.SLIME);
 
     this.setCreativeTab(TinkerRegistry.tabGadgets);
     this.isBlockContainer = true; // has TE
@@ -77,7 +77,7 @@ public class BlockSlimeChannel extends EnumBlock<SlimeType> implements ITileEnti
   // color and side data are stored on the tile entity, but are pulled into the blockstate upon loading the tile entity
   @Nonnull
   @Override
-  public TileEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
+  public BlockEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
     return new TileSlimeChannel();
   }
 
@@ -133,7 +133,7 @@ public class BlockSlimeChannel extends EnumBlock<SlimeType> implements ITileEnti
    * (it would go back and forth and back and forth between the two blocks)
    */
   private IBlockState addDataFromTE(IBlockState state, IBlockAccess source, BlockPos pos) {
-    TileEntity te = source.getTileEntity(pos);
+    BlockEntity te = source.getTileEntity(pos);
     if(te instanceof TileSlimeChannel) {
       TileSlimeChannel channel = (TileSlimeChannel) te;
       return state.withProperty(SIDE, channel.getSide())
@@ -226,7 +226,7 @@ public class BlockSlimeChannel extends EnumBlock<SlimeType> implements ITileEnti
       }
       // exact center defaults to facing
       else {
-        int facing = MathHelper.floor(placer.rotationYaw * 8.0F / 360.0F + 0.5D) & 7;
+        int facing = MathHelper.floor(placer.yaw * 8.0F / 360.0F + 0.5D) & 7;
         direction = ChannelDirection.fromIndex(facing);
         // if on a wall, we rotate it a bit to make sure facing directly towards the wall is up
         if(side.getAxis() != EnumFacing.Axis.Y) {
@@ -257,7 +257,7 @@ public class BlockSlimeChannel extends EnumBlock<SlimeType> implements ITileEnti
    */
   @Override
   public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-    TileEntity te = worldIn.getTileEntity(pos);
+    BlockEntity te = worldIn.getTileEntity(pos);
     // pull the data we stored earlier into the Tile Entity
     if(te instanceof TileSlimeChannel) {
       TileSlimeChannel channel = (TileSlimeChannel) te;
@@ -273,7 +273,7 @@ public class BlockSlimeChannel extends EnumBlock<SlimeType> implements ITileEnti
   }
 
   @Override
-  public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
     for(SlimeType type : SlimeType.VISIBLE_COLORS) {
       list.add(new ItemStack(this, 1, type.getMeta()));
     }
@@ -288,7 +288,7 @@ public class BlockSlimeChannel extends EnumBlock<SlimeType> implements ITileEnti
   public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity) {
     if(!state.getValue(POWERED)) {
       // bounding box to check
-      AxisAlignedBB entityAABB = entity.getCollisionBoundingBox();
+      BoundingBox entityAABB = entity.getCollisionBoundingBox();
       if(entityAABB == null) {
         entityAABB = entity.getEntityBoundingBox();
       }
@@ -375,7 +375,7 @@ public class BlockSlimeChannel extends EnumBlock<SlimeType> implements ITileEnti
     }
 
     // bounding box to check
-    AxisAlignedBB entityAABB = entity.getCollisionBoundingBox();
+    BoundingBox entityAABB = entity.getCollisionBoundingBox();
     if(entityAABB == null) {
       entityAABB = entity.getEntityBoundingBox();
     }
@@ -421,54 +421,54 @@ public class BlockSlimeChannel extends EnumBlock<SlimeType> implements ITileEnti
 
   /* Bounds */
   // Block hitbox and main location for motion
-  private static final ImmutableMap<EnumFacing, AxisAlignedBB> BOUNDS;
+  private static final ImmutableMap<EnumFacing, BoundingBox> BOUNDS;
   // "quarter slab" bounds on bottom used for location checks on connected blocks
-  private static final ImmutableMap<EnumFacing, AxisAlignedBB> LOWER_BOUNDS;
+  private static final ImmutableMap<EnumFacing, BoundingBox> LOWER_BOUNDS;
   // "quarter slab" bounds on side for sideways connected
-  private static final ImmutableMap<EnumFacing, AxisAlignedBB> SIDE_BOUNDS;
+  private static final ImmutableMap<EnumFacing, BoundingBox> SIDE_BOUNDS;
   // "quarter slab" bounds on top for bottom outer connected
-  private static final ImmutableMap<EnumFacing, AxisAlignedBB> UPPER_BOUNDS;
+  private static final ImmutableMap<EnumFacing, BoundingBox> UPPER_BOUNDS;
 
   static {
-    ImmutableMap.Builder<EnumFacing, AxisAlignedBB> builder = ImmutableMap.builder();
-    builder.put(EnumFacing.UP, new AxisAlignedBB(0, 0.5, 0, 1, 1, 1));
-    builder.put(EnumFacing.DOWN, new AxisAlignedBB(0, 0, 0, 1, 0.5, 1));
-    builder.put(EnumFacing.NORTH, new AxisAlignedBB(0, 0, 0, 1, 1, 0.5));
-    builder.put(EnumFacing.SOUTH, new AxisAlignedBB(0, 0, 0.5, 1, 1, 1));
-    builder.put(EnumFacing.WEST, new AxisAlignedBB(0, 0, 0, 0.5, 1, 1));
-    builder.put(EnumFacing.EAST, new AxisAlignedBB(0.5, 0, 0, 1, 1, 1));
+    ImmutableMap.Builder<EnumFacing, BoundingBox> builder = ImmutableMap.builder();
+    builder.put(EnumFacing.UP, new BoundingBox(0, 0.5, 0, 1, 1, 1));
+    builder.put(EnumFacing.DOWN, new BoundingBox(0, 0, 0, 1, 0.5, 1));
+    builder.put(EnumFacing.NORTH, new BoundingBox(0, 0, 0, 1, 1, 0.5));
+    builder.put(EnumFacing.SOUTH, new BoundingBox(0, 0, 0.5, 1, 1, 1));
+    builder.put(EnumFacing.WEST, new BoundingBox(0, 0, 0, 0.5, 1, 1));
+    builder.put(EnumFacing.EAST, new BoundingBox(0.5, 0, 0, 1, 1, 1));
     BOUNDS = builder.build();
 
     builder = ImmutableMap.builder();
-    builder.put(EnumFacing.NORTH, new AxisAlignedBB(0, 0, 0, 1, 0.5, 0.5));
-    builder.put(EnumFacing.SOUTH, new AxisAlignedBB(0, 0, 0.5, 1, 0.5, 1));
-    builder.put(EnumFacing.WEST, new AxisAlignedBB(0, 0, 0, 0.5, 0.5, 1));
-    builder.put(EnumFacing.EAST, new AxisAlignedBB(0.5, 0, 0, 1, 0.5, 1));
+    builder.put(EnumFacing.NORTH, new BoundingBox(0, 0, 0, 1, 0.5, 0.5));
+    builder.put(EnumFacing.SOUTH, new BoundingBox(0, 0, 0.5, 1, 0.5, 1));
+    builder.put(EnumFacing.WEST, new BoundingBox(0, 0, 0, 0.5, 0.5, 1));
+    builder.put(EnumFacing.EAST, new BoundingBox(0.5, 0, 0, 1, 0.5, 1));
     LOWER_BOUNDS = builder.build();
 
     builder = ImmutableMap.builder();
-    builder.put(EnumFacing.NORTH, new AxisAlignedBB(0, 0, 0, 0.5, 1, 0.5));
-    builder.put(EnumFacing.SOUTH, new AxisAlignedBB(0.5, 0, 0.5, 1, 1, 1));
-    builder.put(EnumFacing.WEST, new AxisAlignedBB(0, 0, 0.5, 0.5, 1, 1));
-    builder.put(EnumFacing.EAST, new AxisAlignedBB(0.5, 0, 0, 1, 1, 0.5));
+    builder.put(EnumFacing.NORTH, new BoundingBox(0, 0, 0, 0.5, 1, 0.5));
+    builder.put(EnumFacing.SOUTH, new BoundingBox(0.5, 0, 0.5, 1, 1, 1));
+    builder.put(EnumFacing.WEST, new BoundingBox(0, 0, 0.5, 0.5, 1, 1));
+    builder.put(EnumFacing.EAST, new BoundingBox(0.5, 0, 0, 1, 1, 0.5));
     SIDE_BOUNDS = builder.build();
 
     builder = ImmutableMap.builder();
-    builder.put(EnumFacing.NORTH, new AxisAlignedBB(0, 0.5, 0, 1, 1, 0.5));
-    builder.put(EnumFacing.SOUTH, new AxisAlignedBB(0, 0.5, 0.5, 1, 1, 1));
-    builder.put(EnumFacing.WEST, new AxisAlignedBB(0, 0.5, 0, 0.5, 1, 1));
-    builder.put(EnumFacing.EAST, new AxisAlignedBB(0.5, 0.5, 0, 1, 1, 1));
+    builder.put(EnumFacing.NORTH, new BoundingBox(0, 0.5, 0, 1, 1, 0.5));
+    builder.put(EnumFacing.SOUTH, new BoundingBox(0, 0.5, 0.5, 1, 1, 1));
+    builder.put(EnumFacing.WEST, new BoundingBox(0, 0.5, 0, 0.5, 1, 1));
+    builder.put(EnumFacing.EAST, new BoundingBox(0.5, 0.5, 0, 1, 1, 1));
     UPPER_BOUNDS = builder.build();
   }
 
   @Override
-  public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+  public BoundingBox getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
     return NULL_AABB;
   }
 
   @Nonnull
   @Override
-  public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+  public BoundingBox getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
     return getBounds(state.getActualState(source, pos), source, pos);
   }
 
@@ -477,7 +477,7 @@ public class BlockSlimeChannel extends EnumBlock<SlimeType> implements ITileEnti
    * <br>
    * Makes sure you pas the actual state into this or it won't take connections into account
    */
-  private AxisAlignedBB getBounds(IBlockState state, IBlockAccess source, BlockPos pos) {
+  private BoundingBox getBounds(IBlockState state, IBlockAccess source, BlockPos pos) {
     EnumFacing side = state.getValue(SIDE);
     EnumFacing facing = state.getValue(DIRECTION).getFacing();
     ChannelConnected connected = state.getValue(CONNECTED);
@@ -506,7 +506,7 @@ public class BlockSlimeChannel extends EnumBlock<SlimeType> implements ITileEnti
     return BOUNDS.get(side);
   }
 
-  private AxisAlignedBB getSecondaryBounds(IBlockState state) {
+  private BoundingBox getSecondaryBounds(IBlockState state) {
     EnumFacing side = state.getValue(SIDE);
     EnumFacing facing = state.getValue(DIRECTION).getFacing();
 
@@ -758,7 +758,7 @@ public class BlockSlimeChannel extends EnumBlock<SlimeType> implements ITileEnti
   /**
    * Stores the direction of the channel, though relative to the side
    */
-  public enum ChannelDirection implements IStringSerializable {
+  public enum ChannelDirection implements StringRepresentable {
     SOUTH,
     SOUTHWEST,
     WEST,
@@ -970,7 +970,7 @@ public class BlockSlimeChannel extends EnumBlock<SlimeType> implements ITileEnti
   /**
    * Determines in what way the channel connects to other channels
    */
-  public enum ChannelConnected implements IStringSerializable {
+  public enum ChannelConnected implements StringRepresentable {
     NONE,
     INNER,
     OUTER;

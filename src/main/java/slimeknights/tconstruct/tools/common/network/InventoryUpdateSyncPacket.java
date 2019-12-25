@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.tools.common.network;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 
@@ -28,7 +28,7 @@ public class InventoryUpdateSyncPacket extends AbstractPacketThreadsafe {
   @Override
   public void handleClientSafe(NetHandlerPlayClient netHandler) {
     // only ever sent to players in the same dimension as the position
-    TileEntity tileEntity = Minecraft.getMinecraft().player.getEntityWorld().getTileEntity(pos);
+    BlockEntity tileEntity = MinecraftClient.getMinecraft().player.getEntityWorld().getTileEntity(pos);
     if(tileEntity == null || !(tileEntity instanceof TileInventory)) {
       return;
     }
@@ -40,7 +40,7 @@ public class InventoryUpdateSyncPacket extends AbstractPacketThreadsafe {
       }
       tile.setInventorySlotContents(i, itemStacks[i]);
     }
-    Minecraft.getMinecraft().renderGlobal.notifyBlockUpdate(null, pos, null, null, 0);
+    MinecraftClient.getMinecraft().worldRenderer.notifyBlockUpdate(null, pos, null, null, 0);
   }
 
   @Override

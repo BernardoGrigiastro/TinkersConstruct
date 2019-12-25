@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.gadgets.client;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -27,7 +27,7 @@ public class RenderFancyItemFrame extends RenderItemFrame {
 
   public static final IRenderFactory<EntityFancyItemFrame> FACTORY = new Factory();
 
-  private final Minecraft mc = Minecraft.getMinecraft();
+  private final MinecraftClient mc = MinecraftClient.getMinecraft();
 
   public RenderFancyItemFrame(RenderManager renderManagerIn, RenderItem itemRendererIn) {
     super(renderManagerIn, itemRendererIn);
@@ -43,16 +43,16 @@ public class RenderFancyItemFrame extends RenderItemFrame {
 
     GlStateManager.pushMatrix();
     BlockPos blockpos = entity.getHangingPosition();
-    double d0 = blockpos.getX() - entity.posX + x;
-    double d1 = blockpos.getY() - entity.posY + y;
-    double d2 = blockpos.getZ() - entity.posZ + z;
+    double d0 = blockpos.getX() - entity.x + x;
+    double d1 = blockpos.getY() - entity.y + y;
+    double d2 = blockpos.getZ() - entity.z + z;
     GlStateManager.translate(d0 + 0.5D, d1 + 0.5D, d2 + 0.5D);
-    GlStateManager.rotate(180.0F - entity.rotationYaw, 0.0F, 1.0F, 0.0F);
+    GlStateManager.rotate(180.0F - entity.yaw, 0.0F, 1.0F, 0.0F);
     this.renderManager.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
     // we don't render the clear variant if it has an item
     if(entity.getDisplayedItem().isEmpty() || type != EntityFancyItemFrame.FrameType.CLEAR) {
-      BlockRendererDispatcher blockrendererdispatcher = this.mc.getBlockRendererDispatcher();
+      BlockRenderManager blockrendererdispatcher = this.mc.getBlockRendererDispatcher();
       ModelManager modelmanager = blockrendererdispatcher.getBlockModelShapes().getModelManager();
       IBakedModel ibakedmodel;
 
@@ -80,7 +80,7 @@ public class RenderFancyItemFrame extends RenderItemFrame {
 
     @Override
     public Render<? super EntityFancyItemFrame> createRenderFor(RenderManager manager) {
-      return new RenderFancyItemFrame(manager, Minecraft.getMinecraft().getRenderItem());
+      return new RenderFancyItemFrame(manager, MinecraftClient.getMinecraft().getRenderItem());
     }
   }
 }

@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.smeltery.client.module;
 
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.render.GuiLighting;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import slimeknights.mantle.client.gui.GuiElement;
 import slimeknights.mantle.client.gui.GuiElementScalable;
@@ -16,7 +16,7 @@ import slimeknights.tconstruct.tools.common.client.module.GuiSideInventory;
 
 public class GuiSearedFurnaceSideInventory extends GuiSideInventory {
 
-  public static final ResourceLocation SLOT_LOCATION = GuiSearedFurnace.BACKGROUND;
+  public static final Identifier SLOT_LOCATION = GuiSearedFurnace.BACKGROUND;
 
   protected final TileSearedFurnace furnace;
 
@@ -64,7 +64,7 @@ public class GuiSearedFurnaceSideInventory extends GuiSideInventory {
     super.drawGuiContainerForegroundLayer(mouseX, mouseY);
 
     this.mc.getTextureManager().bindTexture(SLOT_LOCATION);
-    RenderHelper.disableStandardItemLighting();
+    GuiLighting.disableStandardItemLighting();
 
     String tooltipText = null;
 

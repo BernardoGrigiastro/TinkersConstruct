@@ -3,10 +3,9 @@ package slimeknights.tconstruct.tools.modifiers;
 import com.google.common.collect.ImmutableList;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.damage.EntityDamageSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EntityDamageSource;
-
 import java.util.List;
 
 import slimeknights.tconstruct.library.Util;

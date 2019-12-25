@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 import gnu.trove.set.hash.THashSet;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.EnumRarity;
@@ -14,8 +14,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -102,7 +102,7 @@ public abstract class TinkersItem extends Item implements ITinkerable, IModifyab
   @Nonnull
   @Override
   public Entity createEntity(World world, Entity location, ItemStack itemstack) {
-    EntityItem entity = new IndestructibleEntityItem(world, location.posX, location.posY, location.posZ, itemstack);
+    EntityItem entity = new IndestructibleEntityItem(world, location.x, location.y, location.z, itemstack);
     if(location instanceof EntityItem) {
       // workaround for private access on that field >_>
       NBTTagCompound tag = new NBTTagCompound();
@@ -131,7 +131,7 @@ public abstract class TinkersItem extends Item implements ITinkerable, IModifyab
    * @return The built item or null if invalid input.
    */
   @Nonnull
-  public ItemStack buildItemFromStacks(NonNullList<ItemStack> stacks) {
+  public ItemStack buildItemFromStacks(DefaultedList<ItemStack> stacks) {
     long itemCount = stacks.stream().filter(stack -> !stack.isEmpty()).count();
     List<Material> materials = new ArrayList<>(stacks.size());
 
@@ -297,7 +297,7 @@ public abstract class TinkersItem extends Item implements ITinkerable, IModifyab
 
   @Nonnull
   @Override
-  public ItemStack repair(ItemStack repairable, NonNullList<ItemStack> repairItems) {
+  public ItemStack repair(ItemStack repairable, DefaultedList<ItemStack> repairItems) {
     if(repairable.getItemDamage() == 0 && !ToolHelper.isBroken(repairable)) {
       // undamaged and not broken - no need to repair
       return ItemStack.EMPTY;
@@ -310,7 +310,7 @@ public abstract class TinkersItem extends Item implements ITinkerable, IModifyab
     }
 
     // ensure the items only contain valid items
-    NonNullList<ItemStack> items = Util.deepCopyFixedNonNullList(repairItems);
+    DefaultedList<ItemStack> items = Util.deepCopyFixedNonNullList(repairItems);
     boolean foundMatch = false;
     for(int index : getRepairParts()) {
       Material material = materials.get(index);
@@ -367,11 +367,11 @@ public abstract class TinkersItem extends Item implements ITinkerable, IModifyab
   }
 
   /** Allows for custom repair items. Remove used items from the array. */
-  protected int repairCustom(Material material, NonNullList<ItemStack> repairItems) {
+  protected int repairCustom(Material material, DefaultedList<ItemStack> repairItems) {
     return 0;
   }
 
-  protected int calculateRepairAmount(List<Material> materials, NonNullList<ItemStack> repairItems) {
+  protected int calculateRepairAmount(List<Material> materials, DefaultedList<ItemStack> repairItems) {
     Set<Material> materialsMatched = Sets.newHashSet();
     float durability = 0f;
     // try to match each material once
@@ -443,7 +443,7 @@ public abstract class TinkersItem extends Item implements ITinkerable, IModifyab
 
   @Override
   @SideOnly(Side.CLIENT)
-  public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+  public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, TooltipContext flagIn) {
     boolean shift = Util.isShiftKeyDown();
     boolean ctrl = Util.isCtrlKeyDown();
     // modifiers
@@ -456,9 +456,9 @@ public abstract class TinkersItem extends Item implements ITinkerable, IModifyab
       tooltip.add(Util.translate("tooltip.tool.holdCtrl"));
 
       if(worldIn != null) {
-        tooltip.add(TextFormatting.BLUE +
+        tooltip.add(TextFormat.field_1078 +
                     I18n.translateToLocalFormatted("attribute.modifier.plus.0",
-                                                   Util.df.format(ToolHelper.getActualDamage(stack, Minecraft.getMinecraft().player)),
+                                                   Util.df.format(ToolHelper.getActualDamage(stack, MinecraftClient.getMinecraft().player)),
                                                    I18n.translateToLocal("attribute.name.generic.attackDamage")));
       }
     }

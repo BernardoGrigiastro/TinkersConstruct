@@ -1,8 +1,7 @@
 package slimeknights.tconstruct.shared.block;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Material;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -10,9 +9,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.TinkerRegistry;
@@ -22,19 +22,19 @@ import javax.annotation.Nonnull;
 
 public class BlockSlimeCongealed extends Block {
 
-  private static final AxisAlignedBB AABB = new AxisAlignedBB(0, 0, 0, 1, 0.625D, 1.0D);
+  private static final BoundingBox AABB = new BoundingBox(0, 0, 0, 1, 0.625D, 1.0D);
 
   public BlockSlimeCongealed() {
     super(Material.CLAY);
     this.setCreativeTab(TinkerRegistry.tabWorld);
     this.setHardness(0.5f);
-    this.slipperiness = 0.5f;
+    this.friction = 0.5f;
     this.disableStats();
-    this.setSoundType(SoundType.SLIME);
+    this.setSoundType(BlockSoundGroup.SLIME);
   }
 
   @Override
-  public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
     for(SlimeType type : SlimeType.VISIBLE_COLORS) {
       list.add(new ItemStack(this, 1, type.meta));
     }
@@ -63,7 +63,7 @@ public class BlockSlimeCongealed extends Block {
   }
 
   @Override
-  public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+  public BoundingBox getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
     return AABB;
   }
 

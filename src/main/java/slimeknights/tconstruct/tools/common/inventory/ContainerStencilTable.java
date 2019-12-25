@@ -4,7 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -24,7 +24,7 @@ public class ContainerStencilTable
     implements IContainerCraftingCustom {
 
   public InventoryCraftingPersistent craftMatrix;
-  public IInventory craftResult;
+  public Inventory craftResult;
 
   private ItemStack output;
 
@@ -83,7 +83,7 @@ public class ContainerStencilTable
   }
 
   @Override
-  public void onCraftMatrixChanged(IInventory inventoryIn) {
+  public void onCraftMatrixChanged(Inventory inventoryIn) {
     updateResult();
   }
 
@@ -127,7 +127,7 @@ public class ContainerStencilTable
   }
 
   @Override
-  public void onCrafting(EntityPlayer player, ItemStack output, IInventory craftMatrix) {
+  public void onCrafting(EntityPlayer player, ItemStack output, Inventory craftMatrix) {
     ItemStack itemstack1 = craftMatrix.getStackInSlot(0);
 
     // Assumption: Only 1 input, will always be decreased by only 1

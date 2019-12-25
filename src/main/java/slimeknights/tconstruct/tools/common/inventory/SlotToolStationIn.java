@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools.common.inventory;
 
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
@@ -21,7 +21,7 @@ public class SlotToolStationIn extends Slot {
   public ItemStack icon;
   public Container parent;
 
-  public SlotToolStationIn(IInventory inventoryIn, int index, int xPosition, int yPosition, Container parent) {
+  public SlotToolStationIn(Inventory inventoryIn, int index, int xPosition, int yPosition, Container parent) {
     super(inventoryIn, index, xPosition, yPosition);
     this.parent = parent;
   }

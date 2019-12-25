@@ -3,10 +3,10 @@ package slimeknights.tconstruct.library.client.model;
 import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemPropertyGetter;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -19,10 +19,10 @@ import javax.annotation.Nullable;
 @SideOnly(Side.CLIENT)
 public class BakedToolModelOverride {
 
-  public final ImmutableMap<ResourceLocation, Float> predicates;
+  public final ImmutableMap<Identifier, Float> predicates;
   public final BakedToolModel bakedToolModel;
 
-  public BakedToolModelOverride(ImmutableMap<ResourceLocation, Float> predicates, BakedToolModel bakedToolModel) {
+  public BakedToolModelOverride(ImmutableMap<Identifier, Float> predicates, BakedToolModel bakedToolModel) {
     this.predicates = predicates;
     this.bakedToolModel = bakedToolModel;
   }
@@ -30,8 +30,8 @@ public class BakedToolModelOverride {
   public boolean matches(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
     Item item = stack.getItem();
 
-    for(Map.Entry<ResourceLocation, Float> entry : predicates.entrySet()) {
-      IItemPropertyGetter iitempropertygetter = item.getPropertyGetter(entry.getKey());
+    for(Map.Entry<Identifier, Float> entry : predicates.entrySet()) {
+      ItemPropertyGetter iitempropertygetter = item.getPropertyGetter(entry.getKey());
 
       if(iitempropertygetter == null || iitempropertygetter.apply(stack, worldIn, entityIn) < entry.getValue()) {
         return false;

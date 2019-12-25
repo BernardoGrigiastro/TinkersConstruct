@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.smeltery.item;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.IItemPropertyGetter;
+import net.minecraft.item.ItemPropertyGetter;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
@@ -22,11 +22,11 @@ public class ItemTank extends ItemBlockMeta {
 
   public ItemTank(Block block) {
     super(block);
-    this.addPropertyOverride(new ResourceLocation("amount"), TankCapacityGetter.INSTANCE);
+    this.addPropertyOverride(new Identifier("amount"), TankCapacityGetter.INSTANCE);
   }
 
   @Override
-  public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+  public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, TooltipContext flagIn) {
     super.addInformation(stack, worldIn, tooltip, flagIn);
 
     if(stack.hasTagCompound()) {
@@ -39,7 +39,7 @@ public class ItemTank extends ItemBlockMeta {
     }
   }
 
-  public enum TankCapacityGetter implements IItemPropertyGetter {
+  public enum TankCapacityGetter implements ItemPropertyGetter {
     INSTANCE;
 
     @Override

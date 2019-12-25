@@ -1,7 +1,6 @@
 package slimeknights.tconstruct.library.client.texture;
 
-import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.util.Identifier;
 import slimeknights.tconstruct.library.client.RenderUtil;
 
 public class SimpleColoredTexture extends AbstractColoredTexture {
@@ -14,7 +13,7 @@ public class SimpleColoredTexture extends AbstractColoredTexture {
   protected int maxBrightness;
   protected int brightnessData[];
 
-  public SimpleColoredTexture(int colorLow, int colorMid, int colorHigh, ResourceLocation baseTexture,
+  public SimpleColoredTexture(int colorLow, int colorMid, int colorHigh, Identifier baseTexture,
                               String spriteName) {
     super(baseTexture, spriteName);
     this.colorLow = colorLow;

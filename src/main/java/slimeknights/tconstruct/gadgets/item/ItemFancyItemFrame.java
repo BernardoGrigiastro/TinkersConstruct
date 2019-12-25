@@ -5,10 +5,10 @@ import net.minecraft.entity.EntityHanging;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemHangingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -26,7 +26,7 @@ public class ItemFancyItemFrame extends ItemHangingEntity {
   }
 
   @Override
-  public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
     if(this.isInCreativeTab(tab)) {
       subItems.add(new ItemStack(this, 1, EntityFancyItemFrame.FrameType.JEWEL.ordinal()));
 
@@ -76,7 +76,7 @@ public class ItemFancyItemFrame extends ItemHangingEntity {
         EntityHanging entityhanging = new EntityFancyItemFrame(worldIn, blockpos, facing, itemStack.getMetadata());
 
         if(entityhanging.onValidSurface()) {
-          if(!worldIn.isRemote) {
+          if(!worldIn.isClient) {
             worldIn.spawnEntity(entityhanging);
           }
 

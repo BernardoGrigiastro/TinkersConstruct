@@ -2,13 +2,13 @@ package slimeknights.tconstruct.library.client.renderer;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelSlime;
+import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderSlime;
-import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.monster.EntitySlime;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -25,20 +25,20 @@ public class RenderTinkerSlime extends RenderSlime {
 
   public static final Factory FACTORY_BlueSlime = new Factory(0xff67f0f5);
 
-  public static final ResourceLocation slimeTextures = Util.getResource("textures/entity/slime.png");
+  public static final Identifier slimeTextures = Util.getResource("textures/entity/slime.png");
 
   private final int color;
-  private final ResourceLocation texture;
+  private final Identifier texture;
 
   public RenderTinkerSlime(RenderManager renderManager, int color) {
     this(renderManager, color, slimeTextures);
   }
 
-  public RenderTinkerSlime(RenderManager renderManager, int color, ResourceLocation texture) {
+  public RenderTinkerSlime(RenderManager renderManager, int color, Identifier texture) {
     this(renderManager, color, color, new ModelSlime(16), 0.25f, texture);
   }
 
-  public RenderTinkerSlime(RenderManager renderManagerIn, int color, int colorLayer, ModelBase modelBaseIn, float shadowSizeIn, ResourceLocation texture) {
+  public RenderTinkerSlime(RenderManager renderManagerIn, int color, int colorLayer, ModelBase modelBaseIn, float shadowSizeIn, Identifier texture) {
     super(renderManagerIn);
     this.mainModel = modelBaseIn;
     this.shadowSize = shadowSizeIn;
@@ -58,7 +58,7 @@ public class RenderTinkerSlime extends RenderSlime {
 
   @Nonnull
   @Override
-  protected ResourceLocation getEntityTexture(EntitySlime entity) {
+  protected Identifier getEntityTexture(EntitySlime entity) {
     return this.texture;
   }
 
@@ -67,7 +67,7 @@ public class RenderTinkerSlime extends RenderSlime {
     return color;
   }
 
-  public static class LayerSlimeGelColored implements LayerRenderer<EntitySlime> {
+  public static class LayerSlimeGelColored implements FeatureRenderer<EntitySlime> {
 
     private final RenderSlime slimeRenderer;
     private final ModelBase slimeModel;

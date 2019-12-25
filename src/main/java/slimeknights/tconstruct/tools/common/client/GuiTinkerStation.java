@@ -1,12 +1,12 @@
 package slimeknights.tconstruct.tools.common.client;
 
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -30,7 +30,7 @@ import slimeknights.tconstruct.tools.common.network.TinkerStationTabPacket;
 // Takes care of the tinker station pseudo-multiblock
 public class GuiTinkerStation extends GuiMultiModule {
 
-  public static final ResourceLocation BLANK_BACK = Util.getResource("textures/gui/blank.png");
+  public static final Identifier BLANK_BACK = Util.getResource("textures/gui/blank.png");
 
   protected final ContainerMultiModule<?> container;
 
@@ -84,7 +84,7 @@ public class GuiTinkerStation extends GuiMultiModule {
     BlockPos pos = tinkerTabs.tabData.get(selection);
     IBlockState state = world.getBlockState(pos);
     if(state.getBlock() instanceof ITinkerStationBlock) {
-      TileEntity te = world.getTileEntity(pos);
+      BlockEntity te = world.getTileEntity(pos);
       if(te instanceof IInventoryGui) {
         TinkerNetwork.sendToServer(new TinkerStationTabPacket(pos));
       }

@@ -10,19 +10,18 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderLayer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.BakedModelWrapper;
 import net.minecraftforge.client.ForgeHooksClient;
@@ -60,7 +59,7 @@ public class BakedTableModel extends BakedModelWrapper<IBakedModel> {
   private final IModel tableModel;
 
   private final Map<String, IBakedModel> cache = Maps.newHashMap();
-  private static final Function<ResourceLocation, TextureAtlasSprite> textureGetter = location -> {
+  private static final Function<Identifier, Sprite> textureGetter = location -> {
     assert location != null;
     return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());
   };

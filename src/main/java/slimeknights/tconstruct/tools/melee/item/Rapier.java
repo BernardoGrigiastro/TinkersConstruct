@@ -2,12 +2,12 @@ package slimeknights.tconstruct.tools.melee.item;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.client.particle.Particles;
@@ -83,7 +83,7 @@ public class Rapier extends SwordCore {
     if(hit && target instanceof EntityLivingBase) {
       EntityLivingBase targetLiving = (EntityLivingBase) target;
       // reset things to deal damage again
-      targetLiving.hurtResistantTime = 0;
+      targetLiving.field_6008 = 0;
       targetLiving.lastDamage = 0;
       targetLiving.attackEntityFrom(source.setDamageBypassesArmor(), damage);
 
@@ -97,14 +97,14 @@ public class Rapier extends SwordCore {
 
   @Nonnull
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+  public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
     ItemStack itemStackIn = playerIn.getHeldItem(hand);
     if(playerIn.onGround) {
       playerIn.addExhaustion(0.1f);
       playerIn.motionY += 0.32;
       float f = 0.5F;
-      playerIn.motionX = MathHelper.sin(playerIn.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(playerIn.rotationPitch / 180.0F * (float) Math.PI) * f;
-      playerIn.motionZ = -MathHelper.cos(playerIn.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(playerIn.rotationPitch / 180.0F * (float) Math.PI) * f;
+      playerIn.motionX = MathHelper.sin(playerIn.yaw / 180.0F * (float) Math.PI) * MathHelper.cos(playerIn.pitch / 180.0F * (float) Math.PI) * f;
+      playerIn.motionZ = -MathHelper.cos(playerIn.yaw / 180.0F * (float) Math.PI) * MathHelper.cos(playerIn.pitch / 180.0F * (float) Math.PI) * f;
       playerIn.getCooldownTracker().setCooldown(itemStackIn.getItem(), 4);
     }
     EnumActionResult result = EnumActionResult.SUCCESS;
@@ -114,7 +114,7 @@ public class Rapier extends SwordCore {
         result = EnumActionResult.PASS;
       }
     }
-    return ActionResult.newResult(result, itemStackIn);
+    return TypedActionResult.newResult(result, itemStackIn);
   }
 
   @Override

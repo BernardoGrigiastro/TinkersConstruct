@@ -3,9 +3,9 @@ package slimeknights.tconstruct.gadgets;
 import net.minecraft.client.gui.GuiHopper;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -20,7 +20,7 @@ import slimeknights.tconstruct.library.Util;
 @Mod.EventBusSubscriber(Side.CLIENT)
 public class WoodenHopperGUIDrawEvent {
 
-  private static final ResourceLocation HOPPER_GUI_TEXTURE = new ResourceLocation(TConstruct.modID, "textures/gui/hopper.png");
+  private static final Identifier HOPPER_GUI_TEXTURE = new Identifier(TConstruct.modID, "textures/gui/hopper.png");
 
   @SubscribeEvent
   public static void addTooltip(ItemTooltipEvent itemTooltipEvent) {
@@ -42,7 +42,7 @@ public class WoodenHopperGUIDrawEvent {
   @SideOnly(Side.CLIENT)
   private static class GuiWoodenHopper extends GuiHopper {
 
-    public GuiWoodenHopper(InventoryPlayer playerInv, IInventory hopperInv) {
+    public GuiWoodenHopper(InventoryPlayer playerInv, Inventory hopperInv) {
       super(playerInv, hopperInv);
 
       inventorySlots.getSlot(0).xPos += 18*2;

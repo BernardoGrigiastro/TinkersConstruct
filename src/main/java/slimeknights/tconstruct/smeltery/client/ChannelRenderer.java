@@ -4,10 +4,10 @@ import javax.annotation.Nonnull;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -21,7 +21,7 @@ import slimeknights.tconstruct.smeltery.tileentity.TileChannel;
 import slimeknights.tconstruct.smeltery.tileentity.TileChannel.ChannelConnection;
 
 public class ChannelRenderer extends FastTESR<TileChannel> {
-  private static Minecraft mc = Minecraft.getMinecraft();
+  private static MinecraftClient mc = MinecraftClient.getMinecraft();
 
   @Override
   public void renderTileEntityFast(@Nonnull TileChannel te, double x, double y, double z, float partialTicks, int destroyStage, float partial, BufferBuilder renderer) {
@@ -44,8 +44,8 @@ public class ChannelRenderer extends FastTESR<TileChannel> {
     int color = fluid.getColor(fluidStack);
     int brightness = te.getWorld().getCombinedLight(te.getPos(), fluid.getLuminosity());
     TextureMap map = mc.getTextureMapBlocks();
-    TextureAtlasSprite still = map.getTextureExtry(fluid.getStill(fluidStack).toString());
-    TextureAtlasSprite flowing = map.getTextureExtry(fluid.getFlowing(fluidStack).toString());
+    Sprite still = map.getTextureExtry(fluid.getStill(fluidStack).toString());
+    Sprite flowing = map.getTextureExtry(fluid.getFlowing(fluidStack).toString());
 
     // sides
     double x1 = 0, z1 = 0, x2 = 0, z2 = 0;

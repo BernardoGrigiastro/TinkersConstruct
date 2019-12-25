@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.tools;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -33,7 +33,7 @@ public class ToolClientProxy extends ClientProxy {
   public void postInit() {
     RenderEvents renderEvents = new RenderEvents();
     MinecraftForge.EVENT_BUS.register(renderEvents);
-    ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(renderEvents);
+    ((IReloadableResourceManager) MinecraftClient.getMinecraft().getResourceManager()).registerReloadListener(renderEvents);
   }
 
   @Override
@@ -52,8 +52,8 @@ public class ToolClientProxy extends ClientProxy {
     ModelLoader.setCustomModelResourceLocation(tableItem, 0, ToolClientEvents.locToolForge);
 
     // patterns
-    final ResourceLocation patternLoc = ToolClientEvents.locBlankPattern;
-    CustomTextureCreator.patternModelLocation = new ResourceLocation(patternLoc.getResourceDomain(), "item/" + patternLoc.getResourcePath());
+    final Identifier patternLoc = ToolClientEvents.locBlankPattern;
+    CustomTextureCreator.patternModelLocation = new Identifier(patternLoc.getResourceDomain(), "item/" + patternLoc.getResourcePath());
     ModelLoader.setCustomMeshDefinition(TinkerTools.pattern, new PatternMeshDefinition(patternLoc));
 
     // parts

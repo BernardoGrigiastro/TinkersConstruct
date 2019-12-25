@@ -4,7 +4,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.loot.LootTableList;
@@ -18,7 +18,7 @@ import slimeknights.tconstruct.world.TinkerWorld;
 
 public class EntityBlueSlime extends EntitySlime {
 
-  public static final ResourceLocation LOOT_TABLE = Util.getResource("entities/blueslime");
+  public static final Identifier LOOT_TABLE = Util.getResource("entities/blueslime");
 
   public EntityBlueSlime(World worldIn) {
     super(worldIn);
@@ -33,7 +33,7 @@ public class EntityBlueSlime extends EntitySlime {
   }
 
   @Override
-  protected ResourceLocation getLootTable() {
+  protected Identifier getLootTable() {
     return this.getSlimeSize() == 1 ? LOOT_TABLE : LootTableList.EMPTY;
   }
 
@@ -53,15 +53,15 @@ public class EntityBlueSlime extends EntitySlime {
 
   @Override
   protected boolean spawnCustomParticles() {
-    if(this.getEntityWorld().isRemote) {
+    if(this.getEntityWorld().isClient) {
       int i = this.getSlimeSize();
       for(int j = 0; j < i * 8; ++j) {
-        float f = this.rand.nextFloat() * (float) Math.PI * 2.0F;
-        float f1 = this.rand.nextFloat() * 0.5F + 0.5F;
+        float f = this.random.nextFloat() * (float) Math.PI * 2.0F;
+        float f1 = this.random.nextFloat() * 0.5F + 0.5F;
         float f2 = MathHelper.sin(f) * (float) i * 0.5F * f1;
         float f3 = MathHelper.cos(f) * (float) i * 0.5F * f1;
-        double d0 = this.posX + (double) f2;
-        double d1 = this.posZ + (double) f3;
+        double d0 = this.x + (double) f2;
+        double d1 = this.z + (double) f3;
         double d2 = this.getEntityBoundingBox().minY;
         TinkerWorld.proxy.spawnSlimeParticle(this.getEntityWorld(), d0, d2, d1);
       }

@@ -13,8 +13,7 @@ import com.google.gson.reflect.TypeToken;
 
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StringUtils;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.LoaderState;
 import net.minecraftforge.fml.common.ModContainer;
@@ -72,7 +71,7 @@ public class MaterialRenderInfoLoader implements IResourceManagerReloadListener 
       domains.add("minecraft");
 
       for(String domain : domains) {
-        ResourceLocation location = new ResourceLocation(domain, "materials/" + material.getIdentifier());
+        Identifier location = new Identifier(domain, "materials/" + material.getIdentifier());
         try {
           Reader reader = ModelHelper.getReaderForResource(location, resourceManager);
           IMaterialRenderInfoDeserializer deserializer = GSON.fromJson(reader, TYPE);

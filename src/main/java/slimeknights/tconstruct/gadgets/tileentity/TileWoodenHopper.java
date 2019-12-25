@@ -3,14 +3,14 @@ package slimeknights.tconstruct.gadgets.tileentity;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityHopper;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class TileWoodenHopper extends TileEntityHopper {
 
   public TileWoodenHopper() {
-    this.inventory = NonNullList.withSize(1, ItemStack.EMPTY);
+    this.inventory = DefaultedList.withSize(1, ItemStack.EMPTY);
   }
 
   @Override

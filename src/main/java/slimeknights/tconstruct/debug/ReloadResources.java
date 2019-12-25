@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.debug;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -23,8 +23,8 @@ public class ReloadResources extends CommandBase {
   @Override
   public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args)
       throws CommandException {
-    if(sender.getEntityWorld().isRemote) {
-      Minecraft.getMinecraft().refreshResources();
+    if(sender.getEntityWorld().isClient) {
+      MinecraftClient.getMinecraft().refreshResources();
     }
   }
 

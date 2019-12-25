@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.library.book.elements;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
@@ -50,7 +50,7 @@ public class ElementTinkerItem extends ElementItem {
   }
 
   @Override
-  public void drawOverlay(int mouseX, int mouseY, float partialTicks, FontRenderer fontRenderer) {
+  public void drawOverlay(int mouseX, int mouseY, float partialTicks, TextRenderer fontRenderer) {
     if(noTooltip) {
       return;
     }

@@ -2,16 +2,16 @@ package slimeknights.tconstruct.tools.melee.item;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.item.EnumAction;
-import net.minecraft.item.IItemPropertyGetter;
+import net.minecraft.item.ItemPropertyGetter;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -43,7 +43,7 @@ public class BattleSign extends TinkerToolCore {
 
     addCategory(Category.WEAPON);
 
-    this.addPropertyOverride(new ResourceLocation("blocking"), new IItemPropertyGetter() {
+    this.addPropertyOverride(new Identifier("blocking"), new ItemPropertyGetter() {
       @Override
       @SideOnly(Side.CLIENT)
       public float apply(@Nonnull ItemStack stack, World worldIn, EntityLivingBase entityIn) {
@@ -75,13 +75,13 @@ public class BattleSign extends TinkerToolCore {
 
   @Nonnull
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+  public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
     ItemStack itemStackIn = playerIn.getHeldItem(hand);
     if(!ToolHelper.isBroken(itemStackIn)) {
       playerIn.setActiveHand(hand);
-      return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+      return new TypedActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
     }
-    return new ActionResult<>(EnumActionResult.FAIL, itemStackIn);
+    return new TypedActionResult<>(EnumActionResult.FAIL, itemStackIn);
   }
 
   // Extra damage reduction when blocking with a battlesign
@@ -155,8 +155,8 @@ public class BattleSign extends TinkerToolCore {
     projectile.motionY = look.y * speed;
     projectile.motionZ = look.z * speed;
 
-    projectile.rotationYaw = (float) (Math.atan2(projectile.motionX, projectile.motionZ) * 180.0D / Math.PI);
-    projectile.rotationPitch = (float) (Math.atan2(projectile.motionY, speed) * 180.0D / Math.PI);
+    projectile.yaw = (float) (Math.atan2(projectile.motionX, projectile.motionZ) * 180.0D / Math.PI);
+    projectile.pitch = (float) (Math.atan2(projectile.motionY, speed) * 180.0D / Math.PI);
 
     // notify clients from change, otherwise people will get veeeery confused
     TinkerNetwork.sendToAll(new EntityMovementChangePacket(projectile));

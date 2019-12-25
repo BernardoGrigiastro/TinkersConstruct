@@ -1,13 +1,13 @@
 package slimeknights.tconstruct.shared.block;
 
-import net.minecraft.block.SoundType;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.DefaultedList;
+import net.minecraft.util.StringRepresentable;
 import slimeknights.mantle.block.EnumBlock;
 import slimeknights.tconstruct.library.TinkerRegistry;
 
@@ -21,11 +21,11 @@ public class BlockSlime extends net.minecraft.block.BlockSlime {
   public BlockSlime() {
     this.setCreativeTab(TinkerRegistry.tabWorld);
     this.disableStats();
-    this.setSoundType(SoundType.SLIME);
+    this.setSoundType(BlockSoundGroup.SLIME);
   }
 
   @Override
-  public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
     for(SlimeType type : SlimeType.VISIBLE_COLORS) {
       if (type != SlimeType.GREEN) {
         list.add(new ItemStack(this, 1, type.meta));
@@ -60,7 +60,7 @@ public class BlockSlime extends net.minecraft.block.BlockSlime {
     return true;
   }
 
-  public enum SlimeType implements IStringSerializable, EnumBlock.IEnumMeta {
+  public enum SlimeType implements StringRepresentable, EnumBlock.IEnumMeta {
     GREEN(0x01cd4e, 0x69bc5e),
     BLUE(0x01cbcd, 0x74c5c8),
     PURPLE(0xaf4cf6, 0xcc68ff),

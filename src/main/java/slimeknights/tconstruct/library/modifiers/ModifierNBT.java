@@ -1,8 +1,7 @@
 package slimeknights.tconstruct.library.modifiers;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextFormatting;
-
+import net.minecraft.text.TextFormat;
 import slimeknights.tconstruct.library.TinkerRegistry;
 import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.client.CustomFontColor;
@@ -26,7 +25,7 @@ public class ModifierNBT {
   public ModifierNBT(IModifier modifier) {
     this.identifier = modifier.getIdentifier();
     this.level = 0;
-    this.color = Util.enumChatFormattingToColor(TextFormatting.GRAY);
+    this.color = Util.enumChatFormattingToColor(TextFormat.field_1080);
   }
 
   public ModifierNBT(NBTTagCompound tag) {

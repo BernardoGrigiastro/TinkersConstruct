@@ -15,8 +15,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.TagHelper;
 import net.minecraftforge.event.RegistryEvent.Register;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -233,7 +233,7 @@ public class TinkerModifiers extends AbstractToolPulse {
     TinkerRegistry.registerHeadDrop(EntityPlayerMP.class, (entity) -> {
       ItemStack head = new ItemStack(Items.SKULL, 1, 3);
       if(entity instanceof EntityPlayer) {
-        NBTUtil.writeGameProfile(head.getOrCreateSubCompound("SkullOwner"), ((EntityPlayer) entity).getGameProfile());
+        TagHelper.writeGameProfile(head.getOrCreateSubCompound("SkullOwner"), ((EntityPlayer) entity).getGameProfile());
       }
       return head;
     });

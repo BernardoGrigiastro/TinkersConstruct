@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableList;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.text.TextFormat;
+import net.minecraft.util.DefaultedList;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
@@ -33,7 +33,7 @@ public class TinkerCraftingEvent extends TinkerEvent {
     this.itemStack = itemStack;
     this.player = player;
 
-    message += "\n" + TextFormatting.ITALIC + "by " + Loader.instance().activeModContainer().getName();
+    message += "\n" + TextFormat.field_1056 + "by " + Loader.instance().activeModContainer().getName();
     this.message = message;
   }
 
@@ -61,18 +61,18 @@ public class TinkerCraftingEvent extends TinkerEvent {
    */
   public static class ToolCraftingEvent extends TinkerCraftingEvent {
 
-    private final NonNullList<ItemStack> toolParts;
+    private final DefaultedList<ItemStack> toolParts;
 
-    private ToolCraftingEvent(ItemStack itemStack, EntityPlayer player, NonNullList<ItemStack> toolParts) {
+    private ToolCraftingEvent(ItemStack itemStack, EntityPlayer player, DefaultedList<ItemStack> toolParts) {
       super(itemStack, player, Util.translate("gui.error.craftevent.tool.default"));
       this.toolParts = toolParts;
     }
 
-    public NonNullList<ItemStack> getToolParts() {
+    public DefaultedList<ItemStack> getToolParts() {
       return toolParts;
     }
 
-    public static void fireEvent(ItemStack itemStack, EntityPlayer player, NonNullList<ItemStack> toolParts) throws TinkerGuiException {
+    public static void fireEvent(ItemStack itemStack, EntityPlayer player, DefaultedList<ItemStack> toolParts) throws TinkerGuiException {
       ToolCraftingEvent toolCraftingEvent = new ToolCraftingEvent(itemStack, player, toolParts);
       if(MinecraftForge.EVENT_BUS.post(toolCraftingEvent)) {
         throw new TinkerGuiException(toolCraftingEvent.getMessage());
@@ -87,18 +87,18 @@ public class TinkerCraftingEvent extends TinkerEvent {
    */
   public static class ToolPartReplaceEvent extends TinkerCraftingEvent {
 
-    private final NonNullList<ItemStack> toolParts;
+    private final DefaultedList<ItemStack> toolParts;
 
-    private ToolPartReplaceEvent(ItemStack itemStack, EntityPlayer player, NonNullList<ItemStack> toolParts) {
+    private ToolPartReplaceEvent(ItemStack itemStack, EntityPlayer player, DefaultedList<ItemStack> toolParts) {
       super(itemStack, player, Util.translate("gui.error.craftevent.replace.default"));
       this.toolParts = toolParts;
     }
 
-    public NonNullList<ItemStack> getToolParts() {
+    public DefaultedList<ItemStack> getToolParts() {
       return toolParts;
     }
 
-    public static void fireEvent(ItemStack itemStack, EntityPlayer player, NonNullList<ItemStack> toolParts) throws TinkerGuiException {
+    public static void fireEvent(ItemStack itemStack, EntityPlayer player, DefaultedList<ItemStack> toolParts) throws TinkerGuiException {
       ToolPartReplaceEvent toolPartReplaceEvent = new ToolPartReplaceEvent(itemStack, player, toolParts);
       if(MinecraftForge.EVENT_BUS.post(toolPartReplaceEvent)) {
         throw new TinkerGuiException(toolPartReplaceEvent.getMessage());

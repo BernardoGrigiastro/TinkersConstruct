@@ -3,14 +3,14 @@ package slimeknights.tconstruct.smeltery.tileentity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.SPacketParticles;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.Fluid;
@@ -34,7 +34,7 @@ import slimeknights.tconstruct.smeltery.events.TinkerCastingEvent;
 import slimeknights.tconstruct.smeltery.network.FluidUpdatePacket;
 import slimeknights.tconstruct.smeltery.network.FluidUpdatePacket.IFluidPacketReceiver;
 
-public abstract class TileCasting extends TileTable implements ITickable, ISidedInventory, IProgress, IFluidPacketReceiver {
+public abstract class TileCasting extends TileTable implements ITickable, SidedInventory, IProgress, IFluidPacketReceiver {
 
   // the internal fluidtank of the casting block
   public FluidTankAnimated tank;
@@ -161,7 +161,7 @@ public abstract class TileCasting extends TileTable implements ITickable, ISided
           else {
             setInventorySlotContents(1, event.output);
           }
-          getWorld().playSound(null, pos, SoundEvents.BLOCK_LAVA_EXTINGUISH, SoundCategory.AMBIENT, 0.07f, 4f);
+          getWorld().playSound(null, pos, SoundEvents.BLOCK_LAVA_EXTINGUISH, SoundCategory.field_15256, 0.07f, 4f);
 
           // reset state
           reset();

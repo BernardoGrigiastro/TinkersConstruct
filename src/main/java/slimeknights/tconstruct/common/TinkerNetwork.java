@@ -6,7 +6,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.WorldChunk;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 
 import slimeknights.mantle.network.AbstractPacket;
@@ -101,7 +101,7 @@ public class TinkerNetwork extends NetworkWrapper {
   }
 
   public static void sendToClients(WorldServer world, BlockPos pos, AbstractPacket packet) {
-    Chunk chunk = world.getChunkFromBlockCoords(pos);
+    WorldChunk chunk = world.getChunkFromBlockCoords(pos);
     for(EntityPlayer player : world.playerEntities) {
       // only send to relevant players
       if(!(player instanceof EntityPlayerMP)) {
