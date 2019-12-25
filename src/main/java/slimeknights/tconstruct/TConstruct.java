@@ -1,5 +1,7 @@
 package slimeknights.tconstruct;
 
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
@@ -59,18 +61,7 @@ import java.util.Random;
  * @author mDiyo
  */
 
-@Mod(modid = TConstruct.modID,
-     name = TConstruct.modName,
-     version = TConstruct.modVersion,
-     guiFactory = "slimeknights.tconstruct.common.config.ConfigGui$ConfigGuiFactory",
-     dependencies = "required-after:forge@[14.23.1.2577,);"
-                    + "required-after:mantle@[1.12-1.3.3.49,);"
-                    + "after:jei@[4.8,);"
-                    + "before:taiga@(1.3.0,);"
-                    + "after:chisel;"
-                    + "after:quark@[r1.6-177,)",
-     acceptedMinecraftVersions = "[1.12, 1.13)")
-public class TConstruct {
+public class TConstruct implements ModInitializer {
 
   public static final String modID = Util.MODID;
   public static final String modVersion = "${version}";
@@ -79,7 +70,6 @@ public class TConstruct {
   public static final Logger log = LogManager.getLogger(modID);
   public static final Random random = new Random();
 
-  @Mod.Instance(modID)
   public static TConstruct instance;
 
   @SidedProxy(clientSide = "slimeknights.tconstruct.common.CommonProxy", serverSide = "slimeknights.tconstruct.common.CommonProxy")
@@ -125,15 +115,43 @@ public class TConstruct {
   }
 
   public TConstruct() {
-    if(Loader.isModLoaded("Natura")) {
+    if(FabricLoader.getInstance().isModLoaded("Natura")) {
       log.info("Natura, what are we going to do tomorrow night?");
       LogManager.getLogger("Natura").info("TConstruct, we're going to take over the world!");
     }
     else {
       log.info("Preparing to take over the world");
     }
+    instance = this;
   }
-
+  
+  @Override
+  public void onInitialize() {
+    Config.load(event);
+  
+    HarvestLevels.init();
+  
+    NetworkRegistry.INSTANCE.registerGuiHandler(instance, guiHandler);
+  
+    if(event.getSide().isClient()) {
+      ClientProxy.initClient();
+      ClientProxy.initRenderMaterials();
+    }
+  
+    TinkerNetwork.instance.setup();
+    CapabilityTinkerPiggyback.register();
+    CapabilityTinkerProjectile.register();
+  
+    MinecraftForge.EVENT_BUS.register(this);
+    if(event.getSide().isClient()) {
+      ClientProxy.initRenderer();
+    }
+    else {
+      // config syncing
+      MinecraftForge.EVENT_BUS.register(new ConfigSync());
+    }
+  }
+  
   //Force the client and server to have or not have this mod
   @NetworkCheckHandler
   public boolean matchModVersions(Map<String, String> remoteVersions, Side side) {
@@ -145,38 +163,6 @@ public class TConstruct {
     // but we can connect to servers without TiC when TiC is present on the client
     return !remoteVersions.containsKey(modID) || modVersion.equals(remoteVersions.get(modID));
   }
-
-  @Mod.EventHandler
-  public void preInit(FMLPreInitializationEvent event) {
-    Config.load(event);
-
-    HarvestLevels.init();
-
-    NetworkRegistry.INSTANCE.registerGuiHandler(instance, guiHandler);
-
-    if(event.getSide().isClient()) {
-      ClientProxy.initClient();
-      ClientProxy.initRenderMaterials();
-    }
-
-    TinkerNetwork.instance.setup();
-    CapabilityTinkerPiggyback.register();
-    CapabilityTinkerProjectile.register();
-
-    MinecraftForge.EVENT_BUS.register(this);
-  }
-
-  @Mod.EventHandler
-  public void postInit(FMLPostInitializationEvent event) {
-    if(event.getSide().isClient()) {
-      ClientProxy.initRenderer();
-    }
-    else {
-      // config syncing
-      MinecraftForge.EVENT_BUS.register(new ConfigSync());
-    }
-  }
-
 
   private static final String TINKERS_SKYBLOCK_MODID = "tinkerskyblock";
   private static final String WOODEN_HOPPER = "wooden_hopper";
