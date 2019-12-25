@@ -12,41 +12,36 @@ import slimeknights.tconstruct.library.tinkering.PartMaterialType;
 
 public abstract class SwordCore extends TinkerToolCore {
 
-  public static final ImmutableSet<Material> effective_materials =
-      ImmutableSet.of(Material.COBWEB,
-                      Material.REPLACEABLE_PLANT,
-                      Material.UNUSED_PLANT,
-                      Material.PUMPKIN,
-                      Material.LEAVES);
+    public static final ImmutableSet<Material> effective_materials = ImmutableSet.of(Material.COBWEB, Material.REPLACEABLE_PLANT, Material.UNUSED_PLANT, Material.PUMPKIN, Material.LEAVES);
 
-  public SwordCore(PartMaterialType... requiredComponents) {
-    super(requiredComponents);
+    public SwordCore(PartMaterialType... requiredComponents) {
+        super(requiredComponents);
 
-    // extended compatibility
-    setHarvestLevel("sword", 0);
-  }
-
-
-  @Override
-  public boolean isEffective(IBlockState state) {
-    return effective_materials.contains(state.getMaterial());
-  }
-
-  @Override
-  public float getStrVsBlock(ItemStack stack, IBlockState state) {
-    if(state.getBlock() == Blocks.WEB) {
-      return super.getStrVsBlock(stack, state) * 7.5f;
+        // extended compatibility
+        setHarvestLevel("sword", 0);
     }
-    return super.getStrVsBlock(stack, state);
-  }
 
-  @Override
-  public float miningSpeedModifier() {
-    return 0.5f; // slooow, because it's a swooooord
-  }
 
-  @Override
-  public boolean canDestroyBlockInCreative(World world, BlockPos pos, ItemStack stack, EntityPlayer player) {
-    return false;
-  }
+    @Override
+    public boolean isEffective(IBlockState state) {
+        return effective_materials.contains(state.getMaterial());
+    }
+
+    @Override
+    public float getStrVsBlock(ItemStack stack, IBlockState state) {
+        if (state.getBlock() == Blocks.WEB) {
+            return super.getStrVsBlock(stack, state) * 7.5f;
+        }
+        return super.getStrVsBlock(stack, state);
+    }
+
+    @Override
+    public float miningSpeedModifier() {
+        return 0.5f; // slooow, because it's a swooooord
+    }
+
+    @Override
+    public boolean canDestroyBlockInCreative(World world, BlockPos pos, ItemStack stack, EntityPlayer player) {
+        return false;
+    }
 }

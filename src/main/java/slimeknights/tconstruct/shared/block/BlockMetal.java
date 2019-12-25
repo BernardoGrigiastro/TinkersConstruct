@@ -16,55 +16,55 @@ import slimeknights.tconstruct.shared.TinkerFluids;
 import java.util.Locale;
 
 public class BlockMetal extends EnumBlock<BlockMetal.MetalTypes> {
-
-  public static final PropertyEnum<MetalTypes> TYPE = PropertyEnum.create("type", MetalTypes.class);
-
-  public BlockMetal() {
-    super(Material.METAL, TYPE, MetalTypes.class);
-
-    setHardness(5f);
-    setHarvestLevel("pickaxe", -1); // we're generous. no harvest level required
-    setCreativeTab(TinkerRegistry.tabGeneral);
-  }
-
-  @Override
-  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
-    for(MetalTypes type : MetalTypes.values()) {
-      if(type == MetalTypes.ALUBRASS && !TinkerIntegration.isIntegrated(TinkerFluids.alubrass)) {
-        continue;
-      }
-      list.add(new ItemStack(this, 1, type.getMeta()));
+    
+    public static final PropertyEnum<MetalTypes> TYPE = PropertyEnum.create("type", MetalTypes.class);
+    
+    public BlockMetal() {
+        super(Material.METAL, TYPE, MetalTypes.class);
+        
+        setHardness(5f);
+        setHarvestLevel("pickaxe", -1); // we're generous. no harvest level required
+        setCreativeTab(TinkerRegistry.tabGeneral);
     }
-  }
-
-  @Override
-  public boolean isBeaconBase(IBlockAccess worldObj, BlockPos pos, BlockPos beacon) {
-    return true;
-  }
-
-  public enum MetalTypes implements StringRepresentable, EnumBlock.IEnumMeta {
-    COBALT,
-    ARDITE,
-    MANYULLYN,
-    KNIGHTSLIME,
-    PIGIRON,
-    ALUBRASS,
-    SILKY_JEWEL;
-
-    public final int meta;
-
-    MetalTypes() {
-      meta = ordinal();
-    }
-
+    
     @Override
-    public String getName() {
-      return this.toString().toLowerCase(Locale.US);
+    public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
+        for (MetalTypes type : MetalTypes.values()) {
+            if (type == MetalTypes.ALUBRASS && !TinkerIntegration.isIntegrated(TinkerFluids.alubrass)) {
+                continue;
+            }
+            list.add(new ItemStack(this, 1, type.getMeta()));
+        }
     }
-
+    
     @Override
-    public int getMeta() {
-      return meta;
+    public boolean isBeaconBase(IBlockAccess worldObj, BlockPos pos, BlockPos beacon) {
+        return true;
     }
-  }
+    
+    public enum MetalTypes implements StringRepresentable, EnumBlock.IEnumMeta {
+        COBALT,
+        ARDITE,
+        MANYULLYN,
+        KNIGHTSLIME,
+        PIGIRON,
+        ALUBRASS,
+        SILKY_JEWEL;
+        
+        public final int meta;
+        
+        MetalTypes() {
+            meta = ordinal();
+        }
+        
+        @Override
+        public String getName() {
+            return this.toString().toLowerCase(Locale.US);
+        }
+        
+        @Override
+        public int getMeta() {
+            return meta;
+        }
+    }
 }

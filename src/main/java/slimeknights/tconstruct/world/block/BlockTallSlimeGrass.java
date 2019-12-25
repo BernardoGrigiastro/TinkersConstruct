@@ -33,132 +33,134 @@ import java.util.Random;
 
 public class BlockTallSlimeGrass extends BlockBush implements IShearable {
 
-  public static PropertyEnum<SlimePlantType> TYPE = PropertyEnum.create("type", SlimePlantType.class);
-  public static PropertyEnum<FoliageType> FOLIAGE = BlockSlimeGrass.FOLIAGE;
+    public static PropertyEnum<SlimePlantType> TYPE = PropertyEnum.create("type", SlimePlantType.class);
+    public static PropertyEnum<FoliageType> FOLIAGE = BlockSlimeGrass.FOLIAGE;
 
-  public BlockTallSlimeGrass() {
-    setCreativeTab(TinkerRegistry.tabWorld);
-    this.setSoundType(BlockSoundGroup.GRASS);
-  }
-
-  @Override
-  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
-    for(SlimePlantType type : SlimePlantType.values()) {
-      for(FoliageType foliage : FoliageType.values()) {
-        list.add(new ItemStack(this, 1, getMetaFromState(getDefaultState().withProperty(TYPE, type).withProperty(FOLIAGE, foliage))));
-      }
-    }
-  }
-
-  /* State stuff */
-  @Nonnull
-  @Override
-  protected BlockStateContainer createBlockState() {
-    return new BlockStateContainer(this, TYPE, FOLIAGE);
-  }
-
-  @Override
-  public int getMetaFromState(IBlockState state) {
-    int meta = (state.getValue(TYPE)).getMeta();
-    meta |= (state.getValue(FOLIAGE)).ordinal() << 2;
-
-    return meta;
-  }
-
-  @Nonnull
-  @Override
-  public IBlockState getStateFromMeta(int meta) {
-    int type = meta & 3;
-    if(type >= SlimePlantType.values().length) {
-      type = 0;
-    }
-
-    int foliage = meta >> 2;
-    if(foliage >= FoliageType.values().length) {
-      foliage = 0;
-    }
-    IBlockState state = getDefaultState();
-    state = state.withProperty(TYPE, SlimePlantType.values()[type]);
-    state = state.withProperty(FOLIAGE, FoliageType.values()[foliage]);
-
-    return state;
-  }
-
-  /* Logic stuff */
-
-  @Override
-  public boolean isReplaceable(IBlockAccess worldIn, @Nonnull BlockPos pos) {
-    return true;
-  }
-
-  @Nonnull
-  @Override
-  public ItemStack getPickBlock(@Nonnull IBlockState state, HitResult target, @Nonnull World world, @Nonnull BlockPos pos, EntityPlayer player) {
-    int meta = this.getMetaFromState(state);
-    return new ItemStack(Item.getItemFromBlock(this), 1, meta);
-  }
-
-  @Override
-  public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-    return null;
-  }
-
-  @Override
-  public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
-    IBlockState soil = worldIn.getBlockState(pos.down());
-    Block ground = soil.getBlock();
-    return ground == TinkerWorld.slimeGrass || ground == TinkerWorld.slimeDirt;
-  }
-
-  /* Rendering Stuff */
-
-  /**
-   * Get the OffsetType for this Block. Determines if the model is rendered slightly offset.
-   */
-  @Nonnull
-  @Override
-  @SideOnly(Side.CLIENT)
-  public Block.EnumOffsetType getOffsetType() {
-    return Block.EnumOffsetType.XYZ;
-  }
-
-  /* Forge/MC callbacks */
-  @Nonnull
-  @Override
-  public EnumPlantType getPlantType(IBlockAccess world, BlockPos pos) {
-    return TinkerWorld.slimePlantType;
-  }
-
-  @Override
-  public boolean isShearable(ItemStack item, IBlockAccess world, BlockPos pos) {
-    return true;
-  }
-
-  @Override
-  public List<ItemStack> onSheared(ItemStack item, IBlockAccess world, BlockPos pos, int fortune) {
-    IBlockState state = world.getBlockState(pos);
-    ItemStack stack = new ItemStack(this, 1, getMetaFromState(state));
-    return Lists.newArrayList(stack);
-  }
-
-  public enum SlimePlantType implements StringRepresentable, EnumBlock.IEnumMeta {
-    TALL_GRASS,
-    FERN;
-
-    SlimePlantType() {
-      this.meta = this.ordinal();
-    }
-
-    public final int meta;
-
-    @Override
-    public int getMeta() {
-      return meta;
+    public BlockTallSlimeGrass() {
+        setCreativeTab(TinkerRegistry.tabWorld);
+        this.setSoundType(BlockSoundGroup.GRASS);
     }
 
     @Override
-    public String getName() {
-      return this.toString().toLowerCase(Locale.US);
+    public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
+        for (SlimePlantType type : SlimePlantType.values()) {
+            for (FoliageType foliage : FoliageType.values()) {
+                list.add(new ItemStack(this, 1, getMetaFromState(getDefaultState().withProperty(TYPE, type).withProperty(FOLIAGE, foliage))));
+            }
+        }
     }
-  }
+
+    /* State stuff */
+    @Nonnull
+    @Override
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, TYPE, FOLIAGE);
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        int meta = (state.getValue(TYPE)).getMeta();
+        meta |= (state.getValue(FOLIAGE)).ordinal() << 2;
+
+        return meta;
+    }
+
+    @Nonnull
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        int type = meta & 3;
+        if (type >= SlimePlantType.values().length) {
+            type = 0;
+        }
+
+        int foliage = meta >> 2;
+        if (foliage >= FoliageType.values().length) {
+            foliage = 0;
+        }
+        IBlockState state = getDefaultState();
+        state = state.withProperty(TYPE, SlimePlantType.values()[type]);
+        state = state.withProperty(FOLIAGE, FoliageType.values()[foliage]);
+
+        return state;
+    }
+
+    /* Logic stuff */
+
+    @Override
+    public boolean isReplaceable(IBlockAccess worldIn, @Nonnull BlockPos pos) {
+        return true;
+    }
+
+    @Nonnull
+    @Override
+    public ItemStack getPickBlock(
+            @Nonnull IBlockState state, HitResult target,
+            @Nonnull World world, @Nonnull BlockPos pos, EntityPlayer player) {
+        int meta = this.getMetaFromState(state);
+        return new ItemStack(Item.getItemFromBlock(this), 1, meta);
+    }
+
+    @Override
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+        return null;
+    }
+
+    @Override
+    public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
+        IBlockState soil = worldIn.getBlockState(pos.down());
+        Block ground = soil.getBlock();
+        return ground == TinkerWorld.slimeGrass || ground == TinkerWorld.slimeDirt;
+    }
+
+    /* Rendering Stuff */
+
+    /**
+     * Get the OffsetType for this Block. Determines if the model is rendered slightly offset.
+     */
+    @Nonnull
+    @Override
+    @SideOnly(Side.CLIENT)
+    public Block.EnumOffsetType getOffsetType() {
+        return Block.EnumOffsetType.XYZ;
+    }
+
+    /* Forge/MC callbacks */
+    @Nonnull
+    @Override
+    public EnumPlantType getPlantType(IBlockAccess world, BlockPos pos) {
+        return TinkerWorld.slimePlantType;
+    }
+
+    @Override
+    public boolean isShearable(ItemStack item, IBlockAccess world, BlockPos pos) {
+        return true;
+    }
+
+    @Override
+    public List<ItemStack> onSheared(ItemStack item, IBlockAccess world, BlockPos pos, int fortune) {
+        IBlockState state = world.getBlockState(pos);
+        ItemStack stack = new ItemStack(this, 1, getMetaFromState(state));
+        return Lists.newArrayList(stack);
+    }
+
+    public enum SlimePlantType implements StringRepresentable, EnumBlock.IEnumMeta {
+        TALL_GRASS,
+        FERN;
+
+        public final int meta;
+
+        SlimePlantType() {
+            this.meta = this.ordinal();
+        }
+
+        @Override
+        public int getMeta() {
+            return meta;
+        }
+
+        @Override
+        public String getName() {
+            return this.toString().toLowerCase(Locale.US);
+        }
+    }
 }

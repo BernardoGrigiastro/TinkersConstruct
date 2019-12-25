@@ -29,141 +29,137 @@ import javax.annotation.Nonnull;
 
 public class ItemSlimeBoots extends ItemArmorTooltip {
 
-  // todo: determine if this needs toughness
-  public static ArmorMaterial SLIME_MATERIAL = EnumHelper.addArmorMaterial("SLIME", Util.resource("slime"), 0, new int[] { 0, 0, 0, 0 }, 0, SoundEvents.BLOCK_SLIME_PLACE, 0);
+    // todo: determine if this needs toughness
+    public static ArmorMaterial SLIME_MATERIAL = EnumHelper.addArmorMaterial("SLIME", Util.resource("slime"), 0, new int[]{0, 0, 0, 0}, 0, SoundEvents.BLOCK_SLIME_PLACE, 0);
 
-  public ItemSlimeBoots() {
-    super(SLIME_MATERIAL, 0, EntityEquipmentSlot.FEET);
-    this.setCreativeTab(TinkerRegistry.tabGadgets);
-    this.setMaxStackSize(1);
-    this.hasSubtypes = true;
-  }
-
-  @Override
-  public boolean isValidArmor(ItemStack stack, EntityEquipmentSlot armorType, Entity entity) {
-    // can be worn as boots
-    return armorType == EntityEquipmentSlot.FEET;
-  }
-
-  // equipping with rightclick
-  public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
-    ItemStack itemstack = player.getItemStackFromSlot(EntityEquipmentSlot.FEET);
-
-    if(itemstack.isEmpty()) {
-      player.setItemStackToSlot(EntityEquipmentSlot.FEET, stack.copy());
-      stack.shrink(1);
+    public ItemSlimeBoots() {
+        super(SLIME_MATERIAL, 0, EntityEquipmentSlot.FEET);
+        this.setCreativeTab(TinkerRegistry.tabGadgets);
+        this.setMaxStackSize(1);
+        this.hasSubtypes = true;
     }
 
-    return stack;
-  }
-
-  /**
-   * Return whether the specified armor ItemStack has a color.
-   */
-  @Override
-  public boolean hasColor(ItemStack stack) {
-    return true;
-  }
-
-  /**
-   * Return the color for the specified armor ItemStack.
-   */
-  @Override
-  public int getColor(ItemStack stack) {
-    SlimeType type = SlimeType.fromMeta(stack.getMetadata());
-    return type.getBallColor();
-  }
-
-  /**
-   * Determines if this armor will be rendered with the secondary 'overlay'
-   * texture. If this is true, the first texture will be rendered using a tint
-   * of the color specified by getColor(ItemStack)
-   *
-   * @param stack
-   *          The stack
-   * @return true/false
-   */
-  @Override
-  public boolean hasOverlay(ItemStack stack) {
-    // use an overlay so we get a tint
-    return true;
-  }
-
-  /**
-   * ItemStack sensitive version of getItemAttributeModifiers
-   */
-  @Override
-  public Multimap<String, EntityAttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack) {
-    // return an empty map as all our armor values are 0, causing a weird tooltip
-    return HashMultimap.<String, EntityAttributeModifier>create();
-  }
-
-  @Nonnull
-  @Override
-  public String getUnlocalizedName(ItemStack stack) {
-    int meta = stack.getMetadata(); // should call getMetadata below
-    if(meta < SlimeType.values().length) {
-      return super.getUnlocalizedName(stack) + "." + LocUtils.makeLocString(SlimeType.values()[meta].name());
-    }
-    else {
-      return super.getUnlocalizedName(stack);
-    }
-  }
-
-  /**
-   * returns a list of items with the same ID, but different meta (eg: dye
-   * returns 16 items)
-   */
-  @Override
-  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
-    if(this.isInCreativeTab(tab)) {
-      for(SlimeType type : SlimeType.VISIBLE_COLORS) {
-        subItems.add(new ItemStack(this, 1, type.getMeta()));
-      }
-    }
-  }
-
-  // RUBBERY BOUNCY BOUNCERY WOOOOO
-  @SubscribeEvent
-  public void onFall(LivingFallEvent event) {
-    EntityLivingBase entity = event.getEntityLiving();
-    if(entity == null) {
-      return;
-    }
-    ItemStack feet = entity.getItemStackFromSlot(EntityEquipmentSlot.FEET);
-    if(feet.getItem() != this) {
-      return;
+    @Override
+    public boolean isValidArmor(ItemStack stack, EntityEquipmentSlot armorType, Entity entity) {
+        // can be worn as boots
+        return armorType == EntityEquipmentSlot.FEET;
     }
 
-    // thing is wearing slime boots. let's get bouncyyyyy
-    boolean isClient = entity.getEntityWorld().isClient;
-    if(!entity.isSneaking() && event.getDistance() > 2) {
-      event.setDamageMultiplier(0);
-      entity.fallDistance = 0;
-      if(isClient) {
-        entity.motionY *= -0.9;
-        //entity.motionY = event.distance / 15;
-        //entity.motionX = entity.posX - entity.lastTickPosX;
-        //entity.motionZ = entity.posZ - entity.lastTickPosZ;
-        //event.entityLiving.motionY *= -1.2;
-        //event.entityLiving.motionY += 0.8;
-        entity.velocityDirty = true;
-        entity.onGround = false;
-        double f = 0.91d + 0.04d;
-        //System.out.println((entityLiving.worldObj.isRemote ? "client: " : "server: ") + entityLiving.motionX);
-        // only slow down half as much when bouncing
-        entity.motionX /= f;
-        entity.motionZ /= f;
-        TinkerNetwork.sendToServer(new BouncedPacket());
-      }
-      else {
-        event.setCanceled(true); // we don't care about previous cancels, since we just bounceeeee
-      }
-      entity.playSound(SoundEvents.ENTITY_SLIME_SQUISH, 1f, 1f);
-      SlimeBounceHandler.addBounceHandler(entity, entity.motionY);
+    // equipping with rightclick
+    public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
+        ItemStack itemstack = player.getItemStackFromSlot(EntityEquipmentSlot.FEET);
+
+        if (itemstack.isEmpty()) {
+            player.setItemStackToSlot(EntityEquipmentSlot.FEET, stack.copy());
+            stack.shrink(1);
+        }
+
+        return stack;
     }
-    else if(!isClient && entity.isSneaking()) {
-      event.setDamageMultiplier(0.2f);
+
+    /**
+     * Return whether the specified armor ItemStack has a color.
+     */
+    @Override
+    public boolean hasColor(ItemStack stack) {
+        return true;
     }
-  }
+
+    /**
+     * Return the color for the specified armor ItemStack.
+     */
+    @Override
+    public int getColor(ItemStack stack) {
+        SlimeType type = SlimeType.fromMeta(stack.getMetadata());
+        return type.getBallColor();
+    }
+
+    /**
+     * Determines if this armor will be rendered with the secondary 'overlay'
+     * texture. If this is true, the first texture will be rendered using a tint
+     * of the color specified by getColor(ItemStack)
+     *
+     * @param stack The stack
+     * @return true/false
+     */
+    @Override
+    public boolean hasOverlay(ItemStack stack) {
+        // use an overlay so we get a tint
+        return true;
+    }
+
+    /**
+     * ItemStack sensitive version of getItemAttributeModifiers
+     */
+    @Override
+    public Multimap<String, EntityAttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack) {
+        // return an empty map as all our armor values are 0, causing a weird tooltip
+        return HashMultimap.<String, EntityAttributeModifier>create();
+    }
+
+    @Nonnull
+    @Override
+    public String getUnlocalizedName(ItemStack stack) {
+        int meta = stack.getMetadata(); // should call getMetadata below
+        if (meta < SlimeType.values().length) {
+            return super.getUnlocalizedName(stack) + "." + LocUtils.makeLocString(SlimeType.values()[meta].name());
+        } else {
+            return super.getUnlocalizedName(stack);
+        }
+    }
+
+    /**
+     * returns a list of items with the same ID, but different meta (eg: dye
+     * returns 16 items)
+     */
+    @Override
+    public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
+        if (this.isInCreativeTab(tab)) {
+            for (SlimeType type : SlimeType.VISIBLE_COLORS) {
+                subItems.add(new ItemStack(this, 1, type.getMeta()));
+            }
+        }
+    }
+
+    // RUBBERY BOUNCY BOUNCERY WOOOOO
+    @SubscribeEvent
+    public void onFall(LivingFallEvent event) {
+        EntityLivingBase entity = event.getEntityLiving();
+        if (entity == null) {
+            return;
+        }
+        ItemStack feet = entity.getItemStackFromSlot(EntityEquipmentSlot.FEET);
+        if (feet.getItem() != this) {
+            return;
+        }
+
+        // thing is wearing slime boots. let's get bouncyyyyy
+        boolean isClient = entity.getEntityWorld().isClient;
+        if (!entity.isSneaking() && event.getDistance() > 2) {
+            event.setDamageMultiplier(0);
+            entity.fallDistance = 0;
+            if (isClient) {
+                entity.motionY *= -0.9;
+                //entity.motionY = event.distance / 15;
+                //entity.motionX = entity.posX - entity.lastTickPosX;
+                //entity.motionZ = entity.posZ - entity.lastTickPosZ;
+                //event.entityLiving.motionY *= -1.2;
+                //event.entityLiving.motionY += 0.8;
+                entity.velocityDirty = true;
+                entity.onGround = false;
+                double f = 0.91d + 0.04d;
+                //System.out.println((entityLiving.worldObj.isRemote ? "client: " : "server: ") + entityLiving.motionX);
+                // only slow down half as much when bouncing
+                entity.motionX /= f;
+                entity.motionZ /= f;
+                TinkerNetwork.sendToServer(new BouncedPacket());
+            } else {
+                event.setCanceled(true); // we don't care about previous cancels, since we just bounceeeee
+            }
+            entity.playSound(SoundEvents.ENTITY_SLIME_SQUISH, 1f, 1f);
+            SlimeBounceHandler.addBounceHandler(entity, entity.motionY);
+        } else if (!isClient && entity.isSneaking()) {
+            event.setDamageMultiplier(0.2f);
+        }
+    }
 }

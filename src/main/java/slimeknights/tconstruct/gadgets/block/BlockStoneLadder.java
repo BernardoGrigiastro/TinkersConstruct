@@ -6,10 +6,10 @@ import slimeknights.tconstruct.library.TinkerRegistry;
 
 public class BlockStoneLadder extends BlockLadder {
 
-  public BlockStoneLadder() {
-    this.setHardness(0.1F); // much less than stone ladder
-    this.setSoundType(BlockSoundGroup.STONE);
+    public BlockStoneLadder() {
+        this.setHardness(0.1F); // much less than stone ladder
+        this.setSoundType(BlockSoundGroup.STONE);
 
-    this.setCreativeTab(TinkerRegistry.tabGadgets);
-  }
+        this.setCreativeTab(TinkerRegistry.tabGadgets);
+    }
 }

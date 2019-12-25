@@ -19,37 +19,37 @@ import java.util.List;
 
 public class SharpeningKit extends ToolPart {
 
-  public SharpeningKit() {
-    super(Material.VALUE_Shard * 4);
-  }
+    public SharpeningKit() {
+        super(Material.VALUE_Shard * 4);
+    }
 
-  @Override
-  public boolean canUseMaterial(Material mat) {
-    return mat.hasStats(MaterialTypes.HEAD);
-  }
+    @Override
+    public boolean canUseMaterial(Material mat) {
+        return mat.hasStats(MaterialTypes.HEAD);
+    }
 
-  @Override
-  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
-    if(this.isInCreativeTab(tab)) {
-      // this adds a variant of each material to the creative menu
-      for(Material mat : TinkerRegistry.getAllMaterialsWithStats(MaterialTypes.HEAD)) {
-        subItems.add(getItemstackWithMaterial(mat));
-        if(!Config.listAllPartMaterials) {
-          break;
+    @Override
+    public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
+        if (this.isInCreativeTab(tab)) {
+            // this adds a variant of each material to the creative menu
+            for (Material mat : TinkerRegistry.getAllMaterialsWithStats(MaterialTypes.HEAD)) {
+                subItems.add(getItemstackWithMaterial(mat));
+                if (!Config.listAllPartMaterials) {
+                    break;
+                }
+            }
         }
-      }
     }
-  }
 
-  @Override
-  public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, TooltipContext flagIn) {
-    tooltip.addAll(LocUtils.getTooltips(Util.translate("item.tconstruct.sharpening_kit.tooltip")));
-    if(!checkMissingMaterialTooltip(stack, tooltip, MaterialTypes.HEAD)) {
-      Material material = getMaterial(stack);
-      HeadMaterialStats stats = material.getStats(MaterialTypes.HEAD);
-      if(stats != null) {
-        tooltip.add(HeadMaterialStats.formatHarvestLevel(stats.harvestLevel));
-      }
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, TooltipContext flagIn) {
+        tooltip.addAll(LocUtils.getTooltips(Util.translate("item.tconstruct.sharpening_kit.tooltip")));
+        if (!checkMissingMaterialTooltip(stack, tooltip, MaterialTypes.HEAD)) {
+            Material material = getMaterial(stack);
+            HeadMaterialStats stats = material.getStats(MaterialTypes.HEAD);
+            if (stats != null) {
+                tooltip.add(HeadMaterialStats.formatHarvestLevel(stats.harvestLevel));
+            }
+        }
     }
-  }
 }

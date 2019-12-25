@@ -6,87 +6,84 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.util.DefaultedList;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.IForgeRegistryEntry.Impl;
-
-import javax.annotation.Nonnull;
-
 import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.modifiers.TinkerGuiException;
 import slimeknights.tconstruct.library.tinkering.TinkersItem;
 import slimeknights.tconstruct.library.utils.ToolBuilder;
 
+import javax.annotation.Nonnull;
+
 public class TempToolModifying extends Impl<Recipe> implements Recipe {
 
-  public TempToolModifying() {
-    this.setRegistryName(Util.getResource("mod"));
-  }
+    private ItemStack outputTool;
 
-  private ItemStack outputTool;
-
-  @Override
-  public ItemStack getCraftingResult(@Nonnull InventoryCrafting p_77572_1_) {
-    return outputTool;
-  }
-
-  @Override
-  public boolean matches(@Nonnull InventoryCrafting inv, @Nonnull World worldIn) {
-    outputTool = null;
-
-    DefaultedList<ItemStack> stacks = DefaultedList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
-    ItemStack tool = ItemStack.EMPTY;
-
-    for(int i = 0; i < inv.getSizeInventory(); i++) {
-      stacks.set(i, inv.getStackInSlot(i));
-      if(!stacks.get(i).isEmpty() && stacks.get(i).getItem() instanceof TinkersItem) {
-        tool = stacks.get(i);
-        stacks.set(i, ItemStack.EMPTY);
-      }
+    public TempToolModifying() {
+        this.setRegistryName(Util.getResource("mod"));
     }
 
-    if(tool.isEmpty()) {
-      return false;
+    @Override
+    public ItemStack getCraftingResult(@Nonnull InventoryCrafting p_77572_1_) {
+        return outputTool;
     }
 
-    try {
-      outputTool = ToolBuilder.tryModifyTool(stacks, tool, false);
-    }
-    catch(TinkerGuiException e) {
-      System.out.println(e.getMessage());
-    }
+    @Override
+    public boolean matches(@Nonnull InventoryCrafting inv, @Nonnull World worldIn) {
+        outputTool = null;
 
-    return outputTool != null;
-  }
+        DefaultedList<ItemStack> stacks = DefaultedList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+        ItemStack tool = ItemStack.EMPTY;
 
-  @Override
-  public ItemStack getRecipeOutput() {
-    return outputTool;
-  }
+        for (int i = 0; i < inv.getSizeInventory(); i++) {
+            stacks.set(i, inv.getStackInSlot(i));
+            if (!stacks.get(i).isEmpty() && stacks.get(i).getItem() instanceof TinkersItem) {
+                tool = stacks.get(i);
+                stacks.set(i, ItemStack.EMPTY);
+            }
+        }
 
-  @Nonnull
-  @Override
-  public DefaultedList<ItemStack> getRemainingItems(@Nonnull InventoryCrafting inv) {
-    DefaultedList<ItemStack> stacks = DefaultedList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
-    ItemStack tool = null;
+        if (tool.isEmpty()) {
+            return false;
+        }
 
-    for(int i = 0; i < inv.getSizeInventory(); i++) {
-      stacks.set(i, inv.getStackInSlot(i));
-      if(!stacks.get(i).isEmpty() && stacks.get(i).getItem() instanceof TinkersItem) {
-        tool = stacks.get(i);
-        stacks.set(i, ItemStack.EMPTY);
-      }
-    }
+        try {
+            outputTool = ToolBuilder.tryModifyTool(stacks, tool, false);
+        } catch (TinkerGuiException e) {
+            System.out.println(e.getMessage());
+        }
 
-    try {
-      ToolBuilder.tryModifyTool(stacks, tool, true);
-    }
-    catch(TinkerGuiException e) {
-      e.printStackTrace();
+        return outputTool != null;
     }
 
-    return stacks;
-  }
+    @Override
+    public ItemStack getRecipeOutput() {
+        return outputTool;
+    }
 
-  @Override
-  public boolean canFit(int width, int height) {
-    return width * height >= 2;
-  }
+    @Nonnull
+    @Override
+    public DefaultedList<ItemStack> getRemainingItems(@Nonnull InventoryCrafting inv) {
+        DefaultedList<ItemStack> stacks = DefaultedList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+        ItemStack tool = null;
+
+        for (int i = 0; i < inv.getSizeInventory(); i++) {
+            stacks.set(i, inv.getStackInSlot(i));
+            if (!stacks.get(i).isEmpty() && stacks.get(i).getItem() instanceof TinkersItem) {
+                tool = stacks.get(i);
+                stacks.set(i, ItemStack.EMPTY);
+            }
+        }
+
+        try {
+            ToolBuilder.tryModifyTool(stacks, tool, true);
+        } catch (TinkerGuiException e) {
+            e.printStackTrace();
+        }
+
+        return stacks;
+    }
+
+    @Override
+    public boolean canFit(int width, int height) {
+        return width * height >= 2;
+    }
 }

@@ -12,25 +12,25 @@ import java.util.List;
 
 public class TraitHellish extends AbstractTrait {
 
-  private static final float bonusDamage = 4f;
+    private static final float bonusDamage = 4f;
 
-  public TraitHellish() {
-    super("hellish", 0xff0000);
-  }
-
-  @Override
-  public float damage(ItemStack tool, EntityLivingBase player, EntityLivingBase target, float damage, float newDamage, boolean isCritical) {
-    if (!target.isImmuneToFire()) {
-      newDamage += bonusDamage;
-      TConstruct.log.info("Boosted");
+    public TraitHellish() {
+        super("hellish", 0xff0000);
     }
-    return super.damage(tool, player, target, damage, newDamage, isCritical);
-  }
 
-  @Override
-  public List<String> getExtraInfo(ItemStack tool, NBTTagCompound modifierTag) {
-    String loc = String.format(LOC_Extra, getModifierIdentifier());
+    @Override
+    public float damage(ItemStack tool, EntityLivingBase player, EntityLivingBase target, float damage, float newDamage, boolean isCritical) {
+        if (!target.isImmuneToFire()) {
+            newDamage += bonusDamage;
+            TConstruct.log.info("Boosted");
+        }
+        return super.damage(tool, player, target, damage, newDamage, isCritical);
+    }
 
-    return ImmutableList.of(Util.translateFormatted(loc, Util.df.format(bonusDamage)));
-  }
+    @Override
+    public List<String> getExtraInfo(ItemStack tool, NBTTagCompound modifierTag) {
+        String loc = String.format(LOC_Extra, getModifierIdentifier());
+
+        return ImmutableList.of(Util.translateFormatted(loc, Util.df.format(bonusDamage)));
+    }
 }

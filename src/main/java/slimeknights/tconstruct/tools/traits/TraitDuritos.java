@@ -11,23 +11,21 @@ import slimeknights.tconstruct.library.traits.AbstractTrait;
 // the name totally is chylex fault.
 public class TraitDuritos extends AbstractTrait {
 
-  public TraitDuritos() {
-    super("duritos", TextFormat.field_1076);
-  }
+    public TraitDuritos() {
+        super("duritos", TextFormat.field_1076);
+    }
 
-  @Override
-  public int onToolDamage(ItemStack tool, int damage, int newDamage, EntityLivingBase entity) {
-    float r = random.nextFloat();
-    if(r < 0.1f) {
-      // double durability used, add the damage again
-      return newDamage + damage;
+    @Override
+    public int onToolDamage(ItemStack tool, int damage, int newDamage, EntityLivingBase entity) {
+        float r = random.nextFloat();
+        if (r < 0.1f) {
+            // double durability used, add the damage again
+            return newDamage + damage;
+        } else if (r < 0.5f) {
+            // no durability used, substract the durability
+            return Math.max(0, newDamage - damage);
+        } else {
+            return super.onToolDamage(tool, damage, newDamage, entity);
+        }
     }
-    else if(r < 0.5f) {
-      // no durability used, substract the durability
-      return Math.max(0, newDamage - damage);
-    }
-    else {
-      return super.onToolDamage(tool, damage, newDamage, entity);
-    }
-  }
 }

@@ -9,19 +9,19 @@ import net.minecraft.world.World;
 
 public class TileWoodenHopper extends TileEntityHopper {
 
-  public TileWoodenHopper() {
-    this.inventory = DefaultedList.withSize(1, ItemStack.EMPTY);
-  }
+    public TileWoodenHopper() {
+        this.inventory = DefaultedList.withSize(1, ItemStack.EMPTY);
+    }
 
-  @Override
-  public void setTransferCooldown(int ticks) {
-    super.setTransferCooldown(ticks*2);
-  }
+    @Override
+    public void setTransferCooldown(int ticks) {
+        super.setTransferCooldown(ticks * 2);
+    }
 
-  @Override
-  public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
-    // has to use the vanilla method. We could also check if only the rotation differs, but we only have 1 property
-    // so it should be sufficient to only use the block itself
-    return oldState.getBlock() != newSate.getBlock();
-  }
+    @Override
+    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
+        // has to use the vanilla method. We could also check if only the rotation differs, but we only have 1 property
+        // so it should be sufficient to only use the block itself
+        return oldState.getBlock() != newSate.getBlock();
+    }
 }

@@ -13,29 +13,23 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.Set;
 
-import static net.minecraft.world.storage.loot.LootTableList.CHESTS_DESERT_PYRAMID;
-import static net.minecraft.world.storage.loot.LootTableList.CHESTS_JUNGLE_TEMPLE;
-import static net.minecraft.world.storage.loot.LootTableList.CHESTS_STRONGHOLD_CROSSING;
+import static net.minecraft.world.storage.loot.LootTableList.*;
 
 public class GadgetEvents {
-  private static final Set<String> SPAGHETTI_LOCATIONS = ImmutableSet.<String>builder()
-      .add(CHESTS_DESERT_PYRAMID.toString())
-      .add(CHESTS_STRONGHOLD_CROSSING.toString())
-      .add(CHESTS_JUNGLE_TEMPLE.toString())
-      .build();
+    private static final Set<String> SPAGHETTI_LOCATIONS = ImmutableSet.<String>builder().add(CHESTS_DESERT_PYRAMID.toString()).add(CHESTS_STRONGHOLD_CROSSING.toString()).add(CHESTS_JUNGLE_TEMPLE.toString()).build();
 
-  private final LootPool pool;
+    private final LootPool pool;
 
-  public GadgetEvents() {
-    LootEntry entry = new LootEntryItem(TinkerGadgets.spaghetti, 1, 1, new LootFunction[0], new LootCondition[0], "moms_spaghetti");
-    LootCondition chance = new RandomChanceLootCondition(0.05f);
-    pool = new LootPool(new LootEntry[] {entry}, new LootCondition[] {chance}, new UniformLootTableRange(1), new UniformLootTableRange(0), "moms_spaghetti");
-  }
-
-  @SubscribeEvent
-  public void onLootTableLoad(LootTableLoadEvent event) {
-    if(SPAGHETTI_LOCATIONS.contains(event.getName().toString())) {
-      event.getTable().addPool(pool);
+    public GadgetEvents() {
+        LootEntry entry = new LootEntryItem(TinkerGadgets.spaghetti, 1, 1, new LootFunction[0], new LootCondition[0], "moms_spaghetti");
+        LootCondition chance = new RandomChanceLootCondition(0.05f);
+        pool = new LootPool(new LootEntry[]{entry}, new LootCondition[]{chance}, new UniformLootTableRange(1), new UniformLootTableRange(0), "moms_spaghetti");
     }
-  }
+
+    @SubscribeEvent
+    public void onLootTableLoad(LootTableLoadEvent event) {
+        if (SPAGHETTI_LOCATIONS.contains(event.getName().toString())) {
+            event.getTable().addPool(pool);
+        }
+    }
 }

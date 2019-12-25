@@ -5,10 +5,10 @@ package slimeknights.tconstruct.library.fluid;
  */
 public interface IFluidTankUpdater {
 
-  /**
-   * Called when the contained fluid tank changes its contents
-   * <p>
-   * This does not contain the actual changes, the class containing this needs to manually store the data it wants to check
-   */
-  void onTankContentsChanged();
+    /**
+     * Called when the contained fluid tank changes its contents
+     * <p>
+     * This does not contain the actual changes, the class containing this needs to manually store the data it wants to check
+     */
+    void onTankContentsChanged();
 }

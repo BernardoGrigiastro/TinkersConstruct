@@ -4,11 +4,11 @@ import net.minecraft.util.Identifier;
 import slimeknights.tconstruct.library.client.MaterialRenderInfo;
 
 public class BlockRenderInfoDeserializer extends AbstractRenderInfoDeserializer {
-
-  protected String texture;
-
-  @Override
-  public MaterialRenderInfo getMaterialRenderInfo() {
-    return new MaterialRenderInfo.BlockTexture(new Identifier(texture));
-  }
+    
+    protected String texture;
+    
+    @Override
+    public MaterialRenderInfo getMaterialRenderInfo() {
+        return new MaterialRenderInfo.BlockTexture(new Identifier(texture));
+    }
 }

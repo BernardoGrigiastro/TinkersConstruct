@@ -11,43 +11,43 @@ import slimeknights.mantle.network.AbstractPacketThreadsafe;
 import slimeknights.tconstruct.smeltery.tileentity.TileChannel;
 
 public class ChannelConnectionPacket extends AbstractPacketThreadsafe {
-  protected BlockPos pos;
-  protected EnumFacing side;
-  protected boolean connect;
+    protected BlockPos pos;
+    protected EnumFacing side;
+    protected boolean connect;
 
-  public ChannelConnectionPacket() {}
+    public ChannelConnectionPacket() {}
 
-  public ChannelConnectionPacket(BlockPos pos, EnumFacing side, boolean connect) {
-    this.pos = pos;
-    this.side = side;
-    this.connect = connect;
-  }
-
-  @Override
-  public void handleClientSafe(NetHandlerPlayClient netHandler) {
-    BlockEntity te = MinecraftClient.getMinecraft().world.getTileEntity(pos);
-    if(te instanceof TileChannel) {
-      ((TileChannel) te).updateConnection(side, connect);
+    public ChannelConnectionPacket(BlockPos pos, EnumFacing side, boolean connect) {
+        this.pos = pos;
+        this.side = side;
+        this.connect = connect;
     }
-  }
 
-  @Override
-  public void handleServerSafe(NetHandlerPlayServer netHandler) {
-    // clientside only
-    throw new UnsupportedOperationException("Serverside only");
-  }
+    @Override
+    public void handleClientSafe(NetHandlerPlayClient netHandler) {
+        BlockEntity te = MinecraftClient.getMinecraft().world.getTileEntity(pos);
+        if (te instanceof TileChannel) {
+            ((TileChannel) te).updateConnection(side, connect);
+        }
+    }
 
-  @Override
-  public void fromBytes(ByteBuf buf) {
-    pos = readPos(buf);
-    side = EnumFacing.getFront(buf.readByte());
-    connect = buf.readBoolean();
-  }
+    @Override
+    public void handleServerSafe(NetHandlerPlayServer netHandler) {
+        // clientside only
+        throw new UnsupportedOperationException("Serverside only");
+    }
 
-  @Override
-  public void toBytes(ByteBuf buf) {
-    writePos(pos, buf);
-    buf.writeByte(side.getIndex());
-    buf.writeBoolean(connect);
-  }
+    @Override
+    public void fromBytes(ByteBuf buf) {
+        pos = readPos(buf);
+        side = EnumFacing.getFront(buf.readByte());
+        connect = buf.readBoolean();
+    }
+
+    @Override
+    public void toBytes(ByteBuf buf) {
+        writePos(pos, buf);
+        buf.writeByte(side.getIndex());
+        buf.writeBoolean(connect);
+    }
 }

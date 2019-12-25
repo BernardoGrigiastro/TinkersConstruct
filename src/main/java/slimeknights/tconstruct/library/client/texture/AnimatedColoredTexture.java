@@ -3,6 +3,7 @@ package slimeknights.tconstruct.library.client.texture;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.Identifier;
+
 import java.util.function.Function;
 
 /**
@@ -12,28 +13,27 @@ import java.util.function.Function;
  */
 public class AnimatedColoredTexture extends TextureColoredTexture {
 
-  private Sprite actualTexture;
+    private Sprite actualTexture;
 
-  public AnimatedColoredTexture(Identifier addTexture, Identifier baseTexture, String spriteName) {
-    super(addTexture, baseTexture, spriteName);
-  }
-
-  @Override
-  public boolean load(IResourceManager manager, Identifier location, Function<Identifier, Sprite> textureGetter) {
-    if(addTexture.getFrameCount() > 0) {
-      actualTexture = addTexture;
-    }
-    else {
-      actualTexture = textureGetter.apply(addTextureLocation);
-      //actualTexture = backupLoadtextureAtlasSprite(new ResourceLocation(addTextureLocation),
-      //                                           Minecraft.getMinecraft().getResourceManager());
+    public AnimatedColoredTexture(Identifier addTexture, Identifier baseTexture, String spriteName) {
+        super(addTexture, baseTexture, spriteName);
     }
 
-    return super.load(manager, location, textureGetter);
-  }
+    @Override
+    public boolean load(IResourceManager manager, Identifier location, Function<Identifier, Sprite> textureGetter) {
+        if (addTexture.getFrameCount() > 0) {
+            actualTexture = addTexture;
+        } else {
+            actualTexture = textureGetter.apply(addTextureLocation);
+            //actualTexture = backupLoadtextureAtlasSprite(new ResourceLocation(addTextureLocation),
+            //                                           Minecraft.getMinecraft().getResourceManager());
+        }
 
-  @Override
-  protected void processData(int[] data) {
+        return super.load(manager, location, textureGetter);
+    }
+
+    @Override
+    protected void processData(int[] data) {
     /*
     // get animation data again
     ResourceLocation resourcelocation1 = this.getResourceLocation(addTextureLocation);
@@ -121,5 +121,5 @@ public class AnimatedColoredTexture extends TextureColoredTexture {
     catch(ReflectiveOperationException e) {
       e.printStackTrace();
     }*/
-  }
+    }
 }

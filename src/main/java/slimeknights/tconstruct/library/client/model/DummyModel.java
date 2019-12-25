@@ -18,25 +18,25 @@ import java.util.function.Function;
  */
 public class DummyModel implements IModel {
 
-  public static final DummyModel INSTANCE = new DummyModel();
+    public static final DummyModel INSTANCE = new DummyModel();
 
-  @Override
-  public Collection<Identifier> getDependencies() {
-    return ImmutableList.of();
-  }
+    @Override
+    public Collection<Identifier> getDependencies() {
+        return ImmutableList.of();
+    }
 
-  @Override
-  public Collection<Identifier> getTextures() {
-    return ImmutableList.of();
-  }
+    @Override
+    public Collection<Identifier> getTextures() {
+        return ImmutableList.of();
+    }
 
-  @Override
-  public IBakedModel bake(IModelState state, VertexFormat format, Function<Identifier, Sprite> bakedTextureGetter) {
-    return ModelLoaderRegistry.getMissingModel().bake(ModelLoaderRegistry.getMissingModel().getDefaultState(), format, bakedTextureGetter);
-  }
+    @Override
+    public IBakedModel bake(IModelState state, VertexFormat format, Function<Identifier, Sprite> bakedTextureGetter) {
+        return ModelLoaderRegistry.getMissingModel().bake(ModelLoaderRegistry.getMissingModel().getDefaultState(), format, bakedTextureGetter);
+    }
 
-  @Override
-  public IModelState getDefaultState() {
-    return ModelLoaderRegistry.getMissingModel().getDefaultState();
-  }
+    @Override
+    public IModelState getDefaultState() {
+        return ModelLoaderRegistry.getMissingModel().getDefaultState();
+    }
 }

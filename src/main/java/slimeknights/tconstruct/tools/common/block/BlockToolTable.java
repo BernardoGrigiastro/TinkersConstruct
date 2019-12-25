@@ -32,222 +32,208 @@ import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.config.Config;
 import slimeknights.tconstruct.library.TinkerRegistry;
 import slimeknights.tconstruct.shared.block.BlockTable;
-import slimeknights.tconstruct.tools.common.tileentity.TileCraftingStation;
-import slimeknights.tconstruct.tools.common.tileentity.TilePartBuilder;
-import slimeknights.tconstruct.tools.common.tileentity.TilePartChest;
-import slimeknights.tconstruct.tools.common.tileentity.TilePatternChest;
-import slimeknights.tconstruct.tools.common.tileentity.TileStencilTable;
-import slimeknights.tconstruct.tools.common.tileentity.TileTinkerChest;
-import slimeknights.tconstruct.tools.common.tileentity.TileToolStation;
+import slimeknights.tconstruct.tools.common.tileentity.*;
 
 import javax.annotation.Nonnull;
 import java.util.Locale;
 
 public class BlockToolTable extends BlockTable implements ITinkerStationBlock {
-
-  public static final PropertyEnum<TableTypes> TABLES = PropertyEnum.create("type", TableTypes.class);
-
-  public BlockToolTable() {
-    super(Material.WOOD);
-    this.setCreativeTab(TinkerRegistry.tabGeneral);
-
-    this.setSoundType(BlockSoundGroup.WOOD);
-    this.setResistance(5f);
-    this.setHardness(1f);
-
-    // set axe as effective tool for all variants
-    this.setHarvestLevel("axe", 0);
-  }
-
-  @Nonnull
-  @Override
-  public BlockEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
-    switch(TableTypes.fromMeta(meta)) {
-      case CraftingStation:
-        return new TileCraftingStation();
-      case StencilTable:
-        return new TileStencilTable();
-      case PartBuilder:
-        return new TilePartBuilder();
-      case ToolStation:
-        return new TileToolStation();
-      case PatternChest:
-        return new TilePatternChest();
-      case PartChest:
-        return new TilePartChest();
-      default:
-        return super.createNewTileEntity(worldIn, meta);
+    
+    public static final PropertyEnum<TableTypes> TABLES = PropertyEnum.create("type", TableTypes.class);
+    /* Bounds */
+    private static ImmutableList<BoundingBox> BOUNDS_Chest = ImmutableList.of(new BoundingBox(0, 0.9375, 0, 1, 1, 1), // top
+            new BoundingBox(0.0625, 0.1875, 0.0625, 0.9375, 1, 0.9375), // middle
+            new BoundingBox(0.03125, 0, 0.03125, 0.15625, 0.75, 0.15625), new BoundingBox(0.84375, 0, 0.03125, 0.96875, 0.75, 0.15625), new BoundingBox(0.84375, 0, 0.84375, 0.96875, 0.75, 0.96875), new BoundingBox(0.03125, 0, 0.84375, 0.15625, 0.75, 0.96875));
+    
+    public BlockToolTable() {
+        super(Material.WOOD);
+        this.setCreativeTab(TinkerRegistry.tabGeneral);
+        
+        this.setSoundType(BlockSoundGroup.WOOD);
+        this.setResistance(5f);
+        this.setHardness(1f);
+        
+        // set axe as effective tool for all variants
+        this.setHarvestLevel("axe", 0);
     }
-  }
-
-  @Override
-  public boolean openGui(EntityPlayer player, World world, BlockPos pos) {
-    if(!world.isClient) {
-      player.openGui(TConstruct.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
-      if(player.openContainer instanceof BaseContainer) {
-        ((BaseContainer) player.openContainer).syncOnOpen((EntityPlayerMP) player);
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float clickX, float clickY, float clickZ) {
-    BlockEntity te = world.getTileEntity(pos);
-    ItemStack heldItem = player.inventory.getCurrentItem();
-    if(!heldItem.isEmpty() && te instanceof TileTinkerChest) {
-        IItemHandlerModifiable itemHandler = ((TileTinkerChest) te).getItemHandler();
-        ItemStack rest = ItemHandlerHelper.insertItem(itemHandler, heldItem, false);
-
-        if(rest.isEmpty() || rest.getCount() < heldItem.getCount()) {
-          player.inventory.mainInventory.set(player.inventory.currentItem, rest);
-          return true;
-        }
-    }
-
-    return super.onBlockActivated(world, pos, state, player, hand, side, clickX, clickY, clickZ);
-  }
-
-  @Override
-  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
-    // crafting station is boring
-    list.add(new ItemStack(this, 1, TableTypes.CraftingStation.meta));
-
-    // planks for the stencil table
-    addBlocksFromOredict("plankWood", TableTypes.StencilTable.meta, list);
-
-    list.add(new ItemStack(this, 1, TableTypes.PatternChest.meta));
-
-    // logs for the part builder
-    addBlocksFromOredict("logWood", TableTypes.PartBuilder.meta, list);
-
-    list.add(new ItemStack(this, 1, TableTypes.PartChest.meta));
-
-    // stencil table is boring
-    //addBlocksFromOredict("workbench", TableTypes.ToolStation.ordinal(), list);
-    list.add(new ItemStack(this, 1, TableTypes.ToolStation.meta));
-
-  }
-
-  private void addBlocksFromOredict(String oredict, int meta, DefaultedList<ItemStack> list) {
-    for(ItemStack stack : OreDictionary.getOres(oredict)) {
-      Block block = getBlockFromItem(stack.getItem());
-      int blockMeta = stack.getItemDamage();
-
-      if(blockMeta == OreDictionary.WILDCARD_VALUE) {
-        DefaultedList<ItemStack> subBlocks = DefaultedList.create();
-        block.getSubBlocks(null, subBlocks);
-
-        for(ItemStack subBlock : subBlocks) {
-          list.add(createItemstack(this, meta, getBlockFromItem(subBlock.getItem()), subBlock.getItemDamage()));
-          if(!Config.listAllTables) {
-            return;
-          }
-        }
-      }
-      else {
-        list.add(createItemstack(this, meta, block, blockMeta));
-        if(!Config.listAllTables) {
-          return;
-        }
-      }
-    }
-  }
-
-  @Override
-  protected boolean keepInventory(IBlockState state) {
-    return Config.chestsKeepInventory &&
-           (state.getValue(TABLES) == TableTypes.PatternChest || state.getValue(TABLES) == TableTypes.PartChest);
-  }
-
-  @Nonnull
-  @Override
-  protected BlockStateContainer createBlockState() {
-    return new ExtendedBlockState(this, new IProperty[]{TABLES}, new IUnlistedProperty[]{TEXTURE, INVENTORY, FACING});
-  }
-
-  @Nonnull
-  @Override
-  public IBlockState getStateFromMeta(int meta) {
-    return this.getDefaultState().withProperty(TABLES, TableTypes.fromMeta(meta));
-  }
-
-  @Override
-  public int getMetaFromState(IBlockState state) {
-    return (state.getValue(TABLES)).meta;
-  }
-
-  /* Bounds */
-  private static ImmutableList<BoundingBox> BOUNDS_Chest = ImmutableList.of(
-      new BoundingBox(0, 0.9375, 0, 1, 1, 1), // top
-      new BoundingBox(0.0625, 0.1875, 0.0625, 0.9375, 1, 0.9375), // middle
-      new BoundingBox(0.03125, 0, 0.03125, 0.15625, 0.75, 0.15625),
-      new BoundingBox(0.84375, 0, 0.03125, 0.96875, 0.75, 0.15625),
-      new BoundingBox(0.84375, 0, 0.84375, 0.96875, 0.75, 0.96875),
-      new BoundingBox(0.03125, 0, 0.84375, 0.15625, 0.75, 0.96875)
-  );
-
-  @Override
-  public HitResult collisionRayTrace(IBlockState blockState, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Vec3d start, @Nonnull Vec3d end) {
-    if(blockState.getValue(TABLES).isChest) {
-      return raytraceMultiAABB(BOUNDS_Chest, pos, start, end);
-    }
-
-    return super.collisionRayTrace(blockState, worldIn, pos, start, end);
-  }
-
-  @Override
-  public int getGuiNumber(IBlockState state) {
-    switch(state.getValue(TABLES)) {
-      case StencilTable:
-        return 10;
-      case PatternChest:
-        return 15;
-      case PartChest:
-        return 16;
-      case PartBuilder:
-        return 20;
-      case ToolStation:
-        return 25;
-      case CraftingStation:
-        return 50;
-      default:
-        return 0;
-    }
-  }
-
-  public enum TableTypes implements StringRepresentable {
-    CraftingStation,
-    StencilTable,
-    PartBuilder,
-    ToolStation,
-    PatternChest(true),
-    PartChest(true);
-
-    TableTypes() {
-      meta = this.ordinal();
-      this.isChest = false;
-    }
-
-    TableTypes(boolean chest) {
-      meta = this.ordinal();
-      this.isChest = chest;
-    }
-
-    public final int meta;
-    public final boolean isChest;
-
-    public static TableTypes fromMeta(int meta) {
-      if(meta < 0 || meta >= values().length) {
-        meta = 0;
-      }
-
-      return values()[meta];
-    }
-
+    
+    @Nonnull
     @Override
-    public String getName() {
-      return this.toString().toLowerCase(Locale.US);
+    public BlockEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
+        switch (TableTypes.fromMeta(meta)) {
+            case CraftingStation:
+                return new TileCraftingStation();
+            case StencilTable:
+                return new TileStencilTable();
+            case PartBuilder:
+                return new TilePartBuilder();
+            case ToolStation:
+                return new TileToolStation();
+            case PatternChest:
+                return new TilePatternChest();
+            case PartChest:
+                return new TilePartChest();
+            default:
+                return super.createNewTileEntity(worldIn, meta);
+        }
     }
-  }
+    
+    @Override
+    public boolean openGui(EntityPlayer player, World world, BlockPos pos) {
+        if (!world.isClient) {
+            player.openGui(TConstruct.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
+            if (player.openContainer instanceof BaseContainer) {
+                ((BaseContainer) player.openContainer).syncOnOpen((EntityPlayerMP) player);
+            }
+        }
+        return true;
+    }
+    
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float clickX, float clickY, float clickZ) {
+        BlockEntity te = world.getTileEntity(pos);
+        ItemStack heldItem = player.inventory.getCurrentItem();
+        if (!heldItem.isEmpty() && te instanceof TileTinkerChest) {
+            IItemHandlerModifiable itemHandler = ((TileTinkerChest) te).getItemHandler();
+            ItemStack rest = ItemHandlerHelper.insertItem(itemHandler, heldItem, false);
+            
+            if (rest.isEmpty() || rest.getCount() < heldItem.getCount()) {
+                player.inventory.mainInventory.set(player.inventory.currentItem, rest);
+                return true;
+            }
+        }
+        
+        return super.onBlockActivated(world, pos, state, player, hand, side, clickX, clickY, clickZ);
+    }
+    
+    @Override
+    public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
+        // crafting station is boring
+        list.add(new ItemStack(this, 1, TableTypes.CraftingStation.meta));
+        
+        // planks for the stencil table
+        addBlocksFromOredict("plankWood", TableTypes.StencilTable.meta, list);
+        
+        list.add(new ItemStack(this, 1, TableTypes.PatternChest.meta));
+        
+        // logs for the part builder
+        addBlocksFromOredict("logWood", TableTypes.PartBuilder.meta, list);
+        
+        list.add(new ItemStack(this, 1, TableTypes.PartChest.meta));
+        
+        // stencil table is boring
+        //addBlocksFromOredict("workbench", TableTypes.ToolStation.ordinal(), list);
+        list.add(new ItemStack(this, 1, TableTypes.ToolStation.meta));
+        
+    }
+    
+    private void addBlocksFromOredict(String oredict, int meta, DefaultedList<ItemStack> list) {
+        for (ItemStack stack : OreDictionary.getOres(oredict)) {
+            Block block = getBlockFromItem(stack.getItem());
+            int blockMeta = stack.getItemDamage();
+            
+            if (blockMeta == OreDictionary.WILDCARD_VALUE) {
+                DefaultedList<ItemStack> subBlocks = DefaultedList.create();
+                block.getSubBlocks(null, subBlocks);
+                
+                for (ItemStack subBlock : subBlocks) {
+                    list.add(createItemstack(this, meta, getBlockFromItem(subBlock.getItem()), subBlock.getItemDamage()));
+                    if (!Config.listAllTables) {
+                        return;
+                    }
+                }
+            } else {
+                list.add(createItemstack(this, meta, block, blockMeta));
+                if (!Config.listAllTables) {
+                    return;
+                }
+            }
+        }
+    }
+    
+    @Override
+    protected boolean keepInventory(IBlockState state) {
+        return Config.chestsKeepInventory && (state.getValue(TABLES) == TableTypes.PatternChest || state.getValue(TABLES) == TableTypes.PartChest);
+    }
+    
+    @Nonnull
+    @Override
+    protected BlockStateContainer createBlockState() {
+        return new ExtendedBlockState(this, new IProperty[]{TABLES}, new IUnlistedProperty[]{TEXTURE, INVENTORY, FACING});
+    }
+    
+    @Nonnull
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(TABLES, TableTypes.fromMeta(meta));
+    }
+    
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return (state.getValue(TABLES)).meta;
+    }
+    
+    @Override
+    public HitResult collisionRayTrace(IBlockState blockState,
+            @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Vec3d start, @Nonnull Vec3d end) {
+        if (blockState.getValue(TABLES).isChest) {
+            return raytraceMultiAABB(BOUNDS_Chest, pos, start, end);
+        }
+        
+        return super.collisionRayTrace(blockState, worldIn, pos, start, end);
+    }
+    
+    @Override
+    public int getGuiNumber(IBlockState state) {
+        switch (state.getValue(TABLES)) {
+            case StencilTable:
+                return 10;
+            case PatternChest:
+                return 15;
+            case PartChest:
+                return 16;
+            case PartBuilder:
+                return 20;
+            case ToolStation:
+                return 25;
+            case CraftingStation:
+                return 50;
+            default:
+                return 0;
+        }
+    }
+    
+    public enum TableTypes implements StringRepresentable {
+        CraftingStation,
+        StencilTable,
+        PartBuilder,
+        ToolStation,
+        PatternChest(true),
+        PartChest(true);
+        
+        public final int meta;
+        public final boolean isChest;
+        
+        TableTypes() {
+            meta = this.ordinal();
+            this.isChest = false;
+        }
+        TableTypes(boolean chest) {
+            meta = this.ordinal();
+            this.isChest = chest;
+        }
+        
+        public static TableTypes fromMeta(int meta) {
+            if (meta < 0 || meta >= values().length) {
+                meta = 0;
+            }
+            
+            return values()[meta];
+        }
+        
+        @Override
+        public String getName() {
+            return this.toString().toLowerCase(Locale.US);
+        }
+    }
 }

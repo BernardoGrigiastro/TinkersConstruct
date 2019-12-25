@@ -9,16 +9,15 @@ import javax.annotation.Nonnull;
 
 public class TinkerProjectileImpactEvent extends ProjectileImpactEvent {
 
-  @Nonnull
-  private final ItemStack tool;
+    @Nonnull private final ItemStack tool;
 
-  public TinkerProjectileImpactEvent(Entity entity, HitResult ray, @Nonnull ItemStack tool) {
-    super(entity, ray);
-    this.tool = tool.copy();
-  }
+    public TinkerProjectileImpactEvent(Entity entity, HitResult ray, @Nonnull ItemStack tool) {
+        super(entity, ray);
+        this.tool = tool.copy();
+    }
 
-  @Nonnull
-  public ItemStack getTool() {
-    return tool;
-  }
+    @Nonnull
+    public ItemStack getTool() {
+        return tool;
+    }
 }

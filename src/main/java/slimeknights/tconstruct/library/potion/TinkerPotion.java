@@ -7,46 +7,46 @@ import net.minecraft.util.Identifier;
 
 public class TinkerPotion extends Potion {
 
-  private final boolean show;
+    private final boolean show;
 
-  public TinkerPotion(Identifier location, boolean badEffect, boolean showInInventory) {
-    this(location, badEffect, showInInventory, 0xffffff);
-  }
-
-  public TinkerPotion(Identifier location, boolean badEffect, boolean showInInventory, int color) {
-    super(badEffect, color);
-    setPotionName("potion." + location.getResourcePath());
-
-    this.setRegistryName(location);
-
-    this.show = showInInventory;
-  }
-
-  @Override
-  public boolean shouldRenderInvText(PotionEffect effect) {
-    return show;
-  }
-
-  public PotionEffect apply(EntityLivingBase entity, int duration) {
-    return apply(entity, duration, 0);
-  }
-
-  public PotionEffect apply(EntityLivingBase entity, int duration, int level) {
-    PotionEffect effect = new PotionEffect(this, duration, level, false, false);
-    entity.addPotionEffect(effect);
-    return effect;
-  }
-
-  public int getLevel(EntityLivingBase entity) {
-    PotionEffect effect = entity.getActivePotionEffect(this);
-    if(effect != null) {
-      return effect.getAmplifier();
+    public TinkerPotion(Identifier location, boolean badEffect, boolean showInInventory) {
+        this(location, badEffect, showInInventory, 0xffffff);
     }
-    return 0;
-  }
 
-  @Override
-  public boolean shouldRender(PotionEffect effect) {
-    return show;
-  }
+    public TinkerPotion(Identifier location, boolean badEffect, boolean showInInventory, int color) {
+        super(badEffect, color);
+        setPotionName("potion." + location.getResourcePath());
+
+        this.setRegistryName(location);
+
+        this.show = showInInventory;
+    }
+
+    @Override
+    public boolean shouldRenderInvText(PotionEffect effect) {
+        return show;
+    }
+
+    public PotionEffect apply(EntityLivingBase entity, int duration) {
+        return apply(entity, duration, 0);
+    }
+
+    public PotionEffect apply(EntityLivingBase entity, int duration, int level) {
+        PotionEffect effect = new PotionEffect(this, duration, level, false, false);
+        entity.addPotionEffect(effect);
+        return effect;
+    }
+
+    public int getLevel(EntityLivingBase entity) {
+        PotionEffect effect = entity.getActivePotionEffect(this);
+        if (effect != null) {
+            return effect.getAmplifier();
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean shouldRender(PotionEffect effect) {
+        return show;
+    }
 }

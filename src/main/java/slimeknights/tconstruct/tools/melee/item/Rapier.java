@@ -24,110 +24,107 @@ import javax.annotation.Nonnull;
 import java.util.List;
 
 public class Rapier extends SwordCore {
-
-  public static final float DURABILITY_MODIFIER = 0.8f;
-
-  public Rapier() {
-    super(PartMaterialType.handle(TinkerTools.toolRod),
-          PartMaterialType.head(TinkerTools.swordBlade),
-          PartMaterialType.extra(TinkerTools.crossGuard));
-
-    addCategory(Category.WEAPON);
-  }
-
-  @Override
-  public float damagePotential() {
-    return 0.55f;
-  }
-
-  @Override
-  public float damageCutoff() {
-    return 13f;
-  }
-
-  @Override
-  public double attackSpeed() {
-    return 3;
-  }
-
-  @Override
-  public float knockback() {
-    return 0.6f;
-  }
-
-  @Override
-  public boolean dealDamage(ItemStack stack, EntityLivingBase player, Entity entity, float damage) {
-    boolean hit;
-    if(player instanceof EntityPlayer) {
-      hit = dealHybridDamage(DamageSource.causePlayerDamage((EntityPlayer) player), entity, damage);
+    
+    public static final float DURABILITY_MODIFIER = 0.8f;
+    
+    public Rapier() {
+        super(PartMaterialType.handle(TinkerTools.toolRod), PartMaterialType.head(TinkerTools.swordBlade), PartMaterialType.extra(TinkerTools.crossGuard));
+        
+        addCategory(Category.WEAPON);
     }
-    else {
-      hit = dealHybridDamage(DamageSource.causeMobDamage(player), entity, damage);
+    
+    // changes the passed in damagesource, but the default method calls we use always create a new object
+    public static boolean dealHybridDamage(DamageSource source, Entity target, float damage) {
+        if (target instanceof EntityLivingBase) {
+            damage /= 2f;
+        }
+        
+        // half damage normal, half damage armor bypassing
+        boolean hit = target.attackEntityFrom(source, damage);
+        if (hit && target instanceof EntityLivingBase) {
+            EntityLivingBase targetLiving = (EntityLivingBase) target;
+            // reset things to deal damage again
+            targetLiving.field_6008 = 0;
+            targetLiving.lastDamage = 0;
+            targetLiving.attackEntityFrom(source.setDamageBypassesArmor(), damage);
+            
+            int count = Math.round(damage / 2f);
+            if (count > 0) {
+                TinkerTools.proxy.spawnEffectParticle(ParticleEffect.Type.HEART_ARMOR, targetLiving, count);
+            }
+        }
+        return hit;
     }
-
-    if(hit && readyForSpecialAttack(player)) {
-      TinkerTools.proxy.spawnAttackParticle(Particles.RAPIER_ATTACK, player, 0.8d);
+    
+    @Override
+    public float damagePotential() {
+        return 0.55f;
     }
-
-    return hit;
-  }
-
-  // changes the passed in damagesource, but the default method calls we use always create a new object
-  public static boolean dealHybridDamage(DamageSource source, Entity target, float damage) {
-    if(target instanceof EntityLivingBase) {
-      damage /= 2f;
+    
+    @Override
+    public float damageCutoff() {
+        return 13f;
     }
-
-    // half damage normal, half damage armor bypassing
-    boolean hit = target.attackEntityFrom(source, damage);
-    if(hit && target instanceof EntityLivingBase) {
-      EntityLivingBase targetLiving = (EntityLivingBase) target;
-      // reset things to deal damage again
-      targetLiving.field_6008 = 0;
-      targetLiving.lastDamage = 0;
-      targetLiving.attackEntityFrom(source.setDamageBypassesArmor(), damage);
-
-      int count = Math.round(damage / 2f);
-      if(count > 0) {
-        TinkerTools.proxy.spawnEffectParticle(ParticleEffect.Type.HEART_ARMOR, targetLiving, count);
-      }
+    
+    @Override
+    public double attackSpeed() {
+        return 3;
     }
-    return hit;
-  }
-
-  @Nonnull
-  @Override
-  public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
-    ItemStack itemStackIn = playerIn.getHeldItem(hand);
-    if(playerIn.onGround) {
-      playerIn.addExhaustion(0.1f);
-      playerIn.motionY += 0.32;
-      float f = 0.5F;
-      playerIn.motionX = MathHelper.sin(playerIn.yaw / 180.0F * (float) Math.PI) * MathHelper.cos(playerIn.pitch / 180.0F * (float) Math.PI) * f;
-      playerIn.motionZ = -MathHelper.cos(playerIn.yaw / 180.0F * (float) Math.PI) * MathHelper.cos(playerIn.pitch / 180.0F * (float) Math.PI) * f;
-      playerIn.getCooldownTracker().setCooldown(itemStackIn.getItem(), 4);
+    
+    @Override
+    public float knockback() {
+        return 0.6f;
     }
-    EnumActionResult result = EnumActionResult.SUCCESS;
-    if (hand == EnumHand.MAIN_HAND) {
-      ItemStack offhand = playerIn.getHeldItemOffhand();
-      if (!offhand.isEmpty() && (offhand.getItem() == TinkerMeleeWeapons.battleSign || offhand.getItem().isShield(offhand, playerIn))) {
-        result = EnumActionResult.PASS;
-      }
+    
+    @Override
+    public boolean dealDamage(ItemStack stack, EntityLivingBase player, Entity entity, float damage) {
+        boolean hit;
+        if (player instanceof EntityPlayer) {
+            hit = dealHybridDamage(DamageSource.causePlayerDamage((EntityPlayer) player), entity, damage);
+        } else {
+            hit = dealHybridDamage(DamageSource.causeMobDamage(player), entity, damage);
+        }
+        
+        if (hit && readyForSpecialAttack(player)) {
+            TinkerTools.proxy.spawnAttackParticle(Particles.RAPIER_ATTACK, player, 0.8d);
+        }
+        
+        return hit;
     }
-    return TypedActionResult.newResult(result, itemStackIn);
-  }
-
-  @Override
-  public float getRepairModifierForPart(int index) {
-    return DURABILITY_MODIFIER;
-  }
-
-  @Override
-  public ToolNBT buildTagData(List<Material> materials) {
-    ToolNBT data = buildDefaultTag(materials);
-
-    data.durability *= DURABILITY_MODIFIER;
-
-    return data;
-  }
+    
+    @Nonnull
+    @Override
+    public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+        ItemStack itemStackIn = playerIn.getHeldItem(hand);
+        if (playerIn.onGround) {
+            playerIn.addExhaustion(0.1f);
+            playerIn.motionY += 0.32;
+            float f = 0.5F;
+            playerIn.motionX = MathHelper.sin(playerIn.yaw / 180.0F * (float) Math.PI) * MathHelper.cos(playerIn.pitch / 180.0F * (float) Math.PI) * f;
+            playerIn.motionZ = -MathHelper.cos(playerIn.yaw / 180.0F * (float) Math.PI) * MathHelper.cos(playerIn.pitch / 180.0F * (float) Math.PI) * f;
+            playerIn.getCooldownTracker().setCooldown(itemStackIn.getItem(), 4);
+        }
+        EnumActionResult result = EnumActionResult.SUCCESS;
+        if (hand == EnumHand.MAIN_HAND) {
+            ItemStack offhand = playerIn.getHeldItemOffhand();
+            if (!offhand.isEmpty() && (offhand.getItem() == TinkerMeleeWeapons.battleSign || offhand.getItem().isShield(offhand, playerIn))) {
+                result = EnumActionResult.PASS;
+            }
+        }
+        return TypedActionResult.newResult(result, itemStackIn);
+    }
+    
+    @Override
+    public float getRepairModifierForPart(int index) {
+        return DURABILITY_MODIFIER;
+    }
+    
+    @Override
+    public ToolNBT buildTagData(List<Material> materials) {
+        ToolNBT data = buildDefaultTag(materials);
+        
+        data.durability *= DURABILITY_MODIFIER;
+        
+        return data;
+    }
 }

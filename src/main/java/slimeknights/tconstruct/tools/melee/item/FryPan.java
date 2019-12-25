@@ -39,158 +39,157 @@ import java.util.UUID;
 
 public class FryPan extends TinkerToolCore {
 
-  protected static final UUID FRYPAN_CHARGE_BONUS = UUID.fromString("b8f6d5f0-8d5a-11e6-ae22-56b6b6499611");
+    protected static final UUID FRYPAN_CHARGE_BONUS = UUID.fromString("b8f6d5f0-8d5a-11e6-ae22-56b6b6499611");
 
-  public FryPan() {
-    super(PartMaterialType.handle(TinkerTools.toolRod),
-          PartMaterialType.head(TinkerTools.panHead));
+    public FryPan() {
+        super(PartMaterialType.handle(TinkerTools.toolRod), PartMaterialType.head(TinkerTools.panHead));
 
-    addCategory(Category.WEAPON);
-  }
+        addCategory(Category.WEAPON);
+    }
 
-  @Override
-  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
-    if(this.isInCreativeTab(tab)) {
-      addDefaultSubItems(subItems);
-      ItemStack tool = getInfiTool("Bane of Pigs");
+    @Override
+    public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
+        if (this.isInCreativeTab(tab)) {
+            addDefaultSubItems(subItems);
+            ItemStack tool = getInfiTool("Bane of Pigs");
 
-      if(tool != null) {
-        for(int i = 0; i < 25 * 5; i++) {
-          TinkerModifiers.modFiery.apply(tool);
+            if (tool != null) {
+                for (int i = 0; i < 25 * 5; i++) {
+                    TinkerModifiers.modFiery.apply(tool);
+                }
+
+                if (hasValidMaterials(tool)) {
+                    subItems.add(tool);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase player, int timeLeft) {
+        if (world.isClient) {
+            return;
         }
 
-        if(hasValidMaterials(tool)) {
-          subItems.add(tool);
+        float progress = Math.min(1f, (getMaxItemUseDuration(stack) - timeLeft) / 30f);
+        float strength = .1f + 2.5f * progress * progress;
+
+        float range = 3.2f;
+
+        // is the player currently looking at an entity?
+        Vec3d eye = new Vec3d(player.x, player.y + player.getEyeHeight(), player.z); // Entity.getPositionEyes
+        Vec3d look = player.getLook(1.0f);
+        HitResult mop = EntityUtil.raytraceEntity(player, eye, look, range, true);
+
+        // nothing hit :(
+        if (mop == null) {
+            return;
         }
-      }
+
+        // we hit something. let it FLYYYYYYYYY
+        if (mop.typeOfHit == HitResult.Type.ENTITY) {
+            Entity entity = mop.entityHit;
+            double x = look.x * strength;
+            double y = look.y / 3f * strength + 0.1f + 0.4f * progress;
+            double z = look.z * strength;
+
+            // bonus damage!
+            EntityAttributeModifier modifier = new EntityAttributeModifier(FRYPAN_CHARGE_BONUS, "Frypan charge bonus", progress * 5f, 0);
+
+            // we set the entity on fire for the hit if it was fully charged
+            // this makes it so it drops cooked stuff.. and it'funny :D
+            boolean flamingStrike = progress >= 1f && !entity.isBurning();
+            if (flamingStrike) {
+                entity.setFire(1);
+            }
+            player.getEntityAttribute(EntityAttributes.ATTACK_DAMAGE).applyModifier(modifier);
+            ToolHelper.attackEntity(stack, this, player, entity);
+            player.getEntityAttribute(EntityAttributes.ATTACK_DAMAGE).removeModifier(modifier);
+            if (flamingStrike) {
+                entity.extinguish();
+            }
+
+            world.playSound(null, player.getPosition(), Sounds.frypan_boing, SoundCategory.field_15248, 1.5f, 0.6f + 0.2f * TConstruct.random.nextFloat());
+            entity.addVelocity(x, y, z);
+            TinkerTools.proxy.spawnAttackParticle(Particles.FRYPAN_ATTACK, player, 0.6d);
+            if (entity instanceof EntityPlayerMP) {
+                TinkerNetwork.sendPacket(entity, new SPacketEntityVelocity(entity));
+            }
+        }
     }
-  }
 
-  @Override
-  public void onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase player, int timeLeft) {
-    if(world.isClient) {
-      return;
+    @Override
+    public boolean dealDamage(ItemStack stack, EntityLivingBase player, Entity entity, float damage) {
+        boolean hit = super.dealDamage(stack, player, entity, damage);
+        if (hit || player.getEntityWorld().isClient) {
+            player.playSound(Sounds.frypan_boing, 2f, 1f);
+        }
+        if (hit && readyForSpecialAttack(player)) {
+            TinkerTools.proxy.spawnAttackParticle(Particles.FRYPAN_ATTACK, player, 0.8d);
+        }
+        return hit;
     }
 
-    float progress = Math.min(1f, (getMaxItemUseDuration(stack) - timeLeft) / 30f);
-    float strength = .1f + 2.5f * progress * progress;
-
-    float range = 3.2f;
-
-    // is the player currently looking at an entity?
-    Vec3d eye = new Vec3d(player.x, player.y + player.getEyeHeight(), player.z); // Entity.getPositionEyes
-    Vec3d look = player.getLook(1.0f);
-    HitResult mop = EntityUtil.raytraceEntity(player, eye, look, range, true);
-
-    // nothing hit :(
-    if(mop == null) {
-      return;
+    @Override
+    public boolean canDestroyBlockInCreative(World world, BlockPos pos, ItemStack stack, EntityPlayer player) {
+        return false;
     }
 
-    // we hit something. let it FLYYYYYYYYY
-    if(mop.typeOfHit == HitResult.Type.ENTITY) {
-      Entity entity = mop.entityHit;
-      double x = look.x * strength;
-      double y = look.y / 3f * strength + 0.1f + 0.4f * progress;
-      double z = look.z * strength;
-
-      // bonus damage!
-      EntityAttributeModifier modifier = new EntityAttributeModifier(FRYPAN_CHARGE_BONUS, "Frypan charge bonus", progress * 5f, 0);
-
-      // we set the entity on fire for the hit if it was fully charged
-      // this makes it so it drops cooked stuff.. and it'funny :D
-      boolean flamingStrike = progress >= 1f && !entity.isBurning();
-      if(flamingStrike) {
-        entity.setFire(1);
-      }
-      player.getEntityAttribute(EntityAttributes.ATTACK_DAMAGE).applyModifier(modifier);
-      ToolHelper.attackEntity(stack, this, player, entity);
-      player.getEntityAttribute(EntityAttributes.ATTACK_DAMAGE).removeModifier(modifier);
-      if(flamingStrike) {
-        entity.extinguish();
-      }
-
-      world.playSound(null, player.getPosition(), Sounds.frypan_boing, SoundCategory.field_15248, 1.5f, 0.6f + 0.2f * TConstruct.random.nextFloat());
-      entity.addVelocity(x, y, z);
-      TinkerTools.proxy.spawnAttackParticle(Particles.FRYPAN_ATTACK, player, 0.6d);
-      if(entity instanceof EntityPlayerMP) {
-        TinkerNetwork.sendPacket(entity, new SPacketEntityVelocity(entity));
-      }
+    @Override
+    public ItemStack onItemUseFinish(@Nonnull ItemStack stack, World worldIn, EntityLivingBase entityLiving) {
+        return stack;
     }
-  }
 
-  @Override
-  public boolean dealDamage(ItemStack stack, EntityLivingBase player, Entity entity, float damage) {
-    boolean hit = super.dealDamage(stack, player, entity, damage);
-    if(hit || player.getEntityWorld().isClient) {
-      player.playSound(Sounds.frypan_boing, 2f, 1f);
+    @Override
+    public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+        // has to be done in onUpdate because onTickUsing is too early and gets overwritten. bleh.
+        preventSlowDown(entityIn, 0.7f);
+
+        super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
     }
-    if(hit && readyForSpecialAttack(player)) {
-      TinkerTools.proxy.spawnAttackParticle(Particles.FRYPAN_ATTACK, player, 0.8d);
+
+    /**
+     * How long it takes to use or consume an item
+     */
+    @Override
+    public int getMaxItemUseDuration(ItemStack stack) {
+        return 5 * 20;
     }
-    return hit;
-  }
 
-  @Override
-  public boolean canDestroyBlockInCreative(World world, BlockPos pos, ItemStack stack, EntityPlayer player) {
-    return false;
-  }
+    /**
+     * returns the action that specifies what animation to play when the items is being used
+     */
+    @Nonnull
+    @Override
+    public EnumAction getItemUseAction(ItemStack stack) {
+        return EnumAction.BOW;
+    }
 
-  @Override
-  public ItemStack onItemUseFinish(@Nonnull ItemStack stack, World worldIn, EntityLivingBase entityLiving) {
-    return stack;
-  }
+    @Nonnull
+    @Override
+    public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+        ItemStack itemStackIn = playerIn.getHeldItem(hand);
+        playerIn.setActiveHand(hand);
+        return new TypedActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+    }
 
-  @Override
-  public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-    // has to be done in onUpdate because onTickUsing is too early and gets overwritten. bleh.
-    preventSlowDown(entityIn, 0.7f);
+    @Override
+    public float damagePotential() {
+        return 1.0f;
+    }
 
-    super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
-  }
+    @Override
+    public float knockback() {
+        return 2f;
+    }
 
-  /**
-   * How long it takes to use or consume an item
-   */
-  @Override
-  public int getMaxItemUseDuration(ItemStack stack) {
-    return 5 * 20;
-  }
+    @Override
+    public double attackSpeed() {
+        return 1.4d;
+    }
 
-  /**
-   * returns the action that specifies what animation to play when the items is being used
-   */
-  @Nonnull
-  @Override
-  public EnumAction getItemUseAction(ItemStack stack) {
-    return EnumAction.BOW;
-  }
-
-  @Nonnull
-  @Override
-  public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
-    ItemStack itemStackIn = playerIn.getHeldItem(hand);
-    playerIn.setActiveHand(hand);
-    return new TypedActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
-  }
-
-  @Override
-  public float damagePotential() {
-    return 1.0f;
-  }
-
-  @Override
-  public float knockback() {
-    return 2f;
-  }
-
-  @Override
-  public double attackSpeed() {
-    return 1.4d;
-  }
-
-  @Override
-  public ToolNBT buildTagData(List<Material> materials) {
-    return buildDefaultTag(materials);
-  }
+    @Override
+    public ToolNBT buildTagData(List<Material> materials) {
+        return buildDefaultTag(materials);
+    }
 }

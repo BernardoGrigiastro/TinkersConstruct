@@ -9,19 +9,19 @@ import slimeknights.tconstruct.shared.TinkerCommons;
 import slimeknights.tconstruct.shared.TinkerFluids;
 
 public class ItemMetaDynamicTinkers extends ItemMetaDynamic {
-
-  @Override
-  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
-    if(this.isInCreativeTab(tab)) {
-      for(int i = 0; i <= availabilityMask.length; i++) {
-        if(isValid(i)) {
-          // prevent the addition of alubrass if it's not present
-          if((this == TinkerCommons.ingots || this == TinkerCommons.nuggets) && !TinkerIntegration.isIntegrated(TinkerFluids.alubrass) && i == 5) {
-            continue;
-          }
-          subItems.add(new ItemStack(this, 1, i));
+    
+    @Override
+    public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
+        if (this.isInCreativeTab(tab)) {
+            for (int i = 0; i <= availabilityMask.length; i++) {
+                if (isValid(i)) {
+                    // prevent the addition of alubrass if it's not present
+                    if ((this == TinkerCommons.ingots || this == TinkerCommons.nuggets) && !TinkerIntegration.isIntegrated(TinkerFluids.alubrass) && i == 5) {
+                        continue;
+                    }
+                    subItems.add(new ItemStack(this, 1, i));
+                }
+            }
         }
-      }
     }
-  }
 }

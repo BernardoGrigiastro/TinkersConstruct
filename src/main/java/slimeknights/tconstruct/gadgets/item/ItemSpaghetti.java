@@ -7,8 +7,8 @@ import slimeknights.mantle.item.ItemMetaDynamic;
 
 public class ItemSpaghetti extends ItemMetaDynamic {
 
-  @Override
-  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
-    // no creative items
-  }
+    @Override
+    public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> subItems) {
+        // no creative items
+    }
 }

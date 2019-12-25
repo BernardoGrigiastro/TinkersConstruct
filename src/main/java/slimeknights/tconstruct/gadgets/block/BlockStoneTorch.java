@@ -6,11 +6,11 @@ import slimeknights.tconstruct.library.TinkerRegistry;
 
 public class BlockStoneTorch extends BlockTorch {
 
-  public BlockStoneTorch() {
-    this.setHardness(0.0F);
-    this.setLightLevel(0.9375F);
-    this.setSoundType(BlockSoundGroup.STONE);
+    public BlockStoneTorch() {
+        this.setHardness(0.0F);
+        this.setLightLevel(0.9375F);
+        this.setSoundType(BlockSoundGroup.STONE);
 
-    this.setCreativeTab(TinkerRegistry.tabGadgets);
-  }
+        this.setCreativeTab(TinkerRegistry.tabGadgets);
+    }
 }

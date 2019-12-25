@@ -9,31 +9,30 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+import slimeknights.tconstruct.library.TinkerRegistry;
 
 import javax.annotation.Nonnull;
 
-import slimeknights.tconstruct.library.TinkerRegistry;
-
 public class BlockTinkerFluid extends BlockFluidClassic {
 
-  public BlockTinkerFluid(Fluid fluid, Material material) {
-    super(fluid, material);
+    public BlockTinkerFluid(Fluid fluid, Material material) {
+        super(fluid, material);
 
-    setCreativeTab(TinkerRegistry.tabSmeltery);
-  }
-
-  @Nonnull
-  @Override
-  public String getUnlocalizedName() {
-    Fluid fluid = FluidRegistry.getFluid(fluidName);
-    if(fluid != null) {
-      return fluid.getUnlocalizedName();
+        setCreativeTab(TinkerRegistry.tabSmeltery);
     }
-    return super.getUnlocalizedName();
-  }
 
-  @Override
-  public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
-    return BlockFaceShape.UNDEFINED;
-  }
+    @Nonnull
+    @Override
+    public String getUnlocalizedName() {
+        Fluid fluid = FluidRegistry.getFluid(fluidName);
+        if (fluid != null) {
+            return fluid.getUnlocalizedName();
+        }
+        return super.getUnlocalizedName();
+    }
+
+    @Override
+    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
+        return BlockFaceShape.UNDEFINED;
+    }
 }

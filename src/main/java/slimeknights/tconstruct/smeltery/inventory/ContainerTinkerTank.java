@@ -5,10 +5,10 @@ import slimeknights.tconstruct.smeltery.tileentity.TileTinkerTank;
 
 public class ContainerTinkerTank extends BaseContainer<TileTinkerTank> {
 
-  public ContainerTinkerTank(TileTinkerTank tile) {
-    super(tile);
+    public ContainerTinkerTank(TileTinkerTank tile) {
+        super(tile);
 
-    // no player inventory as we don't actually use slots
-  }
+        // no player inventory as we don't actually use slots
+    }
 
 }

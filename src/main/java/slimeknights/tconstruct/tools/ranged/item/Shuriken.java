@@ -6,11 +6,6 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
-
-import java.util.List;
-
-import javax.annotation.Nonnull;
-
 import slimeknights.tconstruct.library.entity.EntityProjectileBase;
 import slimeknights.tconstruct.library.materials.Material;
 import slimeknights.tconstruct.library.materials.MaterialTypes;
@@ -22,66 +17,63 @@ import slimeknights.tconstruct.library.utils.ToolHelper;
 import slimeknights.tconstruct.tools.TinkerTools;
 import slimeknights.tconstruct.tools.common.entity.EntityShuriken;
 
+import javax.annotation.Nonnull;
+import java.util.List;
+
 public class Shuriken extends ProjectileCore {
 
-  private static PartMaterialType shurikenPMT = new PartMaterialType(TinkerTools.knifeBlade, MaterialTypes.HEAD, MaterialTypes.EXTRA, MaterialTypes.PROJECTILE);
+    private static PartMaterialType shurikenPMT = new PartMaterialType(TinkerTools.knifeBlade, MaterialTypes.HEAD, MaterialTypes.EXTRA, MaterialTypes.PROJECTILE);
 
-  public Shuriken() {
-    super(shurikenPMT, shurikenPMT, shurikenPMT, shurikenPMT);
+    public Shuriken() {
+        super(shurikenPMT, shurikenPMT, shurikenPMT, shurikenPMT);
 
-    addCategory(Category.NO_MELEE, Category.PROJECTILE);
-  }
-
-  @Override
-  public int[] getRepairParts() {
-    return new int[]{0, 1, 2, 3};
-  }
-
-  @Override
-  public float damagePotential() {
-    return 0.7f;
-  }
-
-  @Nonnull
-  @Override
-  public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
-    ItemStack itemStackIn = playerIn.getHeldItem(hand);
-    if(ToolHelper.isBroken(itemStackIn)) {
-      return TypedActionResult.newResult(EnumActionResult.FAIL, itemStackIn);
-    }
-    playerIn.getCooldownTracker().setCooldown(itemStackIn.getItem(), 4);
-
-    if(!worldIn.isClient) {
-      boolean usedAmmo = useAmmo(itemStackIn, playerIn);
-      EntityProjectileBase projectile = getProjectile(itemStackIn, itemStackIn, worldIn, playerIn, 2.1f, 0f, 1f, usedAmmo);
-      worldIn.spawnEntity(projectile);
+        addCategory(Category.NO_MELEE, Category.PROJECTILE);
     }
 
-    return TypedActionResult.newResult(EnumActionResult.SUCCESS, itemStackIn);
-  }
+    @Override
+    public int[] getRepairParts() {
+        return new int[]{0, 1, 2, 3};
+    }
 
-  @Override
-  public ProjectileNBT buildTagData(List<Material> materials) {
-    ProjectileNBT data = new ProjectileNBT();
-    data.head(materials.get(0).getStatsOrUnknown(MaterialTypes.HEAD),
-              materials.get(1).getStatsOrUnknown(MaterialTypes.HEAD),
-              materials.get(2).getStatsOrUnknown(MaterialTypes.HEAD),
-              materials.get(3).getStatsOrUnknown(MaterialTypes.HEAD));
+    @Override
+    public float damagePotential() {
+        return 0.7f;
+    }
 
-    data.extra(materials.get(0).getStatsOrUnknown(MaterialTypes.EXTRA),
-               materials.get(1).getStatsOrUnknown(MaterialTypes.EXTRA),
-               materials.get(2).getStatsOrUnknown(MaterialTypes.EXTRA),
-               materials.get(3).getStatsOrUnknown(MaterialTypes.EXTRA));
+    @Nonnull
+    @Override
+    public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+        ItemStack itemStackIn = playerIn.getHeldItem(hand);
+        if (ToolHelper.isBroken(itemStackIn)) {
+            return TypedActionResult.newResult(EnumActionResult.FAIL, itemStackIn);
+        }
+        playerIn.getCooldownTracker().setCooldown(itemStackIn.getItem(), 4);
 
-    data.attack += 1f;
-    data.accuracy = 1f;
+        if (!worldIn.isClient) {
+            boolean usedAmmo = useAmmo(itemStackIn, playerIn);
+            EntityProjectileBase projectile = getProjectile(itemStackIn, itemStackIn, worldIn, playerIn, 2.1f, 0f, 1f, usedAmmo);
+            worldIn.spawnEntity(projectile);
+        }
 
-    return data;
-  }
+        return TypedActionResult.newResult(EnumActionResult.SUCCESS, itemStackIn);
+    }
 
-  @Override
-  public EntityProjectileBase getProjectile(ItemStack stack, ItemStack launcher, World world, EntityPlayer player, float speed, float inaccuracy, float progress, boolean usedAmmo) {
-    inaccuracy *= ProjectileNBT.from(stack).accuracy;
-    return new EntityShuriken(world, player, speed, inaccuracy, getProjectileStack(stack, world, player, usedAmmo), launcher);
-  }
+    @Override
+    public ProjectileNBT buildTagData(List<Material> materials) {
+        ProjectileNBT data = new ProjectileNBT();
+        data.head(materials.get(0).getStatsOrUnknown(MaterialTypes.HEAD), materials.get(1).getStatsOrUnknown(MaterialTypes.HEAD), materials.get(2).getStatsOrUnknown(MaterialTypes.HEAD), materials.get(3).getStatsOrUnknown(MaterialTypes.HEAD));
+
+        data.extra(materials.get(0).getStatsOrUnknown(MaterialTypes.EXTRA), materials.get(1).getStatsOrUnknown(MaterialTypes.EXTRA), materials.get(2).getStatsOrUnknown(MaterialTypes.EXTRA), materials.get(3).getStatsOrUnknown(MaterialTypes.EXTRA));
+
+        data.attack += 1f;
+        data.accuracy = 1f;
+
+        return data;
+    }
+
+    @Override
+    public EntityProjectileBase getProjectile(ItemStack stack, ItemStack launcher, World world, EntityPlayer player, float speed, float inaccuracy, float progress, boolean usedAmmo) {
+        inaccuracy *= ProjectileNBT.from(stack).accuracy;
+        return new EntityShuriken(world, player, speed, inaccuracy, getProjectileStack(stack, world, player, usedAmmo), launcher);
+    }
 }

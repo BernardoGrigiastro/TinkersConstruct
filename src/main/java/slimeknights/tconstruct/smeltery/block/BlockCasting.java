@@ -41,202 +41,192 @@ import java.util.Locale;
 
 public class BlockCasting extends BlockInventory implements IFaucetDepth {
 
-  public static final PropertyEnum<CastingType> TYPE = PropertyEnum.create("type", CastingType.class);
+    public static final PropertyEnum<CastingType> TYPE = PropertyEnum.create("type", CastingType.class);
+    /* Bounds */
+    private static ImmutableList<BoundingBox> BOUNDS_Table = ImmutableList.of(new BoundingBox(0, 0.625, 0, 1, 1, 1), new BoundingBox(0, 0, 0, 0.25, 0.625, 0.25), new BoundingBox(0.75, 0, 0, 1, 0.625, 0.25), new BoundingBox(0.75, 0, 0.75, 1, 0.625, 1), new BoundingBox(0, 0, 0.75, 0.25, 0.625, 1));
+    private static ImmutableList<BoundingBox> BOUNDS_Basin = ImmutableList.of(new BoundingBox(0, 0.25, 0, 1, 1, 1), new BoundingBox(0, 0, 0, 0.3125, 0.25, 0.3125), new BoundingBox(0.6875, 0, 0, 1, 0.25, 0.3125), new BoundingBox(0.6875, 0, 0.6875, 1, 0.25, 1), new BoundingBox(0, 0, 0.6875, 0.3125, 0.25, 1));
 
-  public BlockCasting() {
-    super(Material.STONE);
-    setHardness(3F);
-    setResistance(20F);
-    setCreativeTab(TinkerRegistry.tabSmeltery);
-  }
-
-  @Override
-  public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
-    for(CastingType type : CastingType.values()) {
-      list.add(new ItemStack(this, 1, type.getMeta()));
-    }
-  }
-
-  @Nonnull
-  @Override
-  protected BlockStateContainer createBlockState() {
-    return new ExtendedBlockState(this, new IProperty[]{TYPE}, new IUnlistedProperty[]{BlockTable.INVENTORY, BlockTable.FACING});
-  }
-
-  @Override
-  public int getMetaFromState(IBlockState state) {
-    return state.getValue(TYPE).getMeta();
-  }
-
-  @Nonnull
-  @Override
-  public IBlockState getStateFromMeta(int meta) {
-    if(meta < 0 || meta >= CastingType.values().length) {
-      meta = 0;
-    }
-    return getDefaultState().withProperty(TYPE, CastingType.values()[meta]);
-  }
-
-  @Override
-  public int damageDropped(IBlockState state) {
-    return getMetaFromState(state);
-  }
-
-  @Nonnull
-  @Override
-  public BlockEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
-    switch(getStateFromMeta(meta).getValue(TYPE)) {
-      case TABLE:
-        return new TileCastingTable();
-      case BASIN:
-        return new TileCastingBasin();
-    }
-    return null;
-  }
-
-  @Override
-  public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-    if(playerIn.isSneaking()) {
-      return false;
-    }
-    BlockEntity te = worldIn.getTileEntity(pos);
-    if(te instanceof TileCasting) {
-      ((TileCasting) te).interact(playerIn);
-      return true;
-    }
-    return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
-  }
-
-  @Override
-  public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-    super.onBlockPlacedBy(world, pos, state, placer, stack);
-
-    // we have rotation for the stuff too so the items inside rotate according to placement!
-    BlockEntity te = world.getTileEntity(pos);
-    if(te != null && te instanceof TileCasting) {
-      ((TileCasting) te).setFacing(placer.getHorizontalFacing().getOpposite());
-    }
-  }
-
-  @Nonnull
-  @Override
-  @SideOnly(Side.CLIENT)
-  public IBlockState getExtendedState(@Nonnull IBlockState state, IBlockAccess world, BlockPos pos) {
-    IExtendedBlockState extendedState = (IExtendedBlockState) state;
-
-    BlockEntity te = world.getTileEntity(pos);
-    if(te != null && te instanceof TileCasting) {
-      TileCasting tile = (TileCasting) te;
-      return tile.writeExtendedBlockState(extendedState);
-    }
-
-    return super.getExtendedState(state, world, pos);
-  }
-
-  @Override
-  public boolean isSideSolid(@Nonnull IBlockState base_state, @Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nonnull EnumFacing side) {
-    if(base_state.getValue(TYPE) == CastingType.BASIN) {
-      // solid from the sides, but not up and below
-      return side != EnumFacing.DOWN;
-    }
-    return super.isSideSolid(base_state, world, pos, side);
-  }
-
-  /* Bounds */
-  private static ImmutableList<BoundingBox> BOUNDS_Table = ImmutableList.of(
-      new BoundingBox(0, 0.625, 0, 1, 1, 1),
-      new BoundingBox(0,    0, 0,    0.25, 0.625, 0.25),
-      new BoundingBox(0.75, 0, 0,    1,    0.625, 0.25),
-      new BoundingBox(0.75, 0, 0.75, 1,    0.625, 1),
-      new BoundingBox(0,    0, 0.75, 0.25, 0.625, 1)
-  );
-  private static ImmutableList<BoundingBox> BOUNDS_Basin = ImmutableList.of(
-      new BoundingBox(0, 0.25, 0, 1, 1, 1),
-      new BoundingBox(0,      0, 0,      0.3125, 0.25, 0.3125),
-      new BoundingBox(0.6875, 0, 0,      1,      0.25, 0.3125),
-      new BoundingBox(0.6875, 0, 0.6875, 1,      0.25, 1),
-      new BoundingBox(0,      0, 0.6875, 0.3125, 0.25, 1)
-  );
-
-  @Override
-  public HitResult collisionRayTrace(IBlockState blockState, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Vec3d start, @Nonnull Vec3d end) {
-    if(blockState.getValue(TYPE) == CastingType.BASIN) {
-      return BlockTable.raytraceMultiAABB(BOUNDS_Basin, pos, start, end);
-    }
-    return BlockTable.raytraceMultiAABB(BOUNDS_Table, pos, start, end);
-  }
-
-  @Override
-  protected boolean openGui(EntityPlayer player, World world, BlockPos pos) {
-    // no gui
-    return false;
-  }
-
-  @Override
-  public boolean isOpaqueCube(IBlockState state) {
-    return false;
-  }
-
-  @Override
-  public boolean isFullCube(IBlockState state) {
-    return false;
-  }
-
-  @Nonnull
-  @Override
-  @SideOnly(Side.CLIENT)
-  public BlockRenderLayer getBlockLayer() {
-    return BlockRenderLayer.CUTOUT;
-  }
-
-  @Override
-  public boolean hasComparatorInputOverride(IBlockState state) {
-    return true;
-  }
-
-  @Override
-  public int getComparatorInputOverride(IBlockState blockState, World world, BlockPos pos) {
-    BlockEntity te = world.getTileEntity(pos);
-    if(!(te instanceof TileCasting)) {
-      return 0;
-    }
-
-    return ((TileCasting) te).comparatorStrength();
-  }
-
-  @Override
-  public boolean shouldSideBeRendered(IBlockState blockState, @Nonnull IBlockAccess blockAccess, @Nonnull BlockPos pos, EnumFacing side) {
-    return true;
-  }
-
-  @Override
-  public float getFlowDepth(World world, BlockPos pos, IBlockState state) {
-    if(state.getValue(TYPE) == CastingType.TABLE) {
-      return 0.125f;
-    }
-    else {
-      return 0.725f;
-    }
-  }
-
-  public enum CastingType implements StringRepresentable, EnumBlock.IEnumMeta {
-    TABLE,
-    BASIN;
-
-    public final int meta;
-
-    CastingType() {
-      meta = ordinal();
+    public BlockCasting() {
+        super(Material.STONE);
+        setHardness(3F);
+        setResistance(20F);
+        setCreativeTab(TinkerRegistry.tabSmeltery);
     }
 
     @Override
-    public String getName() {
-      return this.toString().toLowerCase(Locale.US);
+    public void getSubBlocks(CreativeTabs tab, DefaultedList<ItemStack> list) {
+        for (CastingType type : CastingType.values()) {
+            list.add(new ItemStack(this, 1, type.getMeta()));
+        }
+    }
+
+    @Nonnull
+    @Override
+    protected BlockStateContainer createBlockState() {
+        return new ExtendedBlockState(this, new IProperty[]{TYPE}, new IUnlistedProperty[]{BlockTable.INVENTORY, BlockTable.FACING});
     }
 
     @Override
-    public int getMeta() {
-      return meta;
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(TYPE).getMeta();
     }
-  }
+
+    @Nonnull
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        if (meta < 0 || meta >= CastingType.values().length) {
+            meta = 0;
+        }
+        return getDefaultState().withProperty(TYPE, CastingType.values()[meta]);
+    }
+
+    @Override
+    public int damageDropped(IBlockState state) {
+        return getMetaFromState(state);
+    }
+
+    @Nonnull
+    @Override
+    public BlockEntity createNewTileEntity(@Nonnull World worldIn, int meta) {
+        switch (getStateFromMeta(meta).getValue(TYPE)) {
+            case TABLE:
+                return new TileCastingTable();
+            case BASIN:
+                return new TileCastingBasin();
+        }
+        return null;
+    }
+
+    @Override
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        if (playerIn.isSneaking()) {
+            return false;
+        }
+        BlockEntity te = worldIn.getTileEntity(pos);
+        if (te instanceof TileCasting) {
+            ((TileCasting) te).interact(playerIn);
+            return true;
+        }
+        return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
+    }
+
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        super.onBlockPlacedBy(world, pos, state, placer, stack);
+
+        // we have rotation for the stuff too so the items inside rotate according to placement!
+        BlockEntity te = world.getTileEntity(pos);
+        if (te != null && te instanceof TileCasting) {
+            ((TileCasting) te).setFacing(placer.getHorizontalFacing().getOpposite());
+        }
+    }
+
+    @Nonnull
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IBlockState getExtendedState(@Nonnull IBlockState state, IBlockAccess world, BlockPos pos) {
+        IExtendedBlockState extendedState = (IExtendedBlockState) state;
+
+        BlockEntity te = world.getTileEntity(pos);
+        if (te != null && te instanceof TileCasting) {
+            TileCasting tile = (TileCasting) te;
+            return tile.writeExtendedBlockState(extendedState);
+        }
+
+        return super.getExtendedState(state, world, pos);
+    }
+
+    @Override
+    public boolean isSideSolid(
+            @Nonnull IBlockState base_state,
+            @Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nonnull EnumFacing side) {
+        if (base_state.getValue(TYPE) == CastingType.BASIN) {
+            // solid from the sides, but not up and below
+            return side != EnumFacing.DOWN;
+        }
+        return super.isSideSolid(base_state, world, pos, side);
+    }
+
+    @Override
+    public HitResult collisionRayTrace(IBlockState blockState,
+            @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Vec3d start, @Nonnull Vec3d end) {
+        if (blockState.getValue(TYPE) == CastingType.BASIN) {
+            return BlockTable.raytraceMultiAABB(BOUNDS_Basin, pos, start, end);
+        }
+        return BlockTable.raytraceMultiAABB(BOUNDS_Table, pos, start, end);
+    }
+
+    @Override
+    protected boolean openGui(EntityPlayer player, World world, BlockPos pos) {
+        // no gui
+        return false;
+    }
+
+    @Override
+    public boolean isOpaqueCube(IBlockState state) {
+        return false;
+    }
+
+    @Override
+    public boolean isFullCube(IBlockState state) {
+        return false;
+    }
+
+    @Nonnull
+    @Override
+    @SideOnly(Side.CLIENT)
+    public BlockRenderLayer getBlockLayer() {
+        return BlockRenderLayer.CUTOUT;
+    }
+
+    @Override
+    public boolean hasComparatorInputOverride(IBlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getComparatorInputOverride(IBlockState blockState, World world, BlockPos pos) {
+        BlockEntity te = world.getTileEntity(pos);
+        if (!(te instanceof TileCasting)) {
+            return 0;
+        }
+
+        return ((TileCasting) te).comparatorStrength();
+    }
+
+    @Override
+    public boolean shouldSideBeRendered(IBlockState blockState,
+            @Nonnull IBlockAccess blockAccess, @Nonnull BlockPos pos, EnumFacing side) {
+        return true;
+    }
+
+    @Override
+    public float getFlowDepth(World world, BlockPos pos, IBlockState state) {
+        if (state.getValue(TYPE) == CastingType.TABLE) {
+            return 0.125f;
+        } else {
+            return 0.725f;
+        }
+    }
+
+    public enum CastingType implements StringRepresentable, EnumBlock.IEnumMeta {
+        TABLE,
+        BASIN;
+
+        public final int meta;
+
+        CastingType() {
+            meta = ordinal();
+        }
+
+        @Override
+        public String getName() {
+            return this.toString().toLowerCase(Locale.US);
+        }
+
+        @Override
+        public int getMeta() {
+            return meta;
+        }
+    }
 }

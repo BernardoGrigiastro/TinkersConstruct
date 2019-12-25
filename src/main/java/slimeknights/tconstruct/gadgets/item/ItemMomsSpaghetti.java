@@ -22,12 +22,6 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.List;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import slimeknights.mantle.util.LocUtils;
 import slimeknights.tconstruct.common.ClientProxy;
 import slimeknights.tconstruct.gadgets.TinkerGadgets;
@@ -41,187 +35,182 @@ import slimeknights.tconstruct.library.utils.TinkerUtil;
 import slimeknights.tconstruct.library.utils.ToolHelper;
 import slimeknights.tconstruct.library.utils.TooltipBuilder;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+
 public class ItemMomsSpaghetti extends ItemFood implements IRepairable, IModifyable, IToolStationDisplay {
-
-  public static final String LOC_NAME = "item.tconstruct.moms_spaghetti.name";
-  public static final String LOC_DESC = "item.tconstruct.moms_spaghetti.desc";
-  public static final String LOC_USES = "stat.spaghetti.uses.name";
-  public static final String LOC_NOURISHMENT = "stat.spaghetti.nourishment.name";
-  public static final String LOC_SATURATION = "stat.spaghetti.saturation.name";
-  public static final String LOC_TOOLTIP = "item.tconstruct.moms_spaghetti.tooltip";
-
-  public static final int MAX_USES = 100;
-  public static final int USES_PER_WHEAT = 1;
-
-  public ItemMomsSpaghetti() {
-    super(2, 0.2f, false);
-    this.setMaxDamage(MAX_USES);
-    this.setMaxStackSize(1);
-    this.setNoRepair();
-
-    this.setCreativeTab(null);
-  }
-
-  @Override
-  public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> items) {
-    // no creative items, nono
-  }
-
-  @Override
-  public float getSaturationModifier(ItemStack stack) {
-    float saturation = super.getSaturationModifier(stack);
-    if(hasSauce(stack)) {
-      saturation += 0.2f;
+    
+    public static final String LOC_NAME = "item.tconstruct.moms_spaghetti.name";
+    public static final String LOC_DESC = "item.tconstruct.moms_spaghetti.desc";
+    public static final String LOC_USES = "stat.spaghetti.uses.name";
+    public static final String LOC_NOURISHMENT = "stat.spaghetti.nourishment.name";
+    public static final String LOC_SATURATION = "stat.spaghetti.saturation.name";
+    public static final String LOC_TOOLTIP = "item.tconstruct.moms_spaghetti.tooltip";
+    
+    public static final int MAX_USES = 100;
+    public static final int USES_PER_WHEAT = 1;
+    
+    public ItemMomsSpaghetti() {
+        super(2, 0.2f, false);
+        this.setMaxDamage(MAX_USES);
+        this.setMaxStackSize(1);
+        this.setNoRepair();
+        
+        this.setCreativeTab(null);
     }
-    return saturation;
-  }
-
-  @Override
-  public int getHealAmount(ItemStack stack) {
-    int heal = super.getHealAmount(stack);
-    if(hasMeat(stack)) {
-      heal += 1;
+    
+    protected static boolean hasModifier(ItemStack stack, String identifier) {
+        return TinkerUtil.hasModifier(TagUtil.getTagSafe(stack), identifier);
     }
-    return heal;
-  }
-
-  protected static boolean hasModifier(ItemStack stack, String identifier) {
-    return TinkerUtil.hasModifier(TagUtil.getTagSafe(stack), identifier);
-  }
-
-  public static boolean hasSauce(ItemStack stack) {
-    return hasModifier(stack, TinkerGadgets.modSpaghettiSauce.getIdentifier());
-  }
-
-  public static boolean hasMeat(ItemStack stack) {
-    return hasModifier(stack, TinkerGadgets.modSpaghettiMeat.getIdentifier());
-  }
-
-  @Override
-  @Nonnull
-  public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityLivingBase entityLiving) {
-    stack.setItemDamage(stack.getItemDamage() + 1);
-
-    if(entityLiving instanceof EntityPlayer) {
-      EntityPlayer entityplayer = (EntityPlayer) entityLiving;
-      entityplayer.getFoodStats().addStats(this, stack);
-      worldIn.playSound(null, entityplayer.x, entityplayer.y, entityplayer.z, SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.field_15248, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
-      StatBase statBase = StatList.getObjectUseStats(this);
-      assert statBase != null;
-      entityplayer.addStat(statBase);
+    
+    public static boolean hasSauce(ItemStack stack) {
+        return hasModifier(stack, TinkerGadgets.modSpaghettiSauce.getIdentifier());
     }
-
-    return stack;
-  }
-
-  /**
-   * How long it takes to use or consume an item
-   */
-  @Override
-  public int getMaxItemUseDuration(ItemStack stack) {
-    return 10;
-  }
-
-  /**
-   * returns the action that specifies what animation to play when the items is being used
-   */
-  @Nonnull
-  @Override
-  public EnumAction getItemUseAction(ItemStack stack) {
-    return EnumAction.EAT;
-  }
-
-  @Nonnull
-  @Override
-  public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
-    ItemStack itemStackIn = playerIn.getHeldItem(hand);
-    if(playerIn.canEat(false) && getUses(itemStackIn) > 0) {
-      playerIn.setActiveHand(hand);
-      return new TypedActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+    
+    public static boolean hasMeat(ItemStack stack) {
+        return hasModifier(stack, TinkerGadgets.modSpaghettiMeat.getIdentifier());
     }
-    else {
-      return new TypedActionResult<>(EnumActionResult.FAIL, itemStackIn);
+    
+    @Override
+    public void getSubItems(CreativeTabs tab, DefaultedList<ItemStack> items) {
+        // no creative items, nono
     }
-  }
-
-  public int getUses(ItemStack stack) {
-    return stack.getMaxDamage() - stack.getItemDamage();
-  }
-
-  @Override
-  public ItemStack repair(ItemStack repairable, DefaultedList<ItemStack> repairItems) {
-    if(repairable.getItemDamage() == 0) {
-      // nothing to repair, full durability
-      return ItemStack.EMPTY;
+    
+    @Override
+    public float getSaturationModifier(ItemStack stack) {
+        float saturation = super.getSaturationModifier(stack);
+        if (hasSauce(stack)) {
+            saturation += 0.2f;
+        }
+        return saturation;
     }
-
-    // don't accept anything that's not wheat
-    for(ItemStack repairItem : repairItems) {
-      if(repairItem != null && repairItem.getItem() != Items.WHEAT) {
-        return ItemStack.EMPTY;
-      }
+    
+    @Override
+    public int getHealAmount(ItemStack stack) {
+        int heal = super.getHealAmount(stack);
+        if (hasMeat(stack)) {
+            heal += 1;
+        }
+        return heal;
     }
-
-    ItemStack stack = repairable.copy();
-    int index = 0;
-    while(stack.getItemDamage() > 0 && index < repairItems.size()) {
-      ItemStack repairItem = repairItems.get(index);
-      if(repairItem.getCount() > 0) {
-        repairItem.shrink(1);
-
-        //change = Math.min(change, stack.getMaxDamage() - stack.getItemDamage());
-        stack.setItemDamage(stack.getItemDamage() - USES_PER_WHEAT);
-
-        ToolHelper.healTool(stack, USES_PER_WHEAT, null);
-      }
-      else {
-        index++;
-      }
+    
+    @Override
+    @Nonnull
+    public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityLivingBase entityLiving) {
+        stack.setItemDamage(stack.getItemDamage() + 1);
+        
+        if (entityLiving instanceof EntityPlayer) {
+            EntityPlayer entityplayer = (EntityPlayer) entityLiving;
+            entityplayer.getFoodStats().addStats(this, stack);
+            worldIn.playSound(null, entityplayer.x, entityplayer.y, entityplayer.z, SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.field_15248, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+            StatBase statBase = StatList.getObjectUseStats(this);
+            assert statBase != null;
+            entityplayer.addStat(statBase);
+        }
+        
+        return stack;
     }
-
-    return stack;
-  }
-
-  @SideOnly(Side.CLIENT)
-  @Override
-  public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, TooltipContext flagIn) {
-    tooltip.add(String.format("%s: %s", Util.translate(LOC_USES),
-                              CustomFontColor.formatPartialAmount(getUses(stack), getMaxDamage(stack))));
-    TooltipBuilder.addModifierTooltips(stack, tooltip);
-
-    tooltip.add("");
-    int i = 1;
-    if(hasMeat(stack)) {
-      i = 3;
+    
+    /**
+     * How long it takes to use or consume an item
+     */
+    @Override
+    public int getMaxItemUseDuration(ItemStack stack) {
+        return 10;
     }
-    else if(hasSauce(stack)) {
-      i = 2;
+    
+    /**
+     * returns the action that specifies what animation to play when the items is being used
+     */
+    @Nonnull
+    @Override
+    public EnumAction getItemUseAction(ItemStack stack) {
+        return EnumAction.EAT;
     }
-    tooltip.addAll(LocUtils.getTooltips(Util.translate(LOC_TOOLTIP + i)));
-  }
-
-  @Nonnull
-  @SideOnly(Side.CLIENT)
-  @Override
-  public TextRenderer getFontRenderer(ItemStack stack) {
-    return ClientProxy.fontRenderer;
-  }
-
-  @Override
-  public String getLocalizedToolName() {
-    return Util.translate(LOC_NAME);
-  }
-
-  @Override
-  public List<String> getInformation(ItemStack stack) {
-    int nourishment = getHealAmount(stack);
-    float saturation = getSaturationModifier(stack);
-
-    return ImmutableList.of(
-        Util.translate(LOC_DESC),
-        String.format("%s: %s", Util.translate(LOC_USES), getUses(stack)) + TextFormat.RESET,
-        String.format("%s: %s", Util.translate(LOC_NOURISHMENT), nourishment) + TextFormat.RESET,
-        String.format("%s: %s", Util.translate(LOC_SATURATION), Util.dfPercent.format(saturation)) + TextFormat.RESET
-    );
-  }
+    
+    @Nonnull
+    @Override
+    public TypedActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
+        ItemStack itemStackIn = playerIn.getHeldItem(hand);
+        if (playerIn.canEat(false) && getUses(itemStackIn) > 0) {
+            playerIn.setActiveHand(hand);
+            return new TypedActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+        } else {
+            return new TypedActionResult<>(EnumActionResult.FAIL, itemStackIn);
+        }
+    }
+    
+    public int getUses(ItemStack stack) {
+        return stack.getMaxDamage() - stack.getItemDamage();
+    }
+    
+    @Override
+    public ItemStack repair(ItemStack repairable, DefaultedList<ItemStack> repairItems) {
+        if (repairable.getItemDamage() == 0) {
+            // nothing to repair, full durability
+            return ItemStack.EMPTY;
+        }
+        
+        // don't accept anything that's not wheat
+        for (ItemStack repairItem : repairItems) {
+            if (repairItem != null && repairItem.getItem() != Items.WHEAT) {
+                return ItemStack.EMPTY;
+            }
+        }
+        
+        ItemStack stack = repairable.copy();
+        int index = 0;
+        while (stack.getItemDamage() > 0 && index < repairItems.size()) {
+            ItemStack repairItem = repairItems.get(index);
+            if (repairItem.getCount() > 0) {
+                repairItem.shrink(1);
+                
+                //change = Math.min(change, stack.getMaxDamage() - stack.getItemDamage());
+                stack.setItemDamage(stack.getItemDamage() - USES_PER_WHEAT);
+                
+                ToolHelper.healTool(stack, USES_PER_WHEAT, null);
+            } else {
+                index++;
+            }
+        }
+        
+        return stack;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, TooltipContext flagIn) {
+        tooltip.add(String.format("%s: %s", Util.translate(LOC_USES), CustomFontColor.formatPartialAmount(getUses(stack), getMaxDamage(stack))));
+        TooltipBuilder.addModifierTooltips(stack, tooltip);
+        
+        tooltip.add("");
+        int i = 1;
+        if (hasMeat(stack)) {
+            i = 3;
+        } else if (hasSauce(stack)) {
+            i = 2;
+        }
+        tooltip.addAll(LocUtils.getTooltips(Util.translate(LOC_TOOLTIP + i)));
+    }
+    
+    @Nonnull
+    @SideOnly(Side.CLIENT)
+    @Override
+    public TextRenderer getFontRenderer(ItemStack stack) {
+        return ClientProxy.fontRenderer;
+    }
+    
+    @Override
+    public String getLocalizedToolName() {
+        return Util.translate(LOC_NAME);
+    }
+    
+    @Override
+    public List<String> getInformation(ItemStack stack) {
+        int nourishment = getHealAmount(stack);
+        float saturation = getSaturationModifier(stack);
+        
+        return ImmutableList.of(Util.translate(LOC_DESC), String.format("%s: %s", Util.translate(LOC_USES), getUses(stack)) + TextFormat.RESET, String.format("%s: %s", Util.translate(LOC_NOURISHMENT), nourishment) + TextFormat.RESET, String.format("%s: %s", Util.translate(LOC_SATURATION), Util.dfPercent.format(saturation)) + TextFormat.RESET);
+    }
 }
