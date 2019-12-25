@@ -1,8 +1,10 @@
 package slimeknights.tconstruct.common;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
@@ -105,9 +107,6 @@ public class CommonProxy {
     // replicates the World.newExplosion code to separate behaviour on server/client for any explosion implementation
     public void customExplosion(World world, Explosion explosion) {
         // server side
-        if (net.minecraftforge.event.ForgeEventFactory.onExplosionStart(world, explosion)) {
-            return;
-        }
         explosion.doExplosionA();
         explosion.doExplosionB(false);
         
@@ -128,7 +127,7 @@ public class CommonProxy {
     }*/
     }
     
-    public void updateEquippedItemForRendering(EnumHand hand) {
+    public void updateEquippedItemForRendering(Hand hand) {
     
     }
 }

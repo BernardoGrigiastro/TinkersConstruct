@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -11,14 +12,18 @@ import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.resource.ReloadableResourceManager;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ChatUtil;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import slimeknights.mantle.network.AbstractPacket;
+import slimeknights.tconstruct.fabric.TinkerItemGroup;
 import slimeknights.tconstruct.library.TinkerRegistry;
 import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.book.TinkerBook;
@@ -51,7 +56,7 @@ public abstract class ClientProxy extends CommonProxy {
     protected static final ToolModelLoader loader = new ToolModelLoader();
     protected static final MaterialModelLoader materialLoader = new MaterialModelLoader();
     protected static final ModifierModelLoader modifierLoader = new ModifierModelLoader();
-    private static final MinecraftClient mc = MinecraftClient.getMinecraft();
+    private static final MinecraftClient mc = MinecraftClient.getInstance();
     public static Material RenderMaterials[];
     public static Material RenderMaterialString;
     public static CustomFontRenderer fontRenderer;
@@ -93,15 +98,15 @@ public abstract class ClientProxy extends CommonProxy {
     
     public static void initRenderer() {
         if (TinkerHarvestTools.pickaxe != null) {
-            TinkerRegistry.tabTools.setDisplayIcon(TinkerHarvestTools.pickaxe.buildItemForRendering(ImmutableList.of(RenderMaterials[0], RenderMaterials[1], RenderMaterials[2])));
+            ((TinkerItemGroup)TinkerRegistry.tabTools).setIcon(TinkerHarvestTools.pickaxe.buildItemForRendering(ImmutableList.of(RenderMaterials[0], RenderMaterials[1], RenderMaterials[2])));
         }
         if (TinkerTools.pickHead != null) {
-            TinkerRegistry.tabParts.setDisplayIcon(TinkerTools.pickHead.getItemstackWithMaterial(RenderMaterials[2]));
+            ((TinkerItemGroup)TinkerRegistry.tabParts).setIcon(TinkerTools.pickHead.getItemstackWithMaterial(RenderMaterials[2]));
         }
-        
-        IReloadableResourceManager resourceManager = (IReloadableResourceManager) mc.getResourceManager();
-        resourceManager.registerReloadListener(MaterialRenderInfoLoader.INSTANCE);
-        resourceManager.registerReloadListener(CustomTextureCreator.INSTANCE);
+    
+        ReloadableResourceManager resourceManager = (ReloadableResourceManager) mc.getResourceManager();
+        resourceManager.registerListener(MaterialRenderInfoLoader.INSTANCE);
+        resourceManager.registerListener(CustomTextureCreator.INSTANCE);
         
         // Font renderer for tooltips and GUIs
         fontRenderer = new CustomFontRenderer(mc.options, new Identifier("textures/font/ascii.png"), mc.textureManager);
@@ -185,32 +190,31 @@ public abstract class ClientProxy extends CommonProxy {
     
     @Override
     public void spawnSlimeParticle(World world, double x, double y, double z) {
-        mc.particleManager.addEffect(new EntitySlimeFx(world, x, y, z, TinkerCommons.matSlimeBallBlue.getItem(), TinkerCommons.matSlimeBallBlue.getItemDamage()));
+        mc.particleManager.addParticle(new EntitySlimeFx(world, x, y, z, TinkerCommons.matSlimeBallBlue.getItem(), TinkerCommons.matSlimeBallBlue.getDamage()));
     }
     
     @Override
     public void preventPlayerSlowdown(Entity player, float originalSpeed, Item item) {
         // has to be done in onUpdate because onTickUsing is too early and gets overwritten. bleh.
-        if (player instanceof EntityPlayerSP) {
-            EntityPlayerSP playerSP = (EntityPlayerSP) player;
-            ItemStack usingItem = playerSP.getActiveItemStack();
+        if (player instanceof ClientPlayerEntity) {
+            ClientPlayerEntity playerSP = (ClientPlayerEntity) player;
+            ItemStack usingItem = playerSP.getActiveItem();
             if (!usingItem.isEmpty() && usingItem.getItem() == item) {
                 // no slowdown from charging it up
-                playerSP.movementInput.movementForward *= originalSpeed * 5.0F;
-                playerSP.movementInput.movementSideways *= originalSpeed * 5.0F;
+                playerSP.input.movementForward *= originalSpeed * 5.0F;
+                playerSP.input.movementSideways *= originalSpeed * 5.0F;
             }
         }
     }
     
     @Override
     public void customExplosion(World world, Explosion explosion) {
-        net.minecraftforge.event.ForgeEventFactory.onExplosionStart(world, explosion);
         explosion.doExplosionA();
         explosion.doExplosionB(true);
     }
     
     @Override
-    public void updateEquippedItemForRendering(EnumHand hand) {
+    public void updateEquippedItemForRendering(Hand hand) {
         mc.getItemRenderer().resetEquippedProgress(hand);
         mc.getItemRenderer().updateEquippedItem();
     }

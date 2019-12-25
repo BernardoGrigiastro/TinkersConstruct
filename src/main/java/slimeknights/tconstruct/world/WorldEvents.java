@@ -1,6 +1,8 @@
 package slimeknights.tconstruct.world;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.mob.MagmaCubeEntity;
 import net.minecraft.entity.monster.EntityMagmaCube;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.event.world.WorldEvent;
@@ -12,7 +14,7 @@ import slimeknights.tconstruct.world.worldgen.SlimeIslandGenerator;
 public class WorldEvents {
 
     // Custom slime spawning on slime islands
-    Biome.SpawnEntry magmaSlimeSpawn = new Biome.SpawnEntry(EntityMagmaCube.class, 150, 4, 6);
+    Biome.SpawnEntry magmaSlimeSpawn = new Biome.SpawnEntry(EntityType.MAGMA_CUBE, 150, 4, 6);
     Biome.SpawnEntry blueSlimeSpawn = new Biome.SpawnEntry(EntityBlueSlime.class, 15, 2, 4);
 
     @SubscribeEvent

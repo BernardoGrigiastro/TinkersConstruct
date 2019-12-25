@@ -3,9 +3,13 @@ package slimeknights.tconstruct.common;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.Packet;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import slimeknights.mantle.network.AbstractPacket;
@@ -25,40 +29,40 @@ public class TinkerNetwork extends NetworkWrapper {
     }
     
     public static void sendPacket(Entity player, Packet<?> packet) {
-        if (player instanceof EntityPlayerMP && ((EntityPlayerMP) player).connection != null) {
-            ((EntityPlayerMP) player).connection.sendPacket(packet);
+        if (player instanceof ServerPlayerEntity && ((ServerPlayerEntity) player).networkHandler != null) {
+            ((ServerPlayerEntity) player).networkHandler.sendPacket(packet);
         }
     }
     
-    public static void sendToAll(AbstractPacket packet) {
+    public static void sendToAll(Packet packet) {
         instance.network.sendToAll(packet);
     }
     
-    public static void sendTo(AbstractPacket packet, EntityPlayerMP player) {
+    public static void sendTo(Packet packet, ServerPlayerEntity player) {
         instance.network.sendTo(packet, player);
     }
     
-    public static void sendToAllAround(AbstractPacket packet, NetworkRegistry.TargetPoint point) {
+    public static void sendToAllAround(Packet packet, NetworkRegistry.TargetPoint point) {
         instance.network.sendToAllAround(packet, point);
     }
     
-    public static void sendToDimension(AbstractPacket packet, int dimensionId) {
+    public static void sendToDimension(Packet packet, int dimensionId) {
         instance.network.sendToDimension(packet, dimensionId);
     }
     
-    public static void sendToServer(AbstractPacket packet) {
+    public static void sendToServer(Packet packet) {
         instance.network.sendToServer(packet);
     }
     
-    public static void sendToClients(WorldServer world, BlockPos pos, AbstractPacket packet) {
-        WorldChunk chunk = world.getChunkFromBlockCoords(pos);
-        for (EntityPlayer player : world.playerEntities) {
+    public static void sendToClients(ServerWorld world, BlockPos pos, Packet packet) {
+        Chunk chunk = world.getChunk(pos);
+        for (PlayerEntity player : world.getPlayers()) {
             // only send to relevant players
-            if (!(player instanceof EntityPlayerMP)) {
+            if (!(player instanceof ServerPlayerEntity)) {
                 continue;
             }
-            EntityPlayerMP playerMP = (EntityPlayerMP) player;
-            if (world.getPlayerChunkMap().isPlayerWatchingChunk(playerMP, chunk.x, chunk.z)) {
+            ServerPlayerEntity playerMP = (ServerPlayerEntity) player;
+            if (world.getChunkManager().shouldTickEntity(playerMP)) {
                 TinkerNetwork.sendTo(packet, playerMP);
             }
         }

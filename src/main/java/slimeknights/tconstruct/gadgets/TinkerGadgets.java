@@ -7,6 +7,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemHangingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.registry.Registry;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent.Register;
@@ -103,9 +104,13 @@ public class TinkerGadgets extends TinkerPulse {
     
     public static ItemHangingEntity fancyFrame;
     
-    @SubscribeEvent
-    public void registerBlocks(Register<Block> event) {
-        IForgeRegistry<Block> registry = event.getRegistry();
+    public TinkerGadgets() {
+        registerBlocks();
+        registerItems();
+    }
+    
+    public void registerBlocks() {
+        Registry<Block> registry = Registry.BLOCK;
         
         stoneTorch = registerBlock(registry, new BlockStoneTorch(), "stone_torch");
         stoneLadder = registerBlock(registry, new BlockStoneLadder(), "stone_ladder");
@@ -151,13 +156,12 @@ public class TinkerGadgets extends TinkerPulse {
         registerTE(TileSlimeChannel.class, "slime_channel");
     }
     
-    @SubscribeEvent
-    public void registerItems(Register<Item> event) {
-        IForgeRegistry<Item> registry = event.getRegistry();
+    public void registerItems() {
+        Registry<Item> registry = Registry.ITEM;
         
-        stoneTorch = registerItemBlock(registry, stoneTorch);
-        stoneLadder = registerItemBlock(registry, stoneLadder);
-        punji = registerItemBlock(registry, punji);
+        stoneTorch = registerItemBlock(registry, stoneTorch, TinkerRegistry.tabGadgets);
+        stoneLadder = registerItemBlock(registry, stoneLadder, TinkerRegistry.tabGadgets);
+        punji = registerItemBlock(registry, punji, TinkerRegistry.tabGadgets);
         rack = registerItemBlock(registry, new ItemBlockRack(rack));
         
         woodRail = registerItemBlock(registry, woodRail);
@@ -197,8 +201,7 @@ public class TinkerGadgets extends TinkerPulse {
         slimeBoots = registerItem(registry, new ItemSlimeBoots(), "slime_boots");
         piggybackPack = registerItem(registry, new ItemPiggybackPack(), "piggybackpack");
         throwball = registerItem(registry, new ItemThrowball(), "throwball");
-        stoneStick = registerItem(registry, new Item(), "stone_stick");
-        stoneStick.setFull3D().setCreativeTab(TinkerRegistry.tabGadgets);
+        stoneStick = registerItem(registry, new Item(new Item.Settings().itemGroup(TinkerRegistry.tabGadgets)), "stone_stick");
         
         fancyFrame = registerItem(registry, new ItemFancyItemFrame(), "fancy_frame");
         

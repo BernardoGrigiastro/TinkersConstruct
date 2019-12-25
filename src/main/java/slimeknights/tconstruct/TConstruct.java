@@ -1,5 +1,6 @@
 package slimeknights.tconstruct;
 
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
@@ -125,8 +126,8 @@ public class TConstruct implements ModInitializer {
         HarvestLevels.init();
         
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, guiHandler);
-        
-        if (event.getSide().isClient()) {
+    
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             ClientProxy.initClient();
             ClientProxy.initRenderMaterials();
         }
@@ -136,24 +137,12 @@ public class TConstruct implements ModInitializer {
         CapabilityTinkerProjectile.register();
         
         MinecraftForge.EVENT_BUS.register(this);
-        if (event.getSide().isClient()) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             ClientProxy.initRenderer();
         } else {
             // config syncing
             MinecraftForge.EVENT_BUS.register(new ConfigSync());
         }
-    }
-
-    //Force the client and server to have or not have this mod
-    @NetworkCheckHandler
-    public boolean matchModVersions(Map<String, String> remoteVersions, Side side) {
-        
-        // we don't accept clients without TiC
-        if (side == Side.CLIENT) {
-            return remoteVersions.containsKey(modID);
-        }
-        // but we can connect to servers without TiC when TiC is present on the client
-        return !remoteVersions.containsKey(modID) || modVersion.equals(remoteVersions.get(modID));
     }
     
     //Old version compatibility

@@ -1,5 +1,7 @@
 package slimeknights.tconstruct.common;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -23,7 +25,7 @@ import javax.annotation.Nonnull;
 /**
  * This class basically is what you want when you got models to register
  */
-@SideOnly(Side.CLIENT)
+@Environment(EnvType.CLIENT)
 public final class ModelRegisterUtil {
     
     public static final String VARIANT_INVENTORY = "inventory";

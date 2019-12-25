@@ -1,24 +1,30 @@
 package slimeknights.tconstruct.gadgets.block;
 
 import com.google.common.collect.ImmutableMap;
+import net.fabricmc.fabric.api.block.FabricBlockSettings;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.container.NameableContainerProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BoundingBox;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import slimeknights.tconstruct.library.TinkerRegistry;
@@ -28,38 +34,34 @@ import java.util.Locale;
 
 public class BlockPunji extends Block {
 
-    public static final PropertyDirection FACING = PropertyDirection.create("facing");
+    public static final DirectionProperty FACING = DirectionProperty.create("facing");
     //public static final PropertyEnum<ConnectionHorizontal> CON_HOR = PropertyEnum.create("connection_horizontal", ConnectionHorizontal.class);
     //public static final PropertyEnum<ConnectionDiagonal> CON_DIA = PropertyEnum.create("connection_diagonal", ConnectionDiagonal.class);
     //public static final PropertyEnum<ConnectionVertical> CON_VER = PropertyEnum.create("connection_vertical", ConnectionVertical.class);
-    public static final PropertyBool NORTH = PropertyBool.create("north");
-    public static final PropertyBool EAST = PropertyBool.create("east");
-    public static final PropertyBool NORTHEAST = PropertyBool.create("northeast");
-    public static final PropertyBool NORTHWEST = PropertyBool.create("northwest");
+    public static final BooleanProperty NORTH = BooleanProperty.create("north");
+    public static final BooleanProperty EAST = BooleanProperty.create("east");
+    public static final BooleanProperty NORTHEAST = BooleanProperty.create("northeast");
+    public static final BooleanProperty NORTHWEST = BooleanProperty.create("northwest");
     /* Bounds */
-    private static final ImmutableMap<EnumFacing, BoundingBox> BOUNDS;
+    private static final ImmutableMap<Direction, BoundingBox> BOUNDS;
 
     static {
-        ImmutableMap.Builder<EnumFacing, BoundingBox> builder = ImmutableMap.builder();
-        builder.put(EnumFacing.DOWN, new BoundingBox(0.1875, 0, 0.1875, 0.8125, 0.375, 0.8125));
-        builder.put(EnumFacing.UP, new BoundingBox(0.1875, 0.625, 0.1875, 0.8125, 1, 0.8125));
-        builder.put(EnumFacing.NORTH, new BoundingBox(0.1875, 0.1875, 0, 0.8125, 0.8125, 0.375));
-        builder.put(EnumFacing.SOUTH, new BoundingBox(0.1875, 0.1875, 0.625, 0.8125, 0.8125, 1));
-        builder.put(EnumFacing.EAST, new BoundingBox(0.625, 0.1875, 0.1875, 1, 0.8125, 0.8125));
-        builder.put(EnumFacing.WEST, new BoundingBox(0, 0.1875, 0.1875, 0.375, 0.8125, 0.8125));
+        ImmutableMap.Builder<Direction, BoundingBox> builder = ImmutableMap.builder();
+        builder.put(Direction.DOWN, new BoundingBox(0.1875, 0, 0.1875, 0.8125, 0.375, 0.8125));
+        builder.put(Direction.UP, new BoundingBox(0.1875, 0.625, 0.1875, 0.8125, 1, 0.8125));
+        builder.put(Direction.NORTH, new BoundingBox(0.1875, 0.1875, 0, 0.8125, 0.8125, 0.375));
+        builder.put(Direction.SOUTH, new BoundingBox(0.1875, 0.1875, 0.625, 0.8125, 0.8125, 1));
+        builder.put(Direction.EAST, new BoundingBox(0.625, 0.1875, 0.1875, 1, 0.8125, 0.8125));
+        builder.put(Direction.WEST, new BoundingBox(0, 0.1875, 0.1875, 0.375, 0.8125, 0.8125));
 
         BOUNDS = builder.build();
     }
 
     public BlockPunji() {
-        super(Material.PLANT);
-        this.setSoundType(BlockSoundGroup.GRASS);
-        this.setCreativeTab(TinkerRegistry.tabGadgets);
-        this.setHardness(3.0f);
-
-        this.setDefaultState(getBlockState().getBaseState().withProperty(FACING, EnumFacing.DOWN).withProperty(NORTH, false).withProperty(EAST, false).withProperty(NORTHEAST, false).withProperty(NORTHWEST, false));
+        super(FabricBlockSettings.of(Material.PLANT).sounds(BlockSoundGroup.GRASS).hardness(3f).build());
+        this.setDefaultState(getDefaultState().with(FACING, Direction.DOWN).with(NORTH, false).with(EAST, false).with(NORTHEAST, false).with(NORTHWEST, false));
     }
-
+    
     @Nonnull
     @Override
     protected BlockStateContainer createBlockState() {

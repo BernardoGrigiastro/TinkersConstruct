@@ -2,14 +2,17 @@ package slimeknights.tconstruct.library.client;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.sun.prism.TextureMap;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.IResource;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.item.Item;
+import net.minecraft.resource.Resource;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.ResourceReloadListener;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.profiler.Profiler;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
@@ -28,15 +31,16 @@ import slimeknights.tconstruct.library.materials.MaterialGUI;
 import slimeknights.tconstruct.library.tools.IToolPart;
 import slimeknights.tconstruct.library.tools.Pattern;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 /**
  * Textures registered with this creator will get a texture created/loaded for each material.
  */
-public class CustomTextureCreator implements IResourceManagerReloadListener {
+public class CustomTextureCreator implements ResourceReloadListener {
     
     public static final CustomTextureCreator INSTANCE = new CustomTextureCreator();
     public static final Material guiMaterial;
@@ -52,7 +56,7 @@ public class CustomTextureCreator implements IResourceManagerReloadListener {
     private static Logger log = Util.getLogger("TextureGen");
     private static Set<Identifier> baseTextures = Sets.newHashSet();
     private static Map<Identifier, Set<IToolPart>> texturePartMapping = Maps.newHashMap();
-
+    
     static {
         guiMaterial = new MaterialGUI("_internal_gui");
         guiMaterial.setRenderInfo(new MaterialRenderInfo.AbstractMaterialRenderInfo() {
@@ -62,7 +66,7 @@ public class CustomTextureCreator implements IResourceManagerReloadListener {
             }
         });
     }
-
+    
     private int createdTextures;
     
     public static void registerTextures(Collection<Identifier> textures) {
@@ -82,16 +86,16 @@ public class CustomTextureCreator implements IResourceManagerReloadListener {
     }
     
     public static boolean exists(String res) {
-        List<IResource> resources = null;
+        List<Resource> resources = null;
         try {
             Identifier loc = new Identifier(res);
-            loc = new Identifier(loc.getResourceDomain(), "textures/" + loc.getResourcePath() + ".png");
-            resources = MinecraftClient.getMinecraft().getResourceManager().getAllResources(loc);
+            loc = new Identifier(loc.getNamespace(), "textures/" + loc.getPath() + ".png");
+            resources = MinecraftClient.getInstance().getResourceManager().getAllResources(loc);
         } catch (IOException e) {
             return false;
         } finally {
             if (resources != null) {
-                for (IResource resource : resources) {
+                for (Resource resource : resources) {
                     IOUtils.closeQuietly(resource);
                 }
             }
@@ -108,7 +112,7 @@ public class CustomTextureCreator implements IResourceManagerReloadListener {
                 Optional<Identifier> storedResourceLocation = MaterialModelLoader.getToolPartModelLocation(toolpart);
                 if (storedResourceLocation.isPresent()) {
                     Identifier stored = storedResourceLocation.get();
-                    Identifier modelLocation = new Identifier(stored.getResourceDomain(), "item/" + stored.getResourcePath());
+                    Identifier modelLocation = new Identifier(stored.getNamespace(), "item/" + stored.getPath());
                     IModel partModel = ModelLoaderRegistry.getModel(modelLocation);
                     
                     // the actual texture of the part
@@ -255,7 +259,7 @@ public class CustomTextureCreator implements IResourceManagerReloadListener {
                     map.setTextureEntry(partPatternTexture);
                 } else {
                     Identifier modelLocation = item.getRegistryName();
-                    IModel partModel = ModelLoaderRegistry.getModel(new Identifier(modelLocation.getResourceDomain(), "item/parts/" + modelLocation.getResourcePath() + MaterialModelLoader.EXTENSION));
+                    IModel partModel = ModelLoaderRegistry.getModel(new Identifier(modelLocation.getNamespace(), "item/parts/" + modelLocation.getPath() + MaterialModelLoader.EXTENSION));
                     Identifier partTexture = partModel.getTextures().iterator().next();
                     
                     if (partModel != ModelLoaderRegistry.getMissingModel()) {
@@ -276,13 +280,14 @@ public class CustomTextureCreator implements IResourceManagerReloadListener {
     }
     
     @Override
-    public void onResourceManagerReload(@Nonnull IResourceManager resourceManager) {
-        // clear cache
-        baseTextures.clear();
-        for (Map map : sprites.values()) {
-            // safety in case there are some references lying around
-            map.clear();
-        }
-        sprites.clear();
+    public CompletableFuture<Void> reload(Helper helper, ResourceManager resourceManager, Profiler profiler, Profiler profiler2, Executor executor, Executor executor2) {
+        return CompletableFuture.runAsync(() -> {
+            baseTextures.clear();
+            for (Map map : sprites.values()) {
+                // safety in case there are some references lying around
+                map.clear();
+            }
+            sprites.clear();
+        });
     }
 }

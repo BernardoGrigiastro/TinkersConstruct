@@ -1,11 +1,16 @@
 package slimeknights.tconstruct.world.entity;
 
+import net.minecraft.entity.SpawnType;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.ViewableWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.loot.LootTableList;
 import slimeknights.tconstruct.library.Util;
@@ -15,7 +20,7 @@ import slimeknights.tconstruct.world.TinkerWorld;
 
 import javax.annotation.Nonnull;
 
-public class EntityBlueSlime extends EntitySlime {
+public class EntityBlueSlime extends SlimeEntity {
 
     public static final Identifier LOOT_TABLE = Util.getResource("entities/blueslime");
 
@@ -30,18 +35,12 @@ public class EntityBlueSlime extends EntitySlime {
         stack.setCount(size);
         return this.entityDropItem(stack, offsetY);
     }
-
+    
     @Override
-    protected Identifier getLootTable() {
-        return this.getSlimeSize() == 1 ? LOOT_TABLE : LootTableList.EMPTY;
+    protected Identifier getLootTableId() {
+        return this.getSize() == 1 ? LOOT_TABLE : LootTableList.EMPTY;
     }
-
-    @Nonnull
-    @Override
-    protected EntitySlime createInstance() {
-        return new EntityBlueSlime(this.getEntityWorld());
-    }
-
+    
     @Override
     public boolean getCanSpawnHere() {
         if (this.getEntityWorld().getBlockState(this.getPosition()).getBlock() instanceof BlockLiquidSlime) {

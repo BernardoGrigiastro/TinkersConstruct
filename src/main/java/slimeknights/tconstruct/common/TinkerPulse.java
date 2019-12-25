@@ -3,13 +3,15 @@ package slimeknights.tconstruct.common;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.util.registry.Registry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import slimeknights.mantle.block.BlockStairsBase;
 import slimeknights.mantle.block.EnumBlock;
 import slimeknights.mantle.block.EnumBlockSlab;
@@ -55,15 +57,13 @@ public abstract class TinkerPulse {
         return TConstruct.pulseManager.isPulseLoaded(Chisel.PulseId);
     }
     
-    protected static <T extends Block> T registerBlock(IForgeRegistry<Block> registry, T block, String name) {
+    protected static <T extends Block> T registerBlock(Registry<Block> registry, T block, String name) {
         if (!name.equals(name.toLowerCase(Locale.US))) {
             throw new IllegalArgumentException(String.format("Unlocalized names need to be all lowercase! Block: %s", name));
         }
         
-        String prefixedName = Util.prefix(name);
-        block.setUnlocalizedName(prefixedName);
-        
-        register(registry, block, name);
+        Identifier id = Util.getResource(name);
+        register(registry, block, id);
         return block;
     }
     
@@ -71,13 +71,17 @@ public abstract class TinkerPulse {
         return registerBlock(registry, new BlockStairsBase(block.getDefaultState().withProperty(block.prop, value)), name);
     }
     
-    protected static <T extends Block> T registerItemBlock(IForgeRegistry<Item> registry, T block) {
-        
-        ItemBlock itemBlock = new ItemBlockMeta(block);
-        
-        itemBlock.setUnlocalizedName(block.getUnlocalizedName());
-        
-        register(registry, itemBlock, block.getRegistryName());
+    protected static <T extends Block> T registerItemBlock(Registry<Item> registry, T block) {
+        return registerItemBlock(registry, block, new Item.Settings());
+    }
+    
+    protected static <T extends Block> T registerItemBlock(Registry<Item> registry, T block, ItemGroup group) {
+        return registerItemBlock(registry, block, new Item.Settings().itemGroup(group));
+    }
+    
+    protected static <T extends Block> T registerItemBlock(Registry<Item> registry, T block, Item.Settings settings) {
+        BlockItem itemBlock = new BlockItem(block, settings);
+        register(registry, itemBlock, Registry.BLOCK.getId(block));
         return block;
     }
     
@@ -121,27 +125,15 @@ public abstract class TinkerPulse {
     /**
      * Sets the correct unlocalized name and registers the item.
      */
-    protected static <T extends Item> T registerItem(IForgeRegistry<Item> registry, T item, String name) {
+    protected static <T extends Item> T registerItem(Registry<Item> registry, T item, String name) {
         if (!name.equals(name.toLowerCase(Locale.US))) {
             throw new IllegalArgumentException(String.format("Unlocalized names need to be all lowercase! Item: %s", name));
         }
-        
-        item.setUnlocalizedName(Util.prefix(name));
-        item.setRegistryName(Util.getResource(name));
-        registry.register(item);
-        return item;
+        return Registry.register(registry, Util.getResource(name), item);
     }
     
-    protected static <T extends IForgeRegistryEntry<T>> T register(IForgeRegistry<T> registry, T thing, String name) {
-        thing.setRegistryName(Util.getResource(name));
-        registry.register(thing);
-        return thing;
-    }
-    
-    protected static <T extends IForgeRegistryEntry<T>> T register(IForgeRegistry<T> registry, T thing, Identifier name) {
-        thing.setRegistryName(name);
-        registry.register(thing);
-        return thing;
+    protected static <T> T register(Registry<T> registry, T thing, Identifier name) {
+        return Registry.register(registry, name, thing);
     }
     
     protected static void registerTE(Class<? extends BlockEntity> teClazz, String name) {

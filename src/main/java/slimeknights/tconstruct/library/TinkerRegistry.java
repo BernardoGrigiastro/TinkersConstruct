@@ -6,13 +6,16 @@ import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TLinkedHashSet;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.Fluid;
@@ -25,6 +28,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.Logger;
 import slimeknights.mantle.client.CreativeTab;
 import slimeknights.mantle.util.RecipeMatch;
+import slimeknights.tconstruct.fabric.TinkerItemGroup;
 import slimeknights.tconstruct.library.events.MaterialEvent;
 import slimeknights.tconstruct.library.events.TinkerRegisterEvent;
 import slimeknights.tconstruct.library.materials.IMaterialStats;
@@ -82,12 +86,12 @@ public final class TinkerRegistry {
     /*---------------------------------------------------------------------------
     | CREATIVE TABS                                                             |
     ---------------------------------------------------------------------------*/
-    public static CreativeTab tabGeneral = new CreativeTab("TinkerGeneral", new ItemStack(Items.SLIME_BALL));
-    public static CreativeTab tabTools = new CreativeTab("TinkerTools", new ItemStack(Items.IRON_PICKAXE));
-    public static CreativeTab tabParts = new CreativeTab("TinkerToolParts", new ItemStack(Items.STICK));
-    public static CreativeTab tabSmeltery = new CreativeTab("TinkerSmeltery", new ItemStack(Item.getItemFromBlock(Blocks.STONEBRICK)));
-    public static CreativeTab tabWorld = new CreativeTab("TinkerWorld", new ItemStack(Item.getItemFromBlock(Blocks.SLIME_BLOCK)));
-    public static CreativeTab tabGadgets = new CreativeTab("TinkerGadgets", new ItemStack(Blocks.TNT));
+    public static ItemGroup tabGeneral = TinkerItemGroup.newItemGroup("TinkerGeneral", new ItemStack(Items.SLIME_BALL));
+    public static ItemGroup tabTools = TinkerItemGroup.newItemGroup("TinkerTools", new ItemStack(Items.IRON_PICKAXE));
+    public static ItemGroup tabParts =  TinkerItemGroup.newItemGroup("TinkerToolParts", new ItemStack(Items.STICK));
+    public static ItemGroup tabSmeltery =  TinkerItemGroup.newItemGroup("TinkerSmeltery", new ItemStack(Blocks.STONE_BRICKS));
+    public static ItemGroup tabWorld =  TinkerItemGroup.newItemGroup("TinkerWorld", new ItemStack(Blocks.SLIME_BLOCK));
+    public static ItemGroup tabGadgets =  TinkerItemGroup.newItemGroup("TinkerGadgets", new ItemStack(Blocks.TNT));
 
   /*---------------------------------------------------------------------------
   | TRAITS & STATS                                                            |

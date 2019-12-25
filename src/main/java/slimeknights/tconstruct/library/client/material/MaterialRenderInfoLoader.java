@@ -4,9 +4,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.client.resources.IResourceManagerReloadListener;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.ResourceReloadListener;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.profiler.Profiler;
 import net.minecraftforge.fml.common.ModContainer;
 import org.apache.logging.log4j.Logger;
 import slimeknights.tconstruct.library.TinkerRegistry;
@@ -21,15 +22,17 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
-public class MaterialRenderInfoLoader implements IResourceManagerReloadListener {
+public class MaterialRenderInfoLoader implements ResourceReloadListener {
     
     public static final MaterialRenderInfoLoader INSTANCE = new MaterialRenderInfoLoader();
     private static final Type TYPE = new TypeToken<IMaterialRenderInfoDeserializer>() {}.getType();
     private static final Gson GSON = new GsonBuilder().registerTypeAdapter(TYPE, new MaterialInfoDeserializerDeserializer()).create();
     static Map<String, Class<? extends IMaterialRenderInfoDeserializer>> renderInfoDeserializers = Maps.newHashMap();
     private static Logger log = Util.getLogger("RenderInfoLoader");
-    private IResourceManager resourceManager;
+    private ResourceManager resourceManager;
     
     public static void addRenderInfo(String id, Class<? extends IMaterialRenderInfoDeserializer> clazz) {
         renderInfoDeserializers.put(id, clazz);
@@ -76,9 +79,9 @@ public class MaterialRenderInfoLoader implements IResourceManagerReloadListener 
     }
     
     @Override
-    public void onResourceManagerReload(IResourceManager resourceManager) {
+    public CompletableFuture<Void> reload(Helper helper, ResourceManager resourceManager, Profiler profiler, Profiler profiler2, Executor executor, Executor executor2) {
         this.resourceManager = resourceManager;
-        loadRenderInfo();
+        return CompletableFuture.runAsync(this::loadRenderInfo);
     }
     
     private static class MaterialInfoDeserializerDeserializer implements JsonDeserializer<IMaterialRenderInfoDeserializer> {

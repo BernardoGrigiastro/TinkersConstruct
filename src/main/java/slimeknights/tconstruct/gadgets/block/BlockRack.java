@@ -1,7 +1,9 @@
 package slimeknights.tconstruct.gadgets.block;
 
 import com.google.common.collect.ImmutableMap;
+import net.fabricmc.fabric.api.block.FabricBlockSettings;
 import net.minecraft.block.BlockLever.EnumOrientation;
+import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.properties.IProperty;
@@ -16,11 +18,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.util.*;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BoundingBox;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -39,31 +44,31 @@ import javax.annotation.Nonnull;
 public class BlockRack extends BlockTable {
     
     // pull the facing enums from the lever, since the standard facing does not have quite enough, but the lever's facing is perfect
-    public static final PropertyEnum<EnumOrientation> ORIENTATION = PropertyEnum.create("facing", EnumOrientation.class);
-    public static final PropertyBool DRYING = PropertyBool.create("drying");
+    public static final DirectionProperty ORIENTATION = HorizontalFacingBlock.FACING;
+    public static final BooleanProperty DRYING = BooleanProperty.create("drying");
     /* Bounding boxes */
-    private static final ImmutableMap<EnumOrientation, BoundingBox> BOUNDS;
+    private static final ImmutableMap<Direction, BoundingBox> BOUNDS;
     
     static {
-        ImmutableMap.Builder<EnumOrientation, BoundingBox> builder = ImmutableMap.builder();
-        builder.put(EnumOrientation.DOWN_X, new BoundingBox(0.375, 0, 0, 0.625, 0.25, 1));
-        builder.put(EnumOrientation.DOWN_Z, new BoundingBox(0, 0, 0.375, 1, 0.25, 0.625));
-        builder.put(EnumOrientation.UP_X, new BoundingBox(0.375, 0.75, 0, 0.625, 1, 1));
-        builder.put(EnumOrientation.UP_Z, new BoundingBox(0, 0.75, 0.375, 1, 1, 0.625));
-        builder.put(EnumOrientation.NORTH, new BoundingBox(0, 0.75, 0, 1, 1, 0.25));
-        builder.put(EnumOrientation.SOUTH, new BoundingBox(0, 0.75, 0.75, 1, 1, 1));
-        builder.put(EnumOrientation.EAST, new BoundingBox(0.75, 0.75, 0, 1, 1, 1));
-        builder.put(EnumOrientation.WEST, new BoundingBox(0, 0.75, 0, 0.25, 1, 1));
+        ImmutableMap.Builder<Direction, BoundingBox> builder = ImmutableMap.builder();
+        builder.put(Direction.DOWN_X, new BoundingBox(0.375, 0, 0, 0.625, 0.25, 1));
+        builder.put(Direction.DOWN_Z, new BoundingBox(0, 0, 0.375, 1, 0.25, 0.625));
+        builder.put(Direction.UP_X, new BoundingBox(0.375, 0.75, 0, 0.625, 1, 1));
+        builder.put(Direction.UP_Z, new BoundingBox(0, 0.75, 0.375, 1, 1, 0.625));
+        builder.put(Direction.NORTH, new BoundingBox(0, 0.75, 0, 1, 1, 0.25));
+        builder.put(Direction.SOUTH, new BoundingBox(0, 0.75, 0.75, 1, 1, 1));
+        builder.put(Direction.EAST, new BoundingBox(0.75, 0.75, 0, 1, 1, 1));
+        builder.put(Direction.WEST, new BoundingBox(0, 0.75, 0, 0.25, 1, 1));
         BOUNDS = builder.build();
     }
     
     public BlockRack() {
-        super(Material.WOOD);
+        super(FabricBlockSettings.of(Material.WOOD).sounds(BlockSoundGroup.WOOD).hardness(2f));
         this.setSoundType(BlockSoundGroup.WOOD);
         this.setCreativeTab(TinkerRegistry.tabGadgets);
         this.setHardness(2.0F);
         
-        this.setDefaultState(getBlockState().getBaseState().withProperty(ORIENTATION, EnumOrientation.NORTH).withProperty(DRYING, false));
+        this.setDefaultState(getBlockState().getBaseState().withProperty(ORIENTATION, Direction.NORTH).withProperty(DRYING, false));
     }
     
     @Override
