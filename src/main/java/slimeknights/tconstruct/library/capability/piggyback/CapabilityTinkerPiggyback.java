@@ -1,12 +1,12 @@
 package slimeknights.tconstruct.library.capability.piggyback;
 
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.Tag;
+import net.minecraft.util.math.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 
-import java.util.concurrent.Callable;
+import javax.annotation.Nullable;
 
 public class CapabilityTinkerPiggyback implements Capability.IStorage<ITinkerPiggyback> {
     
@@ -17,21 +17,17 @@ public class CapabilityTinkerPiggyback implements Capability.IStorage<ITinkerPig
     }
     
     public static void register() {
-        CapabilityManager.INSTANCE.register(ITinkerPiggyback.class, INSTANCE, new Callable<ITinkerPiggyback>() {
-            @Override
-            public ITinkerPiggyback call() throws Exception {
-                return new TinkerPiggybackHandler();
-            }
-        });
+        CapabilityManager.INSTANCE.register(ITinkerPiggyback.class, INSTANCE, TinkerPiggybackHandler::new);
     }
     
+    @Nullable
     @Override
-    public NBTBase writeNBT(Capability<ITinkerPiggyback> capability, ITinkerPiggyback instance, EnumFacing side) {
+    public Tag writeNBT(Capability<ITinkerPiggyback> capability, ITinkerPiggyback instance, Direction side) {
         return null;
     }
     
     @Override
-    public void readNBT(Capability<ITinkerPiggyback> capability, ITinkerPiggyback instance, EnumFacing side, NBTBase nbt) {
+    public void readNBT(Capability<ITinkerPiggyback> capability, ITinkerPiggyback instance, Direction side, Tag nbt) {
     
     }
 }

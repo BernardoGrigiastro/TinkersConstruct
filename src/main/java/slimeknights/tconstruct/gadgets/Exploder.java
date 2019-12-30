@@ -1,66 +1,55 @@
 package slimeknights.tconstruct.gadgets;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
-import net.fabricmc.fabric.api.event.world.WorldTickCallback;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BoundingBox;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.loot.context.LootContext;
 import net.minecraft.world.loot.context.LootContextParameters;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import slimeknights.tconstruct.common.TinkerNetwork;
-import slimeknights.tconstruct.gadgets.entity.ExplosionEFLN;
+import slimeknights.tconstruct.gadgets.entity.EFLNExplosion;
 import slimeknights.tconstruct.tools.common.network.EntityMovementChangePacket;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Predicate;
 
 public class Exploder {
     
-    private static List<Exploder> toTick = new ArrayList<>();
-    
-    static {
-        WorldTickCallback.EVENT.register(world -> {
-            Iterator<Exploder> iterator = toTick.iterator();
-            while (iterator.hasNext()) {
-                Exploder next = iterator.next();
-                if (!next.onTick(world)) {
-                    iterator.remove();
-                }
-            }
-        });
-    }
-    
     public final double r;
-    public final double rr;
     public final int dist;
-    public final double explosionStrength;
-    public final int blocksPerIteration;
     public final int x, y, z;
     public final World world;
-    public final Entity exploder;
-    public final ExplosionEFLN explosion;
-    protected int currentRadius;
-    protected List<ItemStack> droppedItems; // map containing all items dropped by the explosion and their amounts
+    private final double rr;
+    private final double explosionStrength;
+    private final int blocksPerIteration;
+    private final Entity exploder;
+    private final EFLNExplosion explosion;
+    
+    private int currentRadius;
     private int curX, curY, curZ;
     
-    public Exploder(World world, ExplosionEFLN explosion, Entity exploder, BlockPos location, double r, double explosionStrength, int blocksPerIteration) {
+    private List<ItemStack> droppedItems; // map containing all items dropped by the explosion and their amounts
+    
+    public Exploder(World world, EFLNExplosion explosion, Entity exploder, BlockPos location, double r, double explosionStrength, int blocksPerIteration) {
         this.r = r;
         this.world = world;
         this.explosion = explosion;
@@ -82,61 +71,60 @@ public class Exploder {
         this.droppedItems = Lists.newArrayList();
     }
     
-    public static void startExplosion(World world, ExplosionEFLN explosion, Entity entity, BlockPos location, double r, double explosionStrength) {
+    public static void startExplosion(World world, EFLNExplosion explosion, Entity entity, BlockPos location, double r, double explosionStrength) {
         Exploder exploder = new Exploder(world, explosion, entity, location, r, explosionStrength, Math.max(50, (int) (r * r * r / 10d)));
         exploder.handleEntities();
-        world.playSound(null, location, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F);
-        toTick.add(exploder);
+        world.playSound(null, location, SoundEvents.field_15152, SoundCategory.field_15245, 4.0F, (1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F);
+        MinecraftForge.EVENT_BUS.register(exploder);
     }
     
-    public boolean onTick(World world) {
-        if (world == this.world) {
-            if (!iteration()) {
-                // goodbye world, we're done exploding
-                return finish();
-            }
-        }
-        return true;
-    }
-    
-    void handleEntities() {
-        final Predicate<Entity> predicate = entity -> entity != null && !entity.isImmuneToExplosion() && entity.isAlive() && (!(entity instanceof PlayerEntity) || !((PlayerEntity) entity).isSpectator()) && entity.getPosVector().squaredDistanceTo(x, y, z) <= r * r;
+    private void handleEntities() {
+        final Predicate<Entity> predicate = entity -> entity != null && !entity.isImmuneToExplosions() && EntityPredicates.EXCEPT_SPECTATOR.test(entity) && EntityPredicates.VALID_ENTITY.test(entity) && entity.getPositionVector().squareDistanceTo(this.x, this.y, this.z) <= this.r * this.r;
         
         // damage and blast back entities
-        List<Entity> list = world.getEntities(this.exploder, new BoundingBox(x - r - 1, y - r - 1, z - r - 1, x + r + 1, y + r + 1, z + r + 1), predicate);
+        List<Entity> list = this.world.getEntitiesInAABBexcluding(this.exploder, new Box(this.x - this.r - 1, this.y - this.r - 1, this.z - this.r - 1, this.x + this.r + 1, this.y + this.r + 1, this.z + this.r + 1), predicate);
+        net.minecraftforge.event.ForgeEventFactory.onExplosionDetonate(this.world, this.explosion, list, this.r * 2);
         
         for (Entity entity : list) {
-            //double str = 1f - (double)currentRadius/r;
-            //str *= str;
             // move it away from the center depending on distance and explosion strength
-            Vec3d dir = entity.getPosVector().subtract(exploder.getPosVector().add(0, -r / 2, 0));
-            double str = (r - dir.length()) / r;
+            Vec3d dir = entity.getPositionVector().subtract(this.exploder.getPositionVector().add(0, -this.r / 2, 0));
+            double str = (this.r - dir.length()) / this.r;
             str = Math.max(0.3, str);
             dir = dir.normalize();
-            dir = dir.multiply(explosionStrength * str * 0.3);
+            dir = dir.scale(this.explosionStrength * str * 0.3);
             entity.addVelocity(dir.x, dir.y + 0.5, dir.z);
-            entity.damage(DamageSource.explosion(explosion), (float) (str * explosionStrength));
+            entity.attackEntityFrom(DamageSource.causeExplosionDamage(this.explosion), (float) (str * this.explosionStrength));
             
             if (entity instanceof ServerPlayerEntity) {
-                TinkerNetwork.sendTo(new EntityMovementChangePacket(entity), (ServerPlayerEntity) entity);
+                TinkerNetwork.instance.sendTo(new EntityMovementChangePacket(entity), (ServerPlayerEntity) entity);
             }
         }
     }
     
-    private boolean finish() {
-        final int d = (int) r / 2;
-        final BlockPos pos = new BlockPos(x - d, y - d, z - d);
+    @SubscribeEvent
+    public void onTick(TickEvent.WorldTickEvent event) {
+        if (event.world == this.world && event.phase == TickEvent.Phase.END) {
+            if (!this.iteration()) {
+                // goodbye world, we're done exploding
+                this.finish();
+            }
+        }
+    }
+    
+    private void finish() {
+        final int d = (int) this.r / 2;
+        final BlockPos pos = new BlockPos(this.x - d, this.y - d, this.z - d);
         final Random random = new Random();
         
         List<ItemStack> aggregatedDrops = Lists.newArrayList();
         
-        for (ItemStack drop : droppedItems) {
+        for (ItemStack drop : this.droppedItems) {
             boolean notInList = true;
             
             // check if it's already in our list
             for (ItemStack stack : aggregatedDrops) {
-                if (ItemStack.areEqual(drop, stack)) {
-                    stack.addAmount(drop.getAmount());
+                if (ItemStack.areItemsEqual(drop, stack) && ItemStack.areItemStackTagsEqual(drop, stack)) {
+                    stack.grow(drop.getCount());
                     notInList = false;
                     break;
                 }
@@ -149,17 +137,17 @@ public class Exploder {
         
         // actually drop the aggregated items
         for (ItemStack drop : aggregatedDrops) {
-            int stacksize = drop.getAmount();
+            int stacksize = drop.getCount();
             do {
-                BlockPos spawnPos = pos.add(random.nextInt((int) r), random.nextInt((int) r), random.nextInt((int) r));
+                BlockPos spawnPos = pos.add(random.nextInt((int) this.r), random.nextInt((int) this.r), random.nextInt((int) this.r));
                 ItemStack dropItemstack = drop.copy();
-                dropItemstack.setAmount(Math.min(stacksize, 64));
-                Block.dropStack(world, spawnPos, dropItemstack);
-                stacksize -= dropItemstack.getAmount();
+                dropItemstack.setCount(Math.min(stacksize, 64));
+                Block.spawnAsEntity(this.world, spawnPos, dropItemstack);
+                stacksize -= dropItemstack.getCount();
             } while (stacksize > 0);
         }
         
-        return false;
+        MinecraftForge.EVENT_BUS.unregister(this);
     }
     
     /**
@@ -168,83 +156,90 @@ public class Exploder {
     private boolean iteration() {
         int count = 0;
         
-        explosion.clearAffectedBlocks();
+        this.explosion.clearAffectedBlockPositions();
         
-        while (count < blocksPerIteration && currentRadius < (int) r + 1) {
-            double d = curX * curX + curY * curY + curZ * curZ;
+        while (count < this.blocksPerIteration && this.currentRadius < (int) this.r + 1) {
+            double d = this.curX * this.curX + this.curY * this.curY + this.curZ * this.curZ;
             // inside the explosion?
-            if (d <= rr) {
-                BlockPos pos = new BlockPos(x + curX, y + curY, z + curZ);
-                BlockState state = world.getBlockState(pos);
-                FluidState fluidState = world.getFluidState(pos);
+            if (d <= this.rr) {
+                BlockPos blockpos = new BlockPos(this.x + this.curX, this.y + this.curY, this.z + this.curZ);
+                BlockState blockState = this.world.getBlockState(blockpos);
+                FluidState ifluidstate = this.world.getFluidState(blockpos);
                 
                 // no air blocks
-                if (!state.isAir() || !fluidState.isEmpty()) {
+                if (!blockState.isAir(this.world, blockpos) || !ifluidstate.isEmpty()) {
                     // explosion "strength" at the current position
-                    double f = explosionStrength * (1f - d / rr);
+                    double f = this.explosionStrength * (1f - d / this.rr);
                     
-                    float f2 = Math.max(state.getBlock().getBlastResistance(), fluidState.getBlastResistance());
-                    if (exploder != null) {
-                        f2 = exploder.getEffectiveExplosionResistance(explosion, world, pos, state, fluidState, f2);
+                    float f2 = Math.max(blockState.getExplosionResistance(this.world, blockpos, this.exploder, this.explosion), ifluidstate.getExplosionResistance(this.world, blockpos, this.exploder, this.explosion));
+                    if (this.exploder != null) {
+                        f2 = this.exploder.getExplosionResistance(this.explosion, this.world, blockpos, blockState, ifluidstate, f2);
                     }
+                    
                     f -= (f2 + 0.3F) * 0.3F;
                     
-                    if (f > 0.0F && (exploder == null || exploder.canExplosionDestroyBlock(explosion, world, pos, state, (float) f))) {
+                    if (f > 0.0F && (this.exploder == null || this.exploder.canExplosionDestroyBlock(this.explosion, this.world, blockpos, blockState, (float) f))) {
                         // block should be exploded
                         count++;
-                        explosion.addAffectedBlock(pos);
+                        this.explosion.addAffectedBlock(blockpos);
                     }
                 }
             }
             // get next coordinate;
-            step();
+            this.step();
         }
         
-        explosion.getAffectedBlocks().forEach(this::explodeBlock);
+        net.minecraftforge.event.ForgeEventFactory.onExplosionDetonate(this.world, this.explosion, Collections.emptyList(), this.r * 2);
         
-        return count == blocksPerIteration; // can lead to 1 more call where nothing is done, but that's ok
+        this.explosion.getAffectedBlockPositions().forEach(this::explodeBlock);
+        
+        return count == this.blocksPerIteration; // can lead to 1 more call where nothing is done, but that's ok
     }
     
     // get the next coordinate
     private void step() {
         // we go X/Z plane wise from top to bottom
-        if (++curX > currentRadius) {
-            curX = -currentRadius;
-            if (++curZ > currentRadius) {
-                curZ = -currentRadius;
-                if (--curY < -currentRadius) {
-                    currentRadius++;
-                    curX = curZ = -currentRadius;
-                    curY = currentRadius;
+        if (++this.curX > this.currentRadius) {
+            this.curX = -this.currentRadius;
+            if (++this.curZ > this.currentRadius) {
+                this.curZ = -this.currentRadius;
+                if (--this.curY < -this.currentRadius) {
+                    this.currentRadius++;
+                    this.curX = this.curZ = -this.currentRadius;
+                    this.curY = this.currentRadius;
                 }
             }
         }
         // we skip the internals
-        if (curY != -currentRadius && curY != currentRadius) {
+        if (this.curY != -this.currentRadius && this.curY != this.currentRadius) {
             // we're not in the top or bottom plane
-            if (curZ != -currentRadius && curZ != currentRadius) {
+            if (this.curZ != -this.currentRadius && this.curZ != this.currentRadius) {
                 // we're not in the X/Y planes of the cube, we can therefore skip the x to the end if we're inside
-                if (curX > -currentRadius) {
-                    curX = currentRadius;
+                if (this.curX > -this.currentRadius) {
+                    this.curX = this.currentRadius;
                 }
             }
         }
     }
     
-    private void explodeBlock(BlockPos pos) {
-        BlockState state = world.getBlockState(pos);
-        Block block = state.getBlock();
-        if (!world.isClient && block.shouldDropItemsOnExplosion(explosion)) {
-            BlockEntity blockEntity = block.hasBlockEntity() ? this.world.getBlockEntity(pos) : null;
-            LootContext.Builder builder = (new LootContext.Builder((ServerWorld) this.world)).setRandom(this.world.random).put(LootContextParameters.POSITION, pos).put(LootContextParameters.TOOL, ItemStack.EMPTY).putNullable(LootContextParameters.BLOCK_ENTITY, blockEntity);
-            droppedItems.addAll(state.getDroppedStacks(builder));
+    private void explodeBlock(BlockPos blockpos) {
+        BlockState blockstate = this.world.getBlockState(blockpos);
+        
+        if (!this.world.isClient && blockstate.canDropFromExplosion(this.world, blockpos, this.explosion)) {
+            BlockEntity tileentity = blockstate.hasTileEntity() ? this.world.getTileEntity(blockpos) : null;
+            LootContext.Builder builder = (new LootContext.Builder((ServerWorld) this.world)).withRandom(this.world.random).withParameter(LootContextParameters.field_1232, blockpos).withParameter(LootContextParameters.field_1229, ItemStack.EMPTY).withNullableParameter(LootContextParameters.field_1228, tileentity);
+            
+            this.droppedItems.addAll(blockstate.getDrops(builder));
         }
         
-        if (world instanceof ServerWorld) {
-            ((ServerWorld) world).addImportantParticle(ParticleTypes.POOF, true, pos.getX(), pos.getY(), pos.getZ(), 2, 0, 0);
-            ((ServerWorld) world).addImportantParticle(ParticleTypes.SMOKE, true, pos.getX(), pos.getY(), pos.getZ(), 1, 0, 0);
+        if (this.world instanceof ServerWorld) {
+            for (ServerPlayerEntity serverplayerentity : ((ServerWorld) this.world).getPlayers()) {
+                ((ServerWorld) this.world).spawnParticle(serverplayerentity, ParticleTypes.field_11203, true, blockpos.getX(), blockpos.getY(), blockpos.getZ(), 2, 0, 0, 0, 0d);
+                ((ServerWorld) this.world).spawnParticle(serverplayerentity, ParticleTypes.field_11251, true, blockpos.getX(), blockpos.getY(), blockpos.getZ(), 1, 0, 0, 0, 0d);
+            }
         }
         
-        block.onDestroyedByExplosion(world, pos, explosion);
+        blockstate.onBlockExploded(this.world, blockpos, this.explosion);
     }
+    
 }

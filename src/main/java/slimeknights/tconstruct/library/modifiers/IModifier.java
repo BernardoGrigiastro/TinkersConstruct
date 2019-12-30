@@ -1,10 +1,7 @@
 package slimeknights.tconstruct.library.modifiers;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DefaultedList;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import slimeknights.mantle.util.RecipeMatch;
 
 import java.util.Optional;
@@ -36,7 +33,7 @@ public interface IModifier extends IToolMod {
      * Apply the modifier to a root-nbt of an itemstack.
      * The complete procedure, usually called from the itemstack variant.
      */
-    void apply(NBTTagCompound root);
+    //void apply(NBTTagCompound root);
     
     /**
      * In this function the modifier saves its own data into the given tag.
@@ -45,7 +42,7 @@ public interface IModifier extends IToolMod {
      *
      * @param modifierTag This tag shall be filled with data. It will be saved into the tool as the modifiers identifier.
      */
-    void updateNBT(NBTTagCompound modifierTag);
+    //  void updateNBT(NBTTagCompound modifierTag);
     
     /**
      * This is the actual bread and butter of the modifier. This function applies the actual effect like adding a trait,
@@ -57,22 +54,22 @@ public interface IModifier extends IToolMod {
      * @param rootCompound The main compound of the item to be modified.
      * @param modifierTag  The same tag as for updateNBT.
      */
-    void applyEffect(NBTTagCompound rootCompound, NBTTagCompound modifierTag);
+    //  void applyEffect(NBTTagCompound rootCompound, NBTTagCompound modifierTag);
     
     /**
      * Returns the tooltip to display for the given tag of this specific modifier.
      * If detailed is true also include building info like how much X already is in it. Used in the toolstation display.
      * Color tags are not necessary.
      */
-    String getTooltip(NBTTagCompound modifierTag, boolean detailed);
+    //  String getTooltip(NBTTagCompound modifierTag, boolean detailed);
     
     /**
      * Used for specific modifiers that need a texture variant for each material
      */
-    @SideOnly(Side.CLIENT)
+    //  @SideOnly(Side.CLIENT)
     boolean hasTexturePerMaterial();
     
-    boolean equalModifier(NBTTagCompound modifierTag1, NBTTagCompound modifierTag2);
+    //  boolean equalModifier(NBTTagCompound modifierTag1, NBTTagCompound modifierTag2);
     
     default boolean hasItemsToApplyWith() {
         return true;

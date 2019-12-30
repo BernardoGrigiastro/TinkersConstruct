@@ -1,31 +1,36 @@
 package slimeknights.tconstruct.tools.common.network;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.network.NetHandlerPlayServer;
-import slimeknights.mantle.network.AbstractPacketThreadsafe;
+import net.minecraft.util.PacketByteBuf;
+import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.network.NetworkEvent;
+import slimeknights.mantle.network.AbstractPacket;
 
-public class BouncedPacket extends AbstractPacketThreadsafe {
+import java.util.function.Supplier;
 
+public class BouncedPacket extends AbstractPacket {
+    
     public BouncedPacket() {
+    
     }
-
+    
+    public BouncedPacket(PacketByteBuf buffer) {
+    
+    }
+    
     @Override
-    public void handleClientSafe(NetHandlerPlayClient netHandler) {
-        // only sent to server
-        throw new UnsupportedOperationException("Serverside only");
+    public void encode(PacketByteBuf packetBuffer) {
     }
-
+    
     @Override
-    public void handleServerSafe(NetHandlerPlayServer netHandler) {
-        netHandler.player.fallDistance = 0;
+    public void handle(Supplier<NetworkEvent.Context> supplier) {
+        supplier.get().enqueueWork(() -> {
+            if (supplier.get().getDirection().getReceptionSide() == LogicalSide.SERVER) {
+                if (supplier.get().getSender() != null) {
+                    supplier.get().getSender().fallDistance = 0.0f;
+                }
+            }
+        });
+        supplier.get().setPacketHandled(true);
     }
-
-    @Override
-    public void fromBytes(ByteBuf buf) {
-    }
-
-    @Override
-    public void toBytes(ByteBuf buf) {
-    }
+    
 }

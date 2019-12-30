@@ -1,0 +1,117 @@
+package slimeknights.tconstruct.gadgets.item;
+
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.UseAction;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RayTraceContext;
+import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import slimeknights.mantle.item.TooltipItem;
+import slimeknights.tconstruct.common.TinkerNetwork;
+import slimeknights.tconstruct.items.GadgetItems;
+import slimeknights.tconstruct.library.SlimeBounceHandler;
+import slimeknights.tconstruct.library.TinkerRegistry;
+import slimeknights.tconstruct.shared.block.SlimeBlock;
+import slimeknights.tconstruct.tools.common.network.EntityMovementChangePacket;
+
+import javax.annotation.Nonnull;
+
+public class SlimeSlingItem extends TooltipItem {
+    
+    public SlimeSlingItem() {
+        super((new Properties()).group(TinkerRegistry.tabGadgets).maxStackSize(1));
+    }
+    
+    @OnlyIn(Dist.CLIENT)
+    public static int getColorFromStack(ItemStack stack) {
+        if (stack.getItem() == GadgetItems.slime_sling_blue) {
+            return SlimeBlock.SlimeType.BLUE.getBallColor();
+        } else if (stack.getItem() == GadgetItems.slime_sling_purple) {
+            return SlimeBlock.SlimeType.PURPLE.getBallColor();
+        } else if (stack.getItem() == GadgetItems.slime_sling_magma) {
+            return SlimeBlock.SlimeType.MAGMA.getBallColor();
+        } else if (stack.getItem() == GadgetItems.slime_sling_green) {
+            return SlimeBlock.SlimeType.GREEN.getBallColor();
+        } else if (stack.getItem() == GadgetItems.slime_sling_blood) {
+            return SlimeBlock.SlimeType.BLOOD.getBallColor();
+        } else {
+            return SlimeBlock.SlimeType.GREEN.getBallColor();
+        }
+    }
+    
+    @Nonnull
+    @Override
+    public TypedActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
+        ItemStack itemStackIn = playerIn.getHeldItem(hand);
+        playerIn.setActiveHand(hand);
+        return new TypedActionResult<>(ActionResult.field_5812, itemStackIn);
+    }
+    
+    /**
+     * Called when the player stops using an Item (stops holding the right mouse button).
+     */
+    @Override
+    public void onPlayerStoppedUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft) {
+        if (!(entityLiving instanceof PlayerEntity)) {
+            return;
+        }
+        PlayerEntity player = (PlayerEntity) entityLiving;
+        // has to be on ground to do something
+        if (!player.onGround) {
+            return;
+        }
+        
+        // copy chargeup code from bow \o/
+        int i = this.getUseDuration(stack) - timeLeft;
+        float f = i / 20.0F;
+        f = (f * f + f * 2.0F) / 3.0F;
+        f *= 4f;
+        
+        if (f > 6f) {
+            f = 6f;
+        }
+        
+        // check if player was targeting a block
+        HitResult mop = rayTrace(worldIn, player, RayTraceContext.FluidHandling.field_1348);
+        
+        if (mop != null && mop.getType() == HitResult.Type.field_1332) {
+            // we fling the inverted player look vector
+            Vec3d vec = player.getLookVec().normalize();
+            
+            player.addVelocity(vec.x * -f, vec.y * -f / 3f, vec.z * -f);
+            
+            if (player instanceof ServerPlayerEntity) {
+                ServerPlayerEntity playerMP = (ServerPlayerEntity) player;
+                TinkerNetwork.instance.sendTo(new EntityMovementChangePacket(player), playerMP);
+                //playerMP.playerNetServerHandler.sendPacket(new S12PacketEntityVelocity(player));
+            }
+            //player.playSound(Sounds.slimesling, 1f, 1f);
+            SlimeBounceHandler.addBounceHandler(player);
+        }
+    }
+    
+    /**
+     * How long it takes to use or consume an item
+     */
+    @Override
+    public int getUseDuration(ItemStack stack) {
+        return 72000;
+    }
+    
+    /**
+     * returns the action that specifies what animation to play when the items is being used
+     */
+    @Override
+    public UseAction getUseAction(ItemStack stack) {
+        return UseAction.field_8953;
+    }
+    
+}

@@ -1,217 +1,86 @@
 package slimeknights.tconstruct.library.materials;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.TextFormat;
-import net.minecraft.util.text.translation.I18n;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import slimeknights.mantle.util.RecipeMatch;
-import slimeknights.mantle.util.RecipeMatchRegistry;
-import slimeknights.tconstruct.common.config.Config;
-import slimeknights.tconstruct.library.TinkerRegistry;
+import net.minecraft.util.Identifier;
 import slimeknights.tconstruct.library.Util;
-import slimeknights.tconstruct.library.client.CustomFontColor;
-import slimeknights.tconstruct.library.client.MaterialRenderInfo;
+import slimeknights.tconstruct.library.materials.stats.IMaterialStats;
+import slimeknights.tconstruct.library.materials.stats.MaterialStatType;
 import slimeknights.tconstruct.library.traits.ITrait;
-import slimeknights.tconstruct.library.utils.RecipeUtil;
 
-import javax.annotation.Nonnull;
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class Material extends RecipeMatchRegistry {
+public class Material implements IMaterial {
     
-    public static final Material UNKNOWN = new Material("unknown", TextFormat.field_1068);
-    public static final String LOC_Name = "material.%s.name";
-    public static final String LOC_Prefix = "material.%s.prefix";
+    // todo config
+    //  public static int VALUE_Ore() {
+    //    return (int) (VALUE_Ingot * Config.oreToIngotRatio);
+    //  }
+    // todo default stats. figure out how to hadnle them. maybe have to register stat types and handle it there?
+/*
+  static {
+    UNKNOWN.addStats(new HeadMaterialStats(1, 1, 1, 0));
+    UNKNOWN.addStats(new HandleMaterialStats(1f, 0));
+    UNKNOWN.addStats(new ExtraMaterialStats(0));
+    UNKNOWN.addStats(new BowMaterialStats(1f, 1f, 0f));
+    UNKNOWN.addStats(new BowStringMaterialStats(1f));
+    UNKNOWN.addStats(new ArrowShaftMaterialStats(1f, 0));
+    UNKNOWN.addStats(new FletchingMaterialStats(1f, 1f));
+    UNKNOWN.addStats(new ProjectileMaterialStats());
+  }*/
     
-    // How much the different items are "worth"
-    // the values are used for both liquid conversion as well as part crafting
-    public static final int VALUE_Ingot = 144;
-    public static final int VALUE_Nugget = VALUE_Ingot / 9;
-    public static final int VALUE_Fragment = VALUE_Ingot / 4;
-    public static final int VALUE_Shard = VALUE_Ingot / 2;
-    
-    public static final int VALUE_Gem = 666; // divisible by 3!
-    public static final int VALUE_Block = VALUE_Ingot * 9;
-    
-    public static final int VALUE_SearedBlock = VALUE_Ingot * 2;
-    public static final int VALUE_SearedMaterial = VALUE_Ingot / 2;
-    public static final int VALUE_Glass = 1000;
-    
-    public static final int VALUE_BrickBlock = VALUE_Ingot * 4;
-    
-    public static final int VALUE_SlimeBall = 250;
-    
-    static {
-        UNKNOWN.addStats(new HeadMaterialStats(1, 1, 1, 0));
-        UNKNOWN.addStats(new HandleMaterialStats(1f, 0));
-        UNKNOWN.addStats(new ExtraMaterialStats(0));
-        UNKNOWN.addStats(new BowMaterialStats(1f, 1f, 0f));
-        UNKNOWN.addStats(new BowStringMaterialStats(1f));
-        UNKNOWN.addStats(new ArrowShaftMaterialStats(1f, 0));
-        UNKNOWN.addStats(new FletchingMaterialStats(1f, 1f));
-        UNKNOWN.addStats(new ProjectileMaterialStats());
-    }
-    
+    /**
+     * The fluid associated with this material, can not be null, but Fluids.EMPTY.
+     * If non-null also indicates that the material can be cast.
+     */
+    protected final Fluid fluid;
     /**
      * This String uniquely identifies a material.
      */
-    public final String identifier;
-    // we use a specific map for 2 reasons:
-    // * A Map so we can obtain the stats we want quickly
-    // * the linked map to ensure the order when iterating
-    protected final Map<String, IMaterialStats> stats = new LinkedHashMap<>();
-    /**
-     * Stat-ID -> Traits
-     */
-    protected final Map<String, List<ITrait>> traits = new LinkedHashMap<>();
-    /**
-     * Client-Information
-     * How the material will be rendered on tinker tools etc.
-     */
-    @SideOnly(Side.CLIENT) public MaterialRenderInfo renderInfo;// = new MaterialRenderInfo.Default(0xffffff);
-    public int materialTextColor = 0xffffff; // used in tooltips and other text. Saved in NBT.
-    /**
-     * The fluid associated with this material, can be null
-     */
-    protected Fluid fluid;
+    private final MaterialId identifier;
     /**
      * Material can be crafted into parts in the PartBuilder
      */
-    protected boolean craftable;
-    /**
-     * Material can be cast into parts using the Smeltery and a Cast. Fluid must be NON NULL
-     */
-    protected boolean castable;
-    /**
-     * This item, if it is not null, represents the material for rendering.
-     * In general if you want to give a person this material, you can give them this item.
-     */
-    private ItemStack representativeItem = ItemStack.EMPTY;
-    /**
-     * Ore name that represents this material
-     */
-    private String representativeOre = null;
+    private final boolean craftable;
+    
     /**
      * This item will be used instead of the generic shard item when returning leftovers.
      */
-    private ItemStack shardItem = ItemStack.EMPTY;
+    private final ItemStack shardItem;
+    
+    // we use a specific map for 2 reasons:
+    // * A Map so we can obtain the stats we want quickly
+    // * the linked map to ensure the order when iterating
+    private final LinkedHashMap<Identifier, IMaterialStats> stats = new LinkedHashMap<Identifier, IMaterialStats>();
     /**
-     * If true, the material is not shown
+     * Stat-ID -> Traits used in conjunction with these stats.
+     * <em>null</em> is an allowed key, and is used for general traits that are not stats specific.
      */
-    private boolean hidden;
-    public Material(String identifier, TextFormat textColor) {
-        this(identifier, Util.enumChatFormattingToColor(textColor));
-    }
+    private final LinkedHashMap<Identifier, List<ITrait>> traitsByStats = new LinkedHashMap<Identifier, List<ITrait>>();
     
-    public Material(String identifier, int color) {
-        this(identifier, color, false);
-    }
-    
-    public Material(String identifier, int color, boolean hidden) {
-        this.identifier = Util.sanitizeLocalizationString(identifier); // lowercases and removes whitespaces
-        
-        this.hidden = hidden;
-        
-        // if invisible, make it fully opaque.
-        if (((color >> 24) & 0xFF) == 0) {
-            color |= 0xFF << 24;
-        }
-        
-        this.materialTextColor = color;
-        if (FMLCommonHandler.instance().getSide().isClient()) {
-            setRenderInfo(color);
-        }
-    }
-    
-    public static int VALUE_Ore() {
-        return (int) (VALUE_Ingot * Config.oreToIngotRatio);
-    }
-    
-    public static String getCombinedItemName(String itemName, Collection<Material> materials) {
-        
-        // no material
-        if (materials.isEmpty() || materials.stream().allMatch(Material.UNKNOWN::equals)) {
-            return itemName;
-        }
-        // only one material - prefix
-        if (materials.size() == 1) {
-            return materials.iterator().next().getLocalizedItemName(itemName);
-        }
-        
-        // multiple materials. we'll have to combine
-        StringBuilder sb = new StringBuilder();
-        Iterator<Material> iter = materials.iterator();
-        Material material = iter.next();
-        sb.append(material.getLocalizedName());
-        while (iter.hasNext()) {
-            material = iter.next();
-            sb.append("-");
-            sb.append(material.getLocalizedName());
-        }
-        sb.append(" ");
-        sb.append(itemName);
-        
-        return sb.toString();
-    }
-    
-    /*** If true the material will not be displayed to the user anywhere. Used for special or internal materials. */
-    public boolean isHidden() {
-        return hidden;
-    }
-    
-    /**
-     * Call to declare the material is visible. Used by integration to make materials visible that were previously hidden
-     */
-    public void setVisible() {
-        hidden = false;
-    }
-    
-    public boolean isCraftable() {
-        return this.craftable || (Config.craftCastableMaterials && castable);
-    }
-    
-    /**
-     * Setting this to true allows to craft parts in the PartBuilder
-     */
-    public Material setCraftable(boolean craftable) {
+    public Material(Identifier identifier, Fluid fluid, boolean craftable, ItemStack shardItem) {
+        // lowercases and removes whitespaces
+        this.identifier = new MaterialId(identifier.getNamespace(), Util.sanitizeLocalizationString(identifier.getPath()));
+        this.fluid = fluid;
         this.craftable = craftable;
-        return this;
+        this.shardItem = shardItem;
     }
     
-    public boolean isCastable() {
-        return hasFluid() && this.castable;
+    @Override
+    public MaterialId getIdentifier() {
+        return identifier;
     }
     
-    /**
-     * Setting this to true allows to cast parts of this material. NEEDS TO HAVE A FLUID SET BEFOREHAND!
-     */
-    public Material setCastable(boolean castable) {
-        this.castable = castable;
-        return this;
+    @Override
+    public boolean isCraftable() {
+        return this.craftable;
     }
     
-    /**
-     * The display information for the Material. You should totally set this if you want your material to be visible.
-     *
-     * @param renderInfo How the textures for the material are generated
-     */
-    @SideOnly(Side.CLIENT)
-    public void setRenderInfo(MaterialRenderInfo renderInfo) {
-        this.renderInfo = renderInfo;
-    }
-    
-    @SideOnly(Side.CLIENT)
-    public MaterialRenderInfo setRenderInfo(int color) {
-        setRenderInfo(new MaterialRenderInfo.Default(color));
-        return renderInfo;
+    @Override
+    public Fluid getFluid() {
+        return fluid;
     }
     
     /* Stats */
@@ -225,49 +94,21 @@ public class Material extends RecipeMatchRegistry {
     }
     
     /**
-     * Returns the given type of stats if the material has them. Returns null Otherwise.
-     */
-    private IMaterialStats getStatsSafe(String identifier) {
-        if (identifier == null || identifier.isEmpty()) {
-            return null;
-        }
-        
-        for (IMaterialStats stat : stats.values()) {
-            if (identifier.equals(stat.getIdentifier())) {
-                return stat;
-            }
-        }
-        
-        return null;
-    }
-    
-    /**
      * Returns the material stats of the given type of this material.
      *
-     * @param identifier Identifier of the material.
-     * @param <T>        Type of the Stats are determined by return value. Use the correct
+     * @param partType Identifier of the material.
+     * @param <T>      Type of the Stats are determined by return value. Use the correct
      * @return The stats found or null if none present.
      */
+    @Override
     @SuppressWarnings("unchecked")
-    public <T extends IMaterialStats> T getStats(String identifier) {
-        return (T) getStatsSafe(identifier);
+    public <T extends IMaterialStats> Optional<T> getStatsForType(MaterialStatType partType) {
+        return Optional.ofNullable((T) stats.get(partType));
     }
     
-    @SuppressWarnings("unchecked")
-    public <T extends IMaterialStats> T getStatsOrUnknown(String identifier) {
-        T stats = (T) getStatsSafe(identifier);
-        if (stats == null && this != UNKNOWN) {
-            return UNKNOWN.getStats(identifier);
-        }
-        return stats;
-    }
-    
+    @Override
     public Collection<IMaterialStats> getAllStats() {
         return stats.values();
-    }
-    
-    public boolean hasStats(String identifier) {
-        return getStats(identifier) != null;
     }
     
     /* Traits */
@@ -282,125 +123,41 @@ public class Material extends RecipeMatchRegistry {
     /**
      * Adds the trait to be added if the specified stats are used.
      */
-    public Material addTrait(ITrait materialTrait, String dependency) {
-        // register unregistered traits
-        if (TinkerRegistry.checkMaterialTrait(this, materialTrait, dependency)) {
-            getStatTraits(dependency).add(materialTrait);
-        }
-        
+    public Material addTrait(ITrait materialTrait, Identifier forStatsType) {
+        // todo: we don't register traits automatically on addition anymore, check if all are present
+        getStatTraits(forStatsType).add(materialTrait);
         return this;
+    }
+    
+    @Override
+    public List<ITrait> getAllTraitsForStats(MaterialStatType partType) {
+        List<ITrait> traits = traitsByStats.get(partType);
+        
+        if (traits == null) {
+            return traitsByStats.getOrDefault(null, ImmutableList.of());
+        } else {
+            return traits;
+        }
     }
     
     /**
      * Obtains the list of traits for the given stat, creates it if it doesn't exist yet.
      */
-    protected List<ITrait> getStatTraits(String id) {
-        if (!this.traits.containsKey(id)) {
-            this.traits.put(id, new LinkedList<>());
+    @SuppressWarnings("WeakerAccess")
+    protected List<ITrait> getStatTraits(Identifier forStatsType) {
+        if (!this.traitsByStats.containsKey(forStatsType)) {
+            // linked list since we're only ever iterating over the list
+            this.traitsByStats.put(forStatsType, new LinkedList<>());
         }
-        return this.traits.get(id);
+        return this.traitsByStats.get(forStatsType);
     }
     
-    /**
-     * Returns whether the material has a trait with that identifier.
-     */
-    public boolean hasTrait(String identifier, String stats) {
-        if (identifier == null || identifier.isEmpty()) {
-            return false;
-        }
-        
-        for (ITrait trait : getStatTraits(stats)) {
-            if (trait.getIdentifier().equals(identifier)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    public List<ITrait> getDefaultTraits() {
-        return ImmutableList.copyOf(getStatTraits(null));
-    }
-    
-    public List<ITrait> getAllTraitsForStats(String stats) {
-        if (this.traits.containsKey(stats)) {
-            return ImmutableList.copyOf(this.traits.get(stats));
-        } else if (this.traits.containsKey(null)) {
-            return ImmutableList.copyOf(this.traits.get(null));
-        }
-        return ImmutableList.of();
-    }
-    
+    @Override
     public Collection<ITrait> getAllTraits() {
-        ImmutableSet.Builder<ITrait> builder = ImmutableSet.builder();
-        for (List<ITrait> traitlist : traits.values()) {
-            builder.addAll(traitlist);
-        }
-        return builder.build();
+        return traitsByStats.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
     
-    /* Data about the material itself */
-    
-    public boolean hasFluid() {
-        return fluid != null;
-    }
-    
-    public Fluid getFluid() {
-        return fluid;
-    }
-    
-    /**
-     * Associates this fluid with the material. Used for melting/casting items.
-     */
-    public Material setFluid(Fluid fluid) {
-        if (fluid != null && !FluidRegistry.isFluidRegistered(fluid)) {
-            TinkerRegistry.log.warn("Materials cannot have an unregistered fluid associated with them!");
-        }
-        this.fluid = fluid;
-        return this;
-    }
-    
-    public void addItemIngot(String oredict) {
-        this.addItem(oredict, 1, Material.VALUE_Ingot);
-    }
-    
-    public void addCommonItems(String oredictSuffix) {
-        this.addItem("ingot" + oredictSuffix, 1, Material.VALUE_Ingot);
-        this.addItem("nugget" + oredictSuffix, 1, Material.VALUE_Nugget);
-        this.addItem("block" + oredictSuffix, 1, Material.VALUE_Block);
-    }
-    
-    public ItemStack getRepresentativeItem() {
-        if (representativeOre != null) {
-            ItemStack ore = RecipeUtil.getPreference(representativeOre);
-            if (!ore.isEmpty()) {
-                return ore;
-            }
-        }
-        return representativeItem;
-    }
-    
-    public void setRepresentativeItem(String representativeOre) {
-        this.representativeOre = representativeOre;
-    }
-    
-    public void setRepresentativeItem(Item representativeItem) {
-        setRepresentativeItem(new ItemStack(representativeItem));
-    }
-    
-    public void setRepresentativeItem(Block representativeBlock) {
-        setRepresentativeItem(new ItemStack(representativeBlock));
-    }
-    
-    public void setRepresentativeItem(ItemStack representativeItem) {
-        if (representativeItem == null || representativeItem.isEmpty()) {
-            this.representativeItem = ItemStack.EMPTY;
-        } else if (matches(representativeItem).isPresent()) {
-            this.representativeItem = representativeItem;
-        } else {
-            TinkerRegistry.log.warn("Itemstack {} cannot represent material {} since it is not associated with the material!", representativeItem.toString(), identifier);
-        }
-    }
-    
+    @Override
     public ItemStack getShard() {
         if (shardItem != ItemStack.EMPTY) {
             return shardItem.copy();
@@ -408,63 +165,33 @@ public class Material extends RecipeMatchRegistry {
         return ItemStack.EMPTY;
     }
     
-    public void setShard(Item item) {
-        setShard(new ItemStack(item));
-    }
-    
-    public void setShard(@Nonnull ItemStack stack) {
+    public void setShard(ItemStack stack) {
         if (stack.isEmpty()) {
-            this.shardItem = ItemStack.EMPTY;
+            //this.shardItem = ItemStack.EMPTY;
         } else {
-            Optional<RecipeMatch.Match> matchOptional = matches(stack);
-            if (matchOptional.isPresent()) {
-                RecipeMatch.Match match = matchOptional.get();
-                if (match.amount == VALUE_Shard) {
-                    this.shardItem = stack;
-                    if (representativeItem.isEmpty()) {
-                        this.setRepresentativeItem(shardItem.copy());
-                    }
-                } else {
-                    TinkerRegistry.log.warn("Itemstack {} cannot be shard of material {} since it does not have the correct value! (is {}, has to be {})", representativeItem.toString(), identifier, match.amount, VALUE_Shard);
-                }
-            } else {
-                TinkerRegistry.log.warn("Itemstack {} cannot be shard of material {} since it is not associated with the material!", stack.toString(), identifier);
-            }
+            // todo: shard matching. Reimplement or move it somewhere else? OK like this? Do we keep recipematchregistry?
+      /*
+      Optional<RecipeMatch.Match> matchOptional = matches(stack);
+      if(matchOptional.isPresent()) {
+        RecipeMatch.Match match = matchOptional.get();
+        if(match.amount == MaterialValues.VALUE_Shard) {*/
+            //this.shardItem = stack;
+      /*
+        }
+        else {
+          TinkerRegistry.log.warn("Itemstack {} cannot be shard of material {} since it does not have the correct material value! (is {}, has to be {})",
+                                  stack.toString(),
+                                  identifier,
+                                  match.amount,
+                                  MaterialValues.VALUE_Shard);
+        }
+      }
+      else {
+        TinkerRegistry.log.warn("Itemstack {} cannot be shard of material {} since it is not associated with the material!",
+                                stack.toString(),
+                                identifier);
+      }*/
         }
     }
     
-    public boolean hasItems() {
-        return !items.isEmpty();
-    }
-    
-    public String getLocalizedName() {
-        return Util.translate(LOC_Name, getIdentifier());
-    }
-    
-    /**
-     * Takes a string and turns it into a named variant for this material. E.g. pickaxe -> wooden pickaxe
-     */
-    public String getLocalizedItemName(String itemName) {
-        if (this == UNKNOWN) {
-            return itemName;
-        }
-        
-        if (I18n.canTranslate(String.format(LOC_Prefix, getIdentifier()))) {
-            return I18n.translateToLocalFormatted(String.format(LOC_Prefix, Util.sanitizeLocalizationString(identifier)), itemName);
-        }
-        
-        return getLocalizedName() + " " + itemName;
-    }
-    
-    public String getLocalizedNameColored() {
-        return getTextColor() + getLocalizedName();
-    }
-    
-    public String getIdentifier() {
-        return identifier;
-    }
-    
-    public String getTextColor() {
-        return CustomFontColor.encodeColor(materialTextColor);
-    }
 }

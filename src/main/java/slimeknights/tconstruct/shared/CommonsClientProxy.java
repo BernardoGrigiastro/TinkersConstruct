@@ -1,81 +1,40 @@
 package slimeknights.tconstruct.shared;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.MaterialColor;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.block.BlockColorMap;
-import net.minecraft.client.render.block.BlockColorMapper;
-import net.minecraft.client.render.item.ItemColorMapper;
-import net.minecraft.client.renderer.block.statemap.StateMap;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.item.BlockItem;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.client.model.ModelLoader;
+import net.minecraft.world.ExtendedBlockView;
+import slimeknights.tconstruct.blocks.DecorativeBlocks;
 import slimeknights.tconstruct.common.ClientProxy;
-import slimeknights.tconstruct.shared.block.BlockClearStainedGlass;
-import slimeknights.tconstruct.shared.block.BlockClearStainedGlass.EnumGlassColor;
-
-import javax.annotation.Nonnull;
-
-import static slimeknights.tconstruct.common.ModelRegisterUtil.registerItemBlockMeta;
-import static slimeknights.tconstruct.common.ModelRegisterUtil.registerItemModel;
-import static slimeknights.tconstruct.shared.TinkerCommons.*;
+import slimeknights.tconstruct.shared.block.ClearStainedGlassBlock;
 
 public class CommonsClientProxy extends ClientProxy {
     
-    public static MinecraftClient minecraft = MinecraftClient.getMinecraft();
+    public static MinecraftClient minecraft = MinecraftClient.getInstance();
     
     @Override
     public void init() {
-        final BlockColorMap blockColors = minecraft.getBlockColors();
+        final BlockColors blockColors = minecraft.getBlockColors();
         
-        // stained glass
-        blockColors.registerBlockColorHandler(new BlockColorMapper() {
-            @Override
-            public int colorMultiplier(@Nonnull IBlockState state, IBlockAccess access, BlockPos pos, int tintIndex) {
-                EnumGlassColor type = state.getValue(BlockClearStainedGlass.COLOR);
-                return type.getColor();
+        blockColors.register((state, reader, blockPos, tintIndex) -> {
+            if (state != null && state.getBlock() instanceof ClearStainedGlassBlock) {
+                ClearStainedGlassBlock stainedGlassBlock = (ClearStainedGlassBlock) state.getBlock();
+                return stainedGlassBlock.getGlassColor().getColor();
             }
-        }, blockClearStainedGlass);
+            
+            MaterialColor materialcolor = state.getMaterialColor(reader, blockPos);
+            return materialcolor != null ? materialcolor.color : -1;
+            
+        }, DecorativeBlocks.white_clear_stained_glass, DecorativeBlocks.orange_clear_stained_glass, DecorativeBlocks.magenta_clear_stained_glass, DecorativeBlocks.light_blue_clear_stained_glass, DecorativeBlocks.yellow_clear_stained_glass, DecorativeBlocks.lime_clear_stained_glass, DecorativeBlocks.pink_clear_stained_glass, DecorativeBlocks.gray_clear_stained_glass, DecorativeBlocks.light_gray_clear_stained_glass, DecorativeBlocks.cyan_clear_stained_glass, DecorativeBlocks.purple_clear_stained_glass, DecorativeBlocks.blue_clear_stained_glass, DecorativeBlocks.brown_clear_stained_glass, DecorativeBlocks.green_clear_stained_glass, DecorativeBlocks.red_clear_stained_glass, DecorativeBlocks.black_clear_stained_glass);
         
-        minecraft.getItemColors().registerItemColorHandler(new ItemColorMapper() {
-            @SuppressWarnings("deprecation")
-            @Override
-            public int getColorFromItemstack(@Nonnull ItemStack stack, int tintIndex) {
-                IBlockState iblockstate = ((ItemBlock) stack.getItem()).getBlock().getStateFromMeta(stack.getMetadata());
-                return blockColors.colorMultiplier(iblockstate, null, null, tintIndex);
-            }
-        }, blockClearStainedGlass);
+        minecraft.getItemColors().register((itemStack, tintIndex) -> {
+            BlockState blockstate = ((BlockItem) itemStack.getItem()).getBlock().getDefaultState();
+            return blockColors.getColor(blockstate, (ExtendedBlockView) null, (BlockPos) null, tintIndex);
+        }, DecorativeBlocks.white_clear_stained_glass, DecorativeBlocks.orange_clear_stained_glass, DecorativeBlocks.magenta_clear_stained_glass, DecorativeBlocks.light_blue_clear_stained_glass, DecorativeBlocks.yellow_clear_stained_glass, DecorativeBlocks.lime_clear_stained_glass, DecorativeBlocks.pink_clear_stained_glass, DecorativeBlocks.gray_clear_stained_glass, DecorativeBlocks.light_gray_clear_stained_glass, DecorativeBlocks.cyan_clear_stained_glass, DecorativeBlocks.purple_clear_stained_glass, DecorativeBlocks.blue_clear_stained_glass, DecorativeBlocks.brown_clear_stained_glass, DecorativeBlocks.green_clear_stained_glass, DecorativeBlocks.red_clear_stained_glass, DecorativeBlocks.black_clear_stained_glass);
         
         super.init();
-    }
-    
-    @Override
-    public void registerModels() {
-        // ignore color state for the clear stained glass, it is handled by tinting
-        ModelLoader.setCustomStateMapper(blockClearStainedGlass, (new StateMap.Builder()).ignore(BlockClearStainedGlass.COLOR).build());
-        
-        nuggets.registerItemModels();
-        ingots.registerItemModels();
-        materials.registerItemModels();
-        edibles.registerItemModels();
-        
-        registerItemModel(book, 0, "inventory");
-        
-        registerItemBlockMeta(blockMetal);
-        registerItemBlockMeta(blockSoil);
-        registerItemBlockMeta(blockOre);
-        registerItemBlockMeta(blockFirewood);
-        registerItemBlockMeta(blockSlime);
-        registerItemBlockMeta(blockSlimeCongealed);
-        registerItemBlockMeta(slabFirewood);
-        registerItemModel(stairsFirewood);
-        registerItemModel(stairsLavawood);
-        registerItemModel(blockClearGlass);
-        registerItemModel(blockClearStainedGlass); // this is enumBlock, but the model is tinted instead of using a state
-        
-        registerItemBlockMeta(blockDecoGround);
-        registerItemBlockMeta(slabDecoGround);
-        registerItemModel(stairsMudBrick);
     }
 }

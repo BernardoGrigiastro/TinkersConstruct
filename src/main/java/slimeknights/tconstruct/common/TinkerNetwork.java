@@ -1,24 +1,17 @@
 package slimeknights.tconstruct.common;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.Packet;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import slimeknights.mantle.network.AbstractPacket;
+import net.minecraftforge.fml.network.PacketDistributor;
 import slimeknights.mantle.network.NetworkWrapper;
 import slimeknights.tconstruct.TConstruct;
-import slimeknights.tconstruct.common.config.ConfigSyncPacket;
-import slimeknights.tconstruct.common.network.SpawnParticlePacket;
-import slimeknights.tconstruct.smeltery.network.*;
-import slimeknights.tconstruct.tools.common.network.*;
+import slimeknights.tconstruct.tools.common.network.BouncedPacket;
+import slimeknights.tconstruct.tools.common.network.EntityMovementChangePacket;
+import slimeknights.tconstruct.tools.common.network.InventorySlotSyncPacket;
 
 public class TinkerNetwork extends NetworkWrapper {
     
@@ -28,74 +21,21 @@ public class TinkerNetwork extends NetworkWrapper {
         super(TConstruct.modID);
     }
     
-    public static void sendPacket(Entity player, Packet<?> packet) {
+    public void setup() {
+        this.registerPacket(EntityMovementChangePacket.class, EntityMovementChangePacket::encode, EntityMovementChangePacket::new, EntityMovementChangePacket::handle);
+        this.registerPacket(BouncedPacket.class, BouncedPacket::encode, BouncedPacket::new, BouncedPacket::handle);
+        this.registerPacket(InventorySlotSyncPacket.class, InventorySlotSyncPacket::encode, InventorySlotSyncPacket::new, InventorySlotSyncPacket::handle);
+    }
+    
+    public void sendVanillaPacket(Entity player, Packet<?> packet) {
         if (player instanceof ServerPlayerEntity && ((ServerPlayerEntity) player).networkHandler != null) {
             ((ServerPlayerEntity) player).networkHandler.sendPacket(packet);
         }
     }
     
-    public static void sendToAll(Packet packet) {
-        instance.network.sendToAll(packet);
-    }
-    
-    public static void sendTo(Packet packet, ServerPlayerEntity player) {
-        instance.network.sendTo(packet, player);
-    }
-    
-    public static void sendToAllAround(Packet packet, NetworkRegistry.TargetPoint point) {
-        instance.network.sendToAllAround(packet, point);
-    }
-    
-    public static void sendToDimension(Packet packet, int dimensionId) {
-        instance.network.sendToDimension(packet, dimensionId);
-    }
-    
-    public static void sendToServer(Packet packet) {
-        instance.network.sendToServer(packet);
-    }
-    
-    public static void sendToClients(ServerWorld world, BlockPos pos, Packet packet) {
-        Chunk chunk = world.getChunk(pos);
-        for (PlayerEntity player : world.getPlayers()) {
-            // only send to relevant players
-            if (!(player instanceof ServerPlayerEntity)) {
-                continue;
-            }
-            ServerPlayerEntity playerMP = (ServerPlayerEntity) player;
-            if (world.getChunkManager().shouldTickEntity(playerMP)) {
-                TinkerNetwork.sendTo(packet, playerMP);
-            }
-        }
-    }
-    
-    public void setup() {
-        // register all the packets
-        registerPacketClient(ConfigSyncPacket.class);
-        registerPacketClient(SpawnParticlePacket.class);
+    public void sendToClientsAround(Object msg, ServerWorld serverWorld, BlockPos position) {
+        WorldChunk chunk = serverWorld.getChunkAt(position);
         
-        // TOOLS
-        registerPacket(StencilTableSelectionPacket.class);
-        registerPacket(PartCrafterSelectionPacket.class);
-        registerPacket(ToolStationSelectionPacket.class);
-        registerPacket(ToolStationTextPacket.class);
-        registerPacketServer(TinkerStationTabPacket.class);
-        registerPacketServer(InventoryCraftingSyncPacket.class);
-        registerPacketClient(InventorySlotSyncPacket.class);
-        registerPacketClient(EntityMovementChangePacket.class);
-        registerPacketClient(ToolBreakAnimationPacket.class);
-        
-        // SMELTERY
-        registerPacketClient(SmelteryFluidUpdatePacket.class);
-        registerPacketClient(HeatingStructureFuelUpdatePacket.class);
-        registerPacketClient(SmelteryInventoryUpdatePacket.class);
-        registerPacketServer(SmelteryFluidClicked.class);
-        registerPacketClient(FluidUpdatePacket.class);
-        registerPacketClient(FaucetActivationPacket.class);
-        registerPacketClient(ChannelConnectionPacket.class);
-        registerPacketClient(ChannelFlowPacket.class);
-        
-        // OTHER STUFF
-        registerPacketServer(BouncedPacket.class);
-        registerPacketClient(LastRecipeMessage.class);
+        this.network.send(PacketDistributor.TRACKING_CHUNK.with(() -> chunk), msg);
     }
 }

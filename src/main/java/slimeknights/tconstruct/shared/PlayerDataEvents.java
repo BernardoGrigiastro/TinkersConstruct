@@ -1,29 +1,35 @@
 package slimeknights.tconstruct.shared;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.items.ItemHandlerHelper;
+import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.config.Config;
+import slimeknights.tconstruct.items.CommonItems;
 import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.utils.TagUtil;
 
+@Mod.EventBusSubscriber(modid = TConstruct.modID)
 public class PlayerDataEvents {
     
-    public static final String TAG_PLAYER_HAS_BOOK = Util.prefix("spawned_book");
+    private static final String TAG_PLAYER_HAS_BOOK = Util.prefix("spawned_book");
+    
+    private PlayerDataEvents() {}
     
     @SubscribeEvent
-    public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        if (Config.spawnWithBook) {
-            NBTTagCompound playerData = event.player.getEntityData();
-            NBTTagCompound data = TagUtil.getTagSafe(playerData, EntityPlayer.PERSISTED_NBT_TAG);
+    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (Config.SERVER.shouldSpawnWithTinkersBook.get()) {
+            CompoundTag playerData = event.getPlayer().getPersistentData();
+            CompoundTag data = TagUtil.getTagSafe(playerData, PlayerEntity.PERSISTED_NBT_TAG);
             
             if (!data.getBoolean(TAG_PLAYER_HAS_BOOK)) {
-                ItemHandlerHelper.giveItemToPlayer(event.player, new ItemStack(TinkerCommons.book));
-                data.setBoolean(TAG_PLAYER_HAS_BOOK, true);
-                playerData.setTag(EntityPlayer.PERSISTED_NBT_TAG, data);
+                ItemHandlerHelper.giveItemToPlayer(event.getPlayer(), new ItemStack(CommonItems.book));
+                data.putBoolean(TAG_PLAYER_HAS_BOOK, true);
+                playerData.put(PlayerEntity.PERSISTED_NBT_TAG, data);
             }
         }
     }

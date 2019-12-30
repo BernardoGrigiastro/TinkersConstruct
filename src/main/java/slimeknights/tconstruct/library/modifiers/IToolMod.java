@@ -2,7 +2,7 @@ package slimeknights.tconstruct.library.modifiers;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -26,7 +26,7 @@ public interface IToolMod {
     /**
      * Extra info to display in the tool station. Each entry adds a line.
      */
-    List<String> getExtraInfo(ItemStack tool, NBTTagCompound modifierTag);
+    List<String> getExtraInfo(ItemStack tool, CompoundTag modifierTag);
     
     /**
      * Return true to hide the trait from the user.

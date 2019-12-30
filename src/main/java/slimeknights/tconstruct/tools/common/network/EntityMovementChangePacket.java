@@ -1,84 +1,60 @@
 package slimeknights.tconstruct.tools.common.network;
 
-import io.netty.buffer.ByteBuf;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
-import net.minecraft.network.Packet;
-import net.minecraft.network.listener.PacketListener;
 import net.minecraft.util.PacketByteBuf;
+import net.minecraftforge.fml.network.NetworkEvent;
+import slimeknights.mantle.network.AbstractPacket;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.util.function.Supplier;
 
-public class EntityMovementChangePacket implements Packet {
+public class EntityMovementChangePacket extends AbstractPacket {
     
-    public int entityID;
     public double x;
     public double y;
     public double z;
-    public float yaw;
-    public float pitch;
-    
-    public EntityMovementChangePacket() {
-    }
+    private int entityID;
+    private float yaw;
+    private float pitch;
     
     public EntityMovementChangePacket(Entity entity) {
         this.entityID = entity.getEntityId();
-        this.x = entity.getPos().x;
-        this.y = entity.getPos().y;
-        this.z = entity.getPos().z;
+        this.x = entity.getMotion().x;
+        this.y = entity.getMotion().y;
+        this.z = entity.getMotion().z;
         this.yaw = entity.yaw;
         this.pitch = entity.pitch;
     }
     
-    @Environment(EnvType.CLIENT)
-    public void handleClientSafe() {
-        Entity entity = net.minecraft.client.MinecraftClient.getInstance().world.getEntityById(entityID);
-        if (entity != null) {
-            entity.setPosition(x, y, z);
-            entity.yaw = yaw;
-            entity.pitch = pitch;
-        }
-    }
-    
-    public void fromBytes(ByteBuf buf) {
-        this.entityID = buf.readInt();
-        this.x = buf.readDouble();
-        this.y = buf.readDouble();
-        this.z = buf.readDouble();
-        this.yaw = buf.readFloat();
-        this.pitch = buf.readFloat();
-    }
-    
-    public void toBytes(ByteBuf buf) {
-        buf.writeInt(entityID);
-        buf.writeDouble(x);
-        buf.writeDouble(y);
-        buf.writeDouble(z);
-        buf.writeFloat(yaw);
-        buf.writeFloat(pitch);
+    public EntityMovementChangePacket(PacketByteBuf buffer) {
+        this.entityID = buffer.readInt();
+        this.x = buffer.readDouble();
+        this.y = buffer.readDouble();
+        this.z = buffer.readDouble();
+        this.yaw = buffer.readFloat();
+        this.pitch = buffer.readFloat();
     }
     
     @Override
-    public void read(PacketByteBuf packetByteBuf) throws IOException {
-        fromBytes(packetByteBuf);
+    public void encode(PacketByteBuf packetBuffer) {
+        packetBuffer.writeInt(this.entityID);
+        packetBuffer.writeDouble(this.x);
+        packetBuffer.writeDouble(this.y);
+        packetBuffer.writeDouble(this.z);
+        packetBuffer.writeFloat(this.yaw);
+        packetBuffer.writeFloat(this.pitch);
     }
     
     @Override
-    public void write(PacketByteBuf packetByteBuf) throws IOException {
-        toBytes(packetByteBuf);
-    }
-    
-    @Override
-    public void apply(PacketListener packetListener) {
-        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-            try {
-                getClass().getDeclaredMethod("handleClientSafe").invoke(this);
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                e.printStackTrace();
+    public void handle(Supplier<NetworkEvent.Context> supplier) {
+        supplier.get().enqueueWork(() -> {
+            Entity entity = MinecraftClient.getInstance().world.getEntityByID(this.entityID);
+            if (supplier.get().getSender() != null && entity != null) {
+                entity.setMotion(this.x, this.y, this.z);
+                entity.yaw = this.yaw;
+                entity.pitch = this.pitch;
             }
-        }
+        });
+        supplier.get().setPacketHandled(true);
     }
 }

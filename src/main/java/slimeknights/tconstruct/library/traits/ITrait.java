@@ -1,12 +1,12 @@
 package slimeknights.tconstruct.library.traits;
 
 import com.google.common.collect.Multimap;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -17,6 +17,8 @@ import slimeknights.tconstruct.library.modifiers.IToolMod;
 
 import javax.annotation.Nonnull;
 
+// todo: move defaults to abstractTrait or all abstract to defaults
+
 /**
  * Traits are specific properties on tools with special effects.
  * The trait object contains basic information about the trait.
@@ -26,14 +28,14 @@ public interface ITrait extends IToolMod {
     /* Updating */
     
     /**
-     * Called each tick by the tool. See {@link net.minecraft.item.Item#onUpdate(ItemStack, World, Entity, int, boolean)}
+     * Called each tick by the tool. See {@link net.minecraft.item.Item#inventoryTick(ItemStack, World, Entity, int, boolean)}
      */
     void onUpdate(ItemStack tool, World world, Entity entity, int itemSlot, boolean isSelected);
     
     /**
      * Called by stuff that's in the Armor slot? Unused so far.
      */
-    void onArmorTick(ItemStack tool, World world, EntityPlayer player);
+    void onArmorTick(ItemStack tool, World world, PlayerEntity player);
     
     /* Mining/Harvesting */
     
@@ -48,10 +50,10 @@ public interface ITrait extends IToolMod {
     void beforeBlockBreak(ItemStack tool, BlockEvent.BreakEvent event);
     
     /**
-     * Called after the block has been destroyed. See {@link net.minecraft.item.Item#onBlockDestroyed(ItemStack stack, World worldIn, IBlockState state, BlockPos pos, EntityLivingBase entityLiving)}
+     * Called after the block has been destroyed. See {@link net.minecraft.item.Item#onBlockDestroyed(ItemStack, World, BlockState, BlockPos, LivingEntity)}
      * Called before the tools durability is reduced.
      */
-    void afterBlockBreak(ItemStack tool, World world, IBlockState state, BlockPos pos, EntityLivingBase player, boolean wasEffective);
+    void afterBlockBreak(ItemStack tool, World world, BlockState state, BlockPos pos, LivingEntity player, boolean wasEffective);
     
     /**
      * Called after a block has been broken. See {@link net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent}
@@ -70,7 +72,7 @@ public interface ITrait extends IToolMod {
      * @param target The entity to hit.
      * @return true if it should be a crit. false will NOT prevent a crit from other sources.
      */
-    boolean isCriticalHit(ItemStack tool, EntityLivingBase player, EntityLivingBase target);
+    boolean isCriticalHit(ItemStack tool, LivingEntity player, LivingEntity target);
     
     /**
      * Called when an entity is hit, before the damage is dealt and before critical hit calculation.
@@ -85,7 +87,7 @@ public interface ITrait extends IToolMod {
      * @param isCritical If the hit will be a critical hit.
      * @return The damage to deal. Standard return value is newDamage.
      */
-    float damage(ItemStack tool, EntityLivingBase player, EntityLivingBase target, float damage, float newDamage, boolean isCritical);
+    float damage(ItemStack tool, LivingEntity player, LivingEntity target, float damage, float newDamage, boolean isCritical);
     
     /**
      * Called when an entity is hit, just before the damage is dealt. Damage is the final damage dealt, including critical damage.
@@ -98,7 +100,7 @@ public interface ITrait extends IToolMod {
      * @param damage     The original, unmodified damage from the tool. Does not includes critical damage, that will be calculated afterwards.
      * @param isCritical If the hit will be a critical hit.
      */
-    void onHit(ItemStack tool, EntityLivingBase player, EntityLivingBase target, float damage, boolean isCritical);
+    void onHit(ItemStack tool, LivingEntity player, LivingEntity target, float damage, boolean isCritical);
     
     /**
      * Modify the knockback applied. Called after onHit and with the actual damage value. Damage value INCLUDES crit damage here.
@@ -112,7 +114,7 @@ public interface ITrait extends IToolMod {
      * @param isCritical   If the hit will be a critical hit.
      * @return The knockback, Standard return value is newKnockback.
      */
-    float knockBack(ItemStack tool, EntityLivingBase player, EntityLivingBase target, float damage, float knockback, float newKnockback, boolean isCritical);
+    float knockBack(ItemStack tool, LivingEntity player, LivingEntity target, float damage, float knockback, float newKnockback, boolean isCritical);
     
     /**
      * Called after an entity has been hit, after the damage is dealt.
@@ -124,17 +126,17 @@ public interface ITrait extends IToolMod {
      * @param wasCritical If the hit was a critical hit.
      * @param wasHit      If the target was actually hit. False when the entity was still invulnerable, or prevented the damage because of some other reason.
      */
-    void afterHit(ItemStack tool, EntityLivingBase player, EntityLivingBase target, float damageDealt, boolean wasCritical, boolean wasHit);
+    void afterHit(ItemStack tool, LivingEntity player, LivingEntity target, float damageDealt, boolean wasCritical, boolean wasHit);
     
     /**
      * Called when the player holding the tool blocks an attack.
      */
-    void onBlock(ItemStack tool, EntityPlayer player, LivingHurtEvent event);
+    void onBlock(ItemStack tool, PlayerEntity player, LivingHurtEvent event);
     
     /**
      * Called when the player holding the tool is damaged. Only called if the player is NOT blocking! onBlock is called in that case.
      */
-    default void onPlayerHurt(ItemStack tool, EntityPlayer player, EntityLivingBase attacker, LivingHurtEvent event) {}
+    default void onPlayerHurt(ItemStack tool, PlayerEntity player, LivingEntity attacker, LivingHurtEvent event) {}
     
     /* Damage tool */
     
@@ -146,7 +148,7 @@ public interface ITrait extends IToolMod {
      * @param newDamage The current damage that will be dealt, possibly modified by other traits
      * @return The damage to deal, Standard return value is newDamage
      */
-    int onToolDamage(ItemStack tool, int damage, int newDamage, EntityLivingBase entity);
+    int onToolDamage(ItemStack tool, int damage, int newDamage, LivingEntity entity);
     
     /**
      * Called before the tools durability is getting increased.
@@ -156,7 +158,7 @@ public interface ITrait extends IToolMod {
      * @param newAmount The current damage that will be healed, possibly modified by other traits
      * @return The damage to deal. Standard return value is newAmount
      */
-    int onToolHeal(ItemStack tool, int amount, int newAmount, EntityLivingBase entity);
+    int onToolHeal(ItemStack tool, int amount, int newAmount, LivingEntity entity);
     
     /**
      * Called before the tool is getting repaired with its repair material.
@@ -170,14 +172,14 @@ public interface ITrait extends IToolMod {
     
     /**
      * When the tool is equipped, this is called to set the players attributes.
-     * See Item.getAttributeModifiers
+     * See {@link net.minecraft.item.Item#getAttributeModifiers(EquipmentSlotType, ItemStack)}
      *
      * @param slot         Analogous to Item.getAttributeModifiers
      * @param stack        Item.getAttributeModifiers
      * @param attributeMap The map you usually return. Fill in your stuff, if needed
      */
-    default void getAttributeModifiers(@Nonnull
-            EntityEquipmentSlot slot, ItemStack stack, Multimap<String, EntityAttributeModifier> attributeMap) {}
+    default void getAttributeModifiers(
+            @Nonnull EquipmentSlot slot, ItemStack stack, Multimap<String, EntityAttributeModifier> attributeMap) {}
     
     /**
      * Determines the order in which traits/modifiers are processed. Higher priority gets processed first.

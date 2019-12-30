@@ -6,40 +6,45 @@ package slimeknights.tconstruct.library;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.TextFormat;
 import net.minecraft.util.DefaultedList;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BoundingBox;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.text.translation.I18n;
+import net.minecraftforge.fml.ModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.input.Keyboard;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+import org.lwjgl.glfw.GLFW;
 import slimeknights.mantle.util.RecipeMatchRegistry;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+import java.util.Optional;
 
 @SuppressWarnings("deprecation")
 public class Util {
     
     public static final String MODID = "tconstruct";
     public static final String RESOURCE = MODID.toLowerCase(Locale.US);
+    public static final Marker TCONSTRUCT = MarkerManager.getMarker("TCONSTRUCT");
     
     public static final DecimalFormat df = new DecimalFormat("#,###,###.##", DecimalFormatSymbols.getInstance(Locale.US));
     public static final DecimalFormat dfPercent = new DecimalFormat("#%");
     /* Position helpers */
-    private static ImmutableMap<Vec3i, EnumFacing> offsetMap;
-    private static boolean celsiusPref = false;
+    private static ImmutableMap<Vec3i, Direction> offsetMap;
     
     static {
-        ImmutableMap.Builder<Vec3i, EnumFacing> builder = ImmutableMap.builder();
-        for (EnumFacing facing : EnumFacing.VALUES) {
+        ImmutableMap.Builder<Vec3i, Direction> builder = ImmutableMap.builder();
+        for (Direction facing : Direction.values()) {
             builder.put(facing.getDirectionVec(), facing);
         }
         offsetMap = builder.build();
@@ -51,11 +56,15 @@ public class Util {
         return LogManager.getLogger(log + "-" + type);
     }
     
+    public static Optional<String> getCurrentlyActiveExternalMod() {
+        return Optional.ofNullable(ModLoadingContext.get().getActiveContainer().getModId()).filter(activeModId -> !MODID.equals(activeModId));
+    }
+    
     /**
      * Removes all whitespaces from the given string and makes it lowerspace.
      */
     public static String sanitizeLocalizationString(String string) {
-        return string.toLowerCase(Locale.US).replaceAll(" ", "");
+        return string.toLowerCase(Locale.US).replaceAll(" ", "").trim();
     }
     
     /**
@@ -70,8 +79,8 @@ public class Util {
         return new Identifier(RESOURCE, res);
     }
     
-    public static ModelResourceLocation getModelResource(String res, String variant) {
-        return new ModelResourceLocation(resource(res), variant);
+    public static ModelIdentifier getModelResource(String res, String variant) {
+        return new ModelIdentifier(resource(res), variant);
     }
     
     public static Identifier getModifierResource(String res) {
@@ -91,7 +100,7 @@ public class Util {
      */
     public static String translate(String key, Object... pars) {
         // translates twice to allow rerouting/alias
-        return I18n.translateToLocal(I18n.translateToLocal(String.format(key, pars)).trim()).trim();
+        return I18n.format(I18n.format(String.format(key, pars)).trim()).trim();
     }
     
     /**
@@ -99,7 +108,7 @@ public class Util {
      */
     public static String translateFormatted(String key, Object... pars) {
         // translates twice to allow rerouting/alias
-        return I18n.translateToLocal(I18n.translateToLocalFormatted(key, pars).trim()).trim();
+        return I18n.format(I18n.format(key, pars).trim()).trim();
     }
     
     /**
@@ -122,23 +131,22 @@ public class Util {
      */
     public static boolean isCtrlKeyDown() {
         // prioritize CONTROL, but allow OPTION as well on Mac (note: GuiScreen's isCtrlKeyDown only checks for the OPTION key on Mac)
-        boolean isCtrlKeyDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
+        boolean isCtrlKeyDown = InputUtil.isKeyDown(MinecraftClient.getInstance().window.getHandle(), GLFW.GLFW_KEY_LEFT_CONTROL) || InputUtil.isKeyDown(MinecraftClient.getInstance().window.getHandle(), GLFW.GLFW_KEY_RIGHT_CONTROL);
         if (!isCtrlKeyDown && MinecraftClient.IS_SYSTEM_MAC) {
-            isCtrlKeyDown = Keyboard.isKeyDown(Keyboard.KEY_LMETA) || Keyboard.isKeyDown(Keyboard.KEY_RMETA);
+            isCtrlKeyDown = InputUtil.isKeyDown(MinecraftClient.getInstance().window.getHandle(), GLFW.GLFW_KEY_LEFT_ALT) || InputUtil.isKeyDown(MinecraftClient.getInstance().window.getHandle(), GLFW.GLFW_KEY_RIGHT_ALT);
         }
         
         return isCtrlKeyDown;
     }
     
     public static boolean isShiftKeyDown() {
-        return Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
-        
+        return InputUtil.isKeyDown(MinecraftClient.getInstance().window.getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT) || InputUtil.isKeyDown(MinecraftClient.getInstance().window.getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT);
     }
     
     /**
      * Returns the actual color value for a chatformatting
      */
-    public static int enumChatFormattingToColor(TextFormat color) {
+    public static int enumChatFormattingToColor(Formatting color) {
         int i = color.getColorIndex();
         int j = (i >> 3 & 1) * 85;
         int k = (i >> 2 & 1) * 170 + j;
@@ -162,7 +170,7 @@ public class Util {
      * @param offset Position offset
      * @return Direction of the offset, or null if no direction
      */
-    public static EnumFacing facingFromOffset(BlockPos offset) {
+    public static Direction facingFromOffset(BlockPos offset) {
         return offsetMap.get(offset);
     }
     
@@ -173,7 +181,7 @@ public class Util {
      * @param neighbor Position Neighbor position
      * @return Direction of the offset, or null if no direction
      */
-    public static EnumFacing facingFromNeighbor(BlockPos pos, BlockPos neighbor) {
+    public static Direction facingFromNeighbor(BlockPos pos, BlockPos neighbor) {
         // neighbor is first. For example, neighbor height is 11, pos is 10, so result is 1 or up
         return facingFromOffset(neighbor.subtract(pos));
     }
@@ -187,40 +195,8 @@ public class Util {
      * @param hitZ Z hit location
      * @return True if the click was within the box
      */
-    public static boolean clickedAABB(BoundingBox aabb, float hitX, float hitY, float hitZ) {
+    public static boolean clickedAABB(Box aabb, float hitX, float hitY, float hitZ) {
         return aabb.minX <= hitX && hitX <= aabb.maxX && aabb.minY <= hitY && hitY <= aabb.maxY && aabb.minZ <= hitZ && hitZ <= aabb.maxZ;
     }
     
-    /**
-     * Sets the preference from the config. For internal use only
-     *
-     * @param celsius true for celsius, false for kelvin
-     */
-    public static void setTemperaturePref(boolean celsius) {
-        celsiusPref = celsius;
-    }
-    
-    /**
-     * Formats the given temperature as a string using the config preference
-     *
-     * @param temperature Temperature in kelvin
-     * @return Formatted string
-     */
-    public static String temperatureString(int temperature) {
-        return temperatureString(temperature, celsiusPref);
-    }
-    
-    /**
-     * Formats the given temperature as a string
-     *
-     * @param temperature Temperature in kelvin
-     * @param celsius     If true, displays a celsius, false kelvin
-     * @return Formatted string
-     */
-    public static String temperatureString(int temperature, boolean celsius) {
-        if (celsius) {
-            return translateFormatted("gui.general.temperature.celsius", temperature - 300);
-        }
-        return translateFormatted("gui.general.temperature.kelvin", temperature);
-    }
 }
