@@ -1,56 +1,41 @@
 package slimeknights.tconstruct;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.ModInitializer;
+import net.minecraft.data.DataGenerator;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.network.NetworkCheckHandler;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
+import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import slimeknights.mantle.common.GuiHandler;
 import slimeknights.mantle.pulsar.control.PulseManager;
 import slimeknights.tconstruct.common.ClientProxy;
-import slimeknights.tconstruct.common.CommonProxy;
+import slimeknights.tconstruct.common.ServerProxy;
 import slimeknights.tconstruct.common.TinkerNetwork;
-import slimeknights.tconstruct.common.TinkerOredict;
 import slimeknights.tconstruct.common.config.Config;
-import slimeknights.tconstruct.common.config.ConfigSync;
-import slimeknights.tconstruct.debug.TinkerDebug;
+import slimeknights.tconstruct.common.data.TConstructBlockTagsProvider;
+import slimeknights.tconstruct.common.data.TConstructItemTagsProvider;
+import slimeknights.tconstruct.common.data.TConstructLootTableProvider;
+import slimeknights.tconstruct.common.data.TConstructRecipeProvider;
+import slimeknights.tconstruct.fabric.DistExecutor;
+import slimeknights.tconstruct.fluids.TinkerFluids;
 import slimeknights.tconstruct.gadgets.TinkerGadgets;
 import slimeknights.tconstruct.library.Util;
 import slimeknights.tconstruct.library.book.TinkerBook;
-import slimeknights.tconstruct.library.capability.piggyback.CapabilityTinkerPiggyback;
-import slimeknights.tconstruct.library.capability.projectile.CapabilityTinkerProjectile;
-import slimeknights.tconstruct.library.utils.HarvestLevels;
-import slimeknights.tconstruct.plugin.Chisel;
-import slimeknights.tconstruct.plugin.ChiselAndBits;
-import slimeknights.tconstruct.plugin.CraftingTweaks;
-import slimeknights.tconstruct.plugin.quark.QuarkPlugin;
-import slimeknights.tconstruct.plugin.theoneprobe.TheOneProbe;
-import slimeknights.tconstruct.plugin.waila.Waila;
+import slimeknights.tconstruct.library.materials.MaterialManager;
+import slimeknights.tconstruct.library.materials.client.MaterialRenderManager;
 import slimeknights.tconstruct.shared.TinkerCommons;
-import slimeknights.tconstruct.shared.TinkerFluids;
-import slimeknights.tconstruct.smeltery.TinkerSmeltery;
-import slimeknights.tconstruct.tools.AggregateModelRegistrar;
-import slimeknights.tconstruct.tools.TinkerMaterials;
-import slimeknights.tconstruct.tools.TinkerModifiers;
-import slimeknights.tconstruct.tools.TinkerTools;
-import slimeknights.tconstruct.tools.harvest.TinkerHarvestTools;
-import slimeknights.tconstruct.tools.melee.TinkerMeleeWeapons;
-import slimeknights.tconstruct.tools.ranged.TinkerRangedWeapons;
 import slimeknights.tconstruct.world.TinkerWorld;
 
-import javax.annotation.Nonnull;
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -59,152 +44,74 @@ import java.util.Random;
  * @author mDiyo
  */
 
-@Mod(modid = TConstruct.modID,
-     name = TConstruct.modName,
-     version = TConstruct.modVersion,
-     guiFactory = "slimeknights.tconstruct.common.config.ConfigGui$ConfigGuiFactory",
-     dependencies = "required-after:forge@[14.23.1.2577,);"
-                    + "required-after:mantle@[1.12-1.3.3.49,);"
-                    + "after:jei@[4.8,);"
-                    + "before:taiga@(1.3.0,);"
-                    + "after:chisel;"
-                    + "after:quark@[r1.6-177,)",
-     acceptedMinecraftVersions = "[1.12, 1.13)")
-public class TConstruct {
-
-  public static final String modID = Util.MODID;
-  public static final String modVersion = "${version}";
-  public static final String modName = "Tinkers' Construct";
-
-  public static final Logger log = LogManager.getLogger(modID);
-  public static final Random random = new Random();
-
-  @Mod.Instance(modID)
-  public static TConstruct instance;
-
-  @SidedProxy(clientSide = "slimeknights.tconstruct.common.CommonProxy", serverSide = "slimeknights.tconstruct.common.CommonProxy")
-  public static CommonProxy proxy;
-
-  public static PulseManager pulseManager = new PulseManager(Config.pulseConfig);
-  public static GuiHandler guiHandler = new GuiHandler();
-
-  // Tinker pulses
-  static {
-    pulseManager.registerPulse(new TinkerCommons());
-    pulseManager.registerPulse(new TinkerWorld());
-
-    pulseManager.registerPulse(new TinkerTools());
-    pulseManager.registerPulse(new TinkerHarvestTools());
-    pulseManager.registerPulse(new TinkerMeleeWeapons());
-    pulseManager.registerPulse(new TinkerRangedWeapons());
-    pulseManager.registerPulse(new TinkerModifiers());
-
-    pulseManager.registerPulse(new TinkerSmeltery());
-    pulseManager.registerPulse(new TinkerGadgets());
-
-    pulseManager.registerPulse(new TinkerOredict()); // oredict the items added in the pulses before, needed for integration
-    pulseManager.registerPulse(new TinkerIntegration()); // takes care of adding all the fluids, materials, melting etc. together
-    pulseManager.registerPulse(new TinkerFluids());
-    pulseManager.registerPulse(new TinkerMaterials());
-
-    pulseManager.registerPulse(new AggregateModelRegistrar());
-    // Plugins/Integration
-    pulseManager.registerPulse(new Chisel());
-    pulseManager.registerPulse(new ChiselAndBits());
-    pulseManager.registerPulse(new CraftingTweaks());
-    pulseManager.registerPulse(new Waila());
-    pulseManager.registerPulse(new TheOneProbe());
-    pulseManager.registerPulse(new QuarkPlugin());
-
-    pulseManager.registerPulse(new TinkerDebug());
-
-    if(FMLCommonHandler.instance().getSide() == Side.CLIENT)
-    {
-      TinkerBook.init();
+public class TConstruct implements ModInitializer {
+    
+    public static final String modID = Util.MODID;
+    
+    public static final Logger log = LogManager.getLogger(modID);
+    public static final Random random = new Random();
+    
+    /* Instance of this mod, used for grabbing prototype fields */
+    public static TConstruct instance;
+    
+    public static ServerProxy proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
+    
+    public static PulseManager pulseManager;
+    
+    public TConstruct() {
+        instance = this;
     }
-  }
-
-  public TConstruct() {
-    if(Loader.isModLoaded("Natura")) {
-      log.info("Natura, what are we going to do tomorrow night?");
-      LogManager.getLogger("Natura").info("TConstruct, we're going to take over the world!");
+    
+    @Override
+    public void onInitialize() {
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.serverSpec);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.clientSpec);
+    
+        pulseManager = new PulseManager(Config.pulseConfig);
+        pulseManager.registerPulse(new TinkerCommons());
+        pulseManager.registerPulse(new TinkerFluids());
+        pulseManager.registerPulse(new TinkerWorld());
+        pulseManager.registerPulse(new TinkerGadgets());
+        pulseManager.enablePulses();
+    
+        DistExecutor.runWhenOn(EnvType.CLIENT, () -> TinkerBook::initBook);
+        DistExecutor.runWhenOn(EnvType.CLIENT, () -> () -> ((IReloadableResourceManager) Minecraft.getInstance().getResourceManager()).addReloadListener(new MaterialRenderManager()));
+    
+        MinecraftForge.EVENT_BUS.register(this);
+    
+        preInit();
+        init();
+        postInit();
     }
-    else {
-      log.info("Preparing to take over the world");
+    
+    public static void preInit() {
+        proxy.preInit();
+        
+        TinkerNetwork.instance.setup();
     }
-  }
-
-  //Force the client and server to have or not have this mod
-  @NetworkCheckHandler
-  public boolean matchModVersions(Map<String, String> remoteVersions, Side side) {
-
-    // we don't accept clients without TiC
-    if(side == Side.CLIENT) {
-      return remoteVersions.containsKey(modID);
+    
+    public static void init() {
+        proxy.init();
     }
-    // but we can connect to servers without TiC when TiC is present on the client
-    return !remoteVersions.containsKey(modID) || modVersion.equals(remoteVersions.get(modID));
-  }
-
-  @Mod.EventHandler
-  public void preInit(FMLPreInitializationEvent event) {
-    Config.load(event);
-
-    HarvestLevels.init();
-
-    NetworkRegistry.INSTANCE.registerGuiHandler(instance, guiHandler);
-
-    if(event.getSide().isClient()) {
-      ClientProxy.initClient();
-      ClientProxy.initRenderMaterials();
+    
+    public static void postInit() {
+        proxy.postInit();
     }
-
-    TinkerNetwork.instance.setup();
-    CapabilityTinkerPiggyback.register();
-    CapabilityTinkerProjectile.register();
-
-    MinecraftForge.EVENT_BUS.register(this);
-  }
-
-  @Mod.EventHandler
-  public void postInit(FMLPostInitializationEvent event) {
-    if(event.getSide().isClient()) {
-      ClientProxy.initRenderer();
+    
+    @SubscribeEvent
+    public static void gatherData(final GatherDataEvent event) {
+        DataGenerator datagenerator = event.getGenerator();
+        
+        if (event.includeServer()) {
+            datagenerator.addProvider(new TConstructBlockTagsProvider(datagenerator));
+            datagenerator.addProvider(new TConstructItemTagsProvider(datagenerator));
+            datagenerator.addProvider(new TConstructLootTableProvider(datagenerator));
+            datagenerator.addProvider(new TConstructRecipeProvider(datagenerator));
+        }
     }
-    else {
-      // config syncing
-      MinecraftForge.EVENT_BUS.register(new ConfigSync());
+    
+    @SubscribeEvent
+    public void onServerAboutToStart(final FMLServerAboutToStartEvent event) {
+        event.getServer().getResourceManager().addReloadListener(new MaterialManager());
     }
-  }
-
-
-  private static final String TINKERS_SKYBLOCK_MODID = "tinkerskyblock";
-  private static final String WOODEN_HOPPER = "wooden_hopper";
-
-  //Old version compatibility
-  @SubscribeEvent
-  public void missingItemMappings(RegistryEvent.MissingMappings<Item> event) {
-    for(RegistryEvent.MissingMappings.Mapping<Item> entry : event.getAllMappings()) {
-      @Nonnull
-      String path = entry.key.toString();
-      if(path.equals(Util.resource("bucket")) || path.equals(Util.resource("glow")) || path.equals(Util.resource("blood")) || path.equals(Util.resource("milk")) || path.equals(Util.resource("purpleslime")) || path.equals(Util.resource("blueslime")) || path.contains(Util.resource("molten"))) {
-        entry.ignore();
-      }
-
-      // wooder hopper, moved from skyblock to tic
-      if(entry.key.getResourceDomain().equals(TINKERS_SKYBLOCK_MODID) && entry.key.getResourcePath().equals(WOODEN_HOPPER)) {
-        entry.remap(Item.getItemFromBlock(TinkerGadgets.woodenHopper));
-      }
-    }
-  }
-
-  @SubscribeEvent
-  public void missingBlockMappings(RegistryEvent.MissingMappings<Block> event) {
-    for(RegistryEvent.MissingMappings.Mapping<Block> entry : event.getAllMappings()) {
-      // wooder hopper, moved from skyblock to tic
-      if(entry.key.getResourceDomain().equals(TINKERS_SKYBLOCK_MODID) && entry.key.getResourcePath().equals(WOODEN_HOPPER)) {
-        entry.remap(TinkerGadgets.woodenHopper);
-      }
-    }
-  }
 }

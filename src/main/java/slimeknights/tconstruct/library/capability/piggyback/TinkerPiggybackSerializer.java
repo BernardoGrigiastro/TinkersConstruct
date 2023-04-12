@@ -1,87 +1,92 @@
 package slimeknights.tconstruct.library.capability.piggyback;
 
 import com.google.common.collect.Maps;
-
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.chunk.storage.AnvilChunkLoader;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.util.LazyOptional;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.annotation.Nonnull;
-
-// This capability and serializer takes care of:
-// * Saving carried entities for SSP (otherwise they'd vanish)
-// * Tell the player when stuff riding him stops (otherwise other players dismounting wouldn't get dismounted for the carrying player)
-public class TinkerPiggybackSerializer implements ICapabilitySerializable<NBTTagCompound> {
-
-  private final EntityPlayer player;
-  private final ITinkerPiggyback piggyback;
-
-  public TinkerPiggybackSerializer(@Nonnull EntityPlayer player) {
-    this.player = player;
-    piggyback = new TinkerPiggybackHandler();
-    piggyback.setRiddenPlayer(player);
-  }
-
-  @Override
-  public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-    return capability == CapabilityTinkerPiggyback.PIGGYBACK;
-  }
-
-  @Override
-  public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-    if(capability == CapabilityTinkerPiggyback.PIGGYBACK) {
-      return (T) piggyback;
+public class TinkerPiggybackSerializer implements ICapabilitySerializable<CompoundTag> {
+    
+    private final PlayerEntity player;
+    private final ITinkerPiggyback piggyback;
+    private final LazyOptional<ITinkerPiggyback> providerCap;
+    
+    public TinkerPiggybackSerializer(@Nonnull PlayerEntity player) {
+        this.player = player;
+        this.piggyback = new TinkerPiggybackHandler();
+        this.piggyback.setRiddenPlayer(player);
+        this.providerCap = LazyOptional.of(() -> this.piggyback);
     }
-    return null;
-  }
-
-  @Override
-  public NBTTagCompound serializeNBT() {
-    NBTTagCompound tagCompound = new NBTTagCompound();
-    NBTTagList riderList = new NBTTagList();
-    // save riders
-    for(Entity entity : player.getRecursivePassengers()) {
-      String id = EntityList.getEntityString(entity);
-      if(id != null && !"".equals(id)) {
-        NBTTagCompound entityTag = new NBTTagCompound();
-        NBTTagCompound entityDataTag = new NBTTagCompound();
-        entity.writeToNBT(entityDataTag);
-        entityDataTag.setString("id", EntityList.getEntityString(entity));
-        entityTag.setUniqueId("Attach", entity.getRidingEntity().getUniqueID());
-        entityTag.setTag("Entity", entityDataTag);
-        riderList.appendTag(entityTag);
-      }
+    
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        if (cap == CapabilityTinkerPiggyback.PIGGYBACK) {
+            return this.providerCap.cast();
+        }
+        return LazyOptional.empty();
     }
-
-    tagCompound.setTag("riders", riderList);
-    if(riderList.hasNoTags()) {
-      return new NBTTagCompound();
+    
+    @Override
+    public CompoundTag serializeNBT() {
+        CompoundTag compoundNBT = new CompoundTag();
+        ListTag riderList = new ListTag();
+        
+        // save riders
+        for (Entity entity : this.player.getRecursivePassengers()) {
+            String id = entity.getEntityString();
+            if (id != null && !"".equals(id)) {
+                CompoundTag entityTag = new CompoundTag();
+                CompoundTag entityDataTag = new CompoundTag();
+                entity.writeWithoutTypeId(entityDataTag);
+                entityDataTag.putString("id", entity.getEntityString());
+                entityTag.putUniqueId("Attach", entity.getRidingEntity().getUniqueID());
+                entityTag.put("Entity", entityDataTag);
+                riderList.add(entityTag);
+            }
+        }
+        
+        compoundNBT.put("riders", riderList);
+        
+        if (riderList.isEmpty()) {
+            return new CompoundTag();
+        }
+        
+        return compoundNBT;
     }
-    return tagCompound;
-  }
-
-  @Override
-  public void deserializeNBT(NBTTagCompound nbt) {
-    NBTTagList riderList = nbt.getTagList("riders", 10);
-
-    Map<UUID, Entity> attachedTo = Maps.newHashMap();
-    for(int i = 0; i < riderList.tagCount(); i++) {
-      NBTTagCompound entityTag = riderList.getCompoundTagAt(i);
-      Entity entity = AnvilChunkLoader.readWorldEntity(entityTag.getCompoundTag("Entity"), player.getEntityWorld(), true);
-      if(entity != null) {
-        UUID uuid = entityTag.getUniqueId("Attach");
-
-        attachedTo.put(uuid, entity);
-      }
+    
+    @Override
+    public void deserializeNBT(CompoundTag nbt) {
+        ListTag riderList = nbt.getList("riders", 10);
+        
+        Map<UUID, Entity> attachedTo = Maps.newHashMap();
+        
+        if (this.player.getEntityWorld() instanceof ServerWorld) {
+            ServerWorld serverWorld = (ServerWorld) this.player.getEntityWorld();
+            
+            for (int i = 0; i < riderList.size(); i++) {
+                CompoundTag entityTag = riderList.getCompound(i);
+                Entity entity = EntityType.func_220335_a(entityTag.getCompound("Entity"), serverWorld, (p_217885_1_) -> {
+                    return !serverWorld.summonEntity(p_217885_1_) ? null : p_217885_1_;
+                });
+                if (entity != null) {
+                    UUID uuid = entityTag.getUniqueId("Attach");
+                    
+                    attachedTo.put(uuid, entity);
+                }
+            }
+        }
     }
-  }
 }

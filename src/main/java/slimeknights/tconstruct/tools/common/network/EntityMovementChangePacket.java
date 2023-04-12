@@ -1,69 +1,60 @@
 package slimeknights.tconstruct.tools.common.network;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
-import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.util.PacketByteBuf;
+import net.minecraftforge.fml.network.NetworkEvent;
+import slimeknights.mantle.network.AbstractPacket;
 
-import io.netty.buffer.ByteBuf;
-import slimeknights.mantle.network.AbstractPacketThreadsafe;
+import java.util.function.Supplier;
 
-public class EntityMovementChangePacket extends AbstractPacketThreadsafe {
-
-  public int entityID;
-  public double x;
-  public double y;
-  public double z;
-  public float yaw;
-  public float pitch;
-
-  public EntityMovementChangePacket() {
-  }
-
-  public EntityMovementChangePacket(Entity entity) {
-    this.entityID = entity.getEntityId();
-    this.x = entity.motionX;
-    this.y = entity.motionY;
-    this.z = entity.motionZ;
-    this.yaw = entity.rotationYaw;
-    this.pitch = entity.rotationPitch;
-  }
-
-  @Override
-  public void handleClientSafe(NetHandlerPlayClient netHandler) {
-    Entity entity = Minecraft.getMinecraft().world.getEntityByID(entityID);
-    if(entity != null) {
-      entity.motionX = x;
-      entity.motionY = y;
-      entity.motionZ = z;
-      entity.rotationYaw = yaw;
-      entity.rotationPitch = pitch;
+public class EntityMovementChangePacket extends AbstractPacket {
+    
+    public double x;
+    public double y;
+    public double z;
+    private int entityID;
+    private float yaw;
+    private float pitch;
+    
+    public EntityMovementChangePacket(Entity entity) {
+        this.entityID = entity.getEntityId();
+        this.x = entity.getMotion().x;
+        this.y = entity.getMotion().y;
+        this.z = entity.getMotion().z;
+        this.yaw = entity.yaw;
+        this.pitch = entity.pitch;
     }
-  }
-
-  @Override
-  public void handleServerSafe(NetHandlerPlayServer netHandler) {
-    // only ever sent to clients
-    throw new UnsupportedOperationException("Serverside only");
-  }
-
-  @Override
-  public void fromBytes(ByteBuf buf) {
-    this.entityID = buf.readInt();
-    this.x = buf.readDouble();
-    this.y = buf.readDouble();
-    this.z = buf.readDouble();
-    this.yaw = buf.readFloat();
-    this.pitch = buf.readFloat();
-  }
-
-  @Override
-  public void toBytes(ByteBuf buf) {
-    buf.writeInt(entityID);
-    buf.writeDouble(x);
-    buf.writeDouble(y);
-    buf.writeDouble(z);
-    buf.writeFloat(yaw);
-    buf.writeFloat(pitch);
-  }
+    
+    public EntityMovementChangePacket(PacketByteBuf buffer) {
+        this.entityID = buffer.readInt();
+        this.x = buffer.readDouble();
+        this.y = buffer.readDouble();
+        this.z = buffer.readDouble();
+        this.yaw = buffer.readFloat();
+        this.pitch = buffer.readFloat();
+    }
+    
+    @Override
+    public void encode(PacketByteBuf packetBuffer) {
+        packetBuffer.writeInt(this.entityID);
+        packetBuffer.writeDouble(this.x);
+        packetBuffer.writeDouble(this.y);
+        packetBuffer.writeDouble(this.z);
+        packetBuffer.writeFloat(this.yaw);
+        packetBuffer.writeFloat(this.pitch);
+    }
+    
+    @Override
+    public void handle(Supplier<NetworkEvent.Context> supplier) {
+        supplier.get().enqueueWork(() -> {
+            Entity entity = MinecraftClient.getInstance().world.getEntityByID(this.entityID);
+            if (supplier.get().getSender() != null && entity != null) {
+                entity.setMotion(this.x, this.y, this.z);
+                entity.yaw = this.yaw;
+                entity.pitch = this.pitch;
+            }
+        });
+        supplier.get().setPacketHandled(true);
+    }
 }

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "tconstruct",
+  "version": "${version}",
+  "name": "Tinkers' Construct",
+  "description": "A little of this, a little of that, a lot of tinkering, and a lot of tools",
+  "authors": [
+    "boni",
+    "KnightMiner",
+    "shedaniel"
+  ],
+  "contact": {
+    "homepage": "https://github.com/shedaniel/TinkersConstruct",
+    "sources": "https://github.com/shedaniel/TinkersConstruct",
+    "issues": "https://github.com/shedaniel/TinkersConstruct/issues"
+  },
+  "license": "MIT",
+  "icon": "logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "slimeknights.tconstruct.TConstruct"
+    ]
+  },
+  "mixins": [
+    "tconstruct.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.7.2",
+    "fabric": "*"
+  }
+}
